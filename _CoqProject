@@ -1,3 +1,10 @@
 -R . coqrel
 
+RelDefinitions.v
+RelOperators.v
+Relators.v
+MorphismsCompat.v
+Monotonicity.v
+Transport.v
 LogicalRelations.v
+LogicalRelationsTests.v
