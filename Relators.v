@@ -71,41 +71,6 @@ Notation "∀ - : 'rel' , FE" := (forall_pointwise_rel (fun _ => FE))
 Notation "∀ - : 'rel' v , FE" := (forall_pointwise_rel (fun v => FE))
   (at level 200, a at level 0).
 
-(** ** [Prop] constructions *)
-
-(** *** Monotonicity of logical connectives *)
-
-Global Instance all_monotonic A:
-  Proper ((- ==> impl) ++> impl) (@all A).
-Proof.
-  intros P Q HPQ H x.
-  apply HPQ.
-  apply H.
-Qed.
-
-Global Instance ex_monotonic A:
-  Proper ((- ==> impl) ++> impl) (@ex A).
-Proof.
-  intros P Q HPQ [x Hx].
-  exists x.
-  apply HPQ.
-  assumption.
-Qed.
-
-Global Instance and_monotonic:
-  Proper (impl ++> impl ++> impl) and.
-Proof.
-  intros P1 P2 HP Q1 Q2 HQ [HP1 HQ1].
-  eauto.
-Qed.
-
-Global Instance or_monotonic:
-  Proper (impl ++> impl ++> impl) or.
-Proof.
-  intros P1 P2 HP Q1 Q2 HQ [HP1|HQ1];
-  eauto.
-Qed.
-
 (** *** Sets ([A -> Prop]) *)
 
 (** Sets of type [A -> Prop] can be related using the regular arrow
@@ -400,4 +365,37 @@ Proof.
   - intros a1 a2 Ha.
     eapply IHHl.
     eapply Hfg; assumption.
+Qed.
+
+(** ** Monotonicity of logical connectives *)
+
+Global Instance all_monotonic A:
+  Proper ((- ==> impl) ++> impl) (@all A).
+Proof.
+  intros P Q HPQ H x.
+  apply HPQ.
+  apply H.
+Qed.
+
+Global Instance ex_monotonic A:
+  Proper ((- ==> impl) ++> impl) (@ex A).
+Proof.
+  intros P Q HPQ [x Hx].
+  exists x.
+  apply HPQ.
+  assumption.
+Qed.
+
+Global Instance and_monotonic:
+  Proper (impl ++> impl ++> impl) and.
+Proof.
+  intros P1 P2 HP Q1 Q2 HQ [HP1 HQ1].
+  eauto.
+Qed.
+
+Global Instance or_monotonic:
+  Proper (impl ++> impl ++> impl) or.
+Proof.
+  intros P1 P2 HP Q1 Q2 HQ [HP1|HQ1];
+  eauto.
 Qed.
