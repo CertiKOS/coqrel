@@ -118,7 +118,7 @@ Goal
          (Hxb: RB xb1 xb2)
          (Hya: RA ya1 ya2)
          (Hyb: RB yb1 yb2),
-    (RA * RB)%signature
+    (RA * RB)%rel
       (opA xa1 ya1, opB xb1 yb1)
       (opA xa2 ya2, opB xb2 yb2).
 Proof.

@@ -38,13 +38,14 @@ Hint Extern 1 (Convertible ?x ?y) =>
 Notation rel := (fun A1 A2 => A1 -> A2 -> Prop).
 
 (** Note that the status of [rel] as a notation, rather than an actual
-  definition, also prevents us from binding it to the [signature]
+  definition, also prevents us from binding it to a [rel]
   scope. As a workaround, we open it as a global scope; in most places
   the [type] scope will override it as required. However this is an
   imperfect solutions, and means we must scope type explicitely here
   and there. *)
 
-Open Scope signature_scope.
+Delimit Scope rel_scope with rel.
+Open Scope rel_scope.
 
 (** ** Proper elements *)
 
@@ -70,7 +71,7 @@ Open Scope signature_scope.
 
 Class ProperDef {A} (m: A) (R: rel A A) := proper_prf : R m m.
 
-Arguments ProperDef {_} _ R%signature.
+Arguments ProperDef {_} _ R%rel.
 
 Notation "'@' 'Proper' T R m" := (@ProperDef T m R)
   (at level 10, T at next level, R at next level, m at next level).
@@ -94,7 +95,7 @@ Class Related {A B} (R: rel A B) (m1: A) (m2: B) := related_prf : R m1 m2.
 (** When the two terms only differ in their implicit arguments, we can
   use the following shorthand. *)
 
-Notation Properish R m := (Related R%signature m m) (only parsing).
+Notation Properish R m := (Related R%rel m m) (only parsing).
 
 (** ** Order on relations *)
 
@@ -105,7 +106,7 @@ Notation Properish R m := (Related R%signature m m) (only parsing).
 Class subrel {A B} (R1 R2: rel A B) :=
   subrel_at x y: R1 x y -> R2 x y.
 
-Arguments subrel {A B} R1%signature R2%signature.
+Arguments subrel {A B} R1%rel R2%rel.
 
 Global Instance subrel_preorder A B:
   @PreOrder (rel A B) subrel.
@@ -136,16 +137,16 @@ Definition arrow_rel {A1 A2 B1 B2}:
   rel A1 A2 -> rel B1 B2 -> rel (A1 -> B1) (A2 -> B2) :=
     fun RA RB f g => forall x y, RA x y -> RB (f x) (g y).
 
-Arguments arrow_rel {_ _ _ _} RA%signature RB%signature _ _.
+Arguments arrow_rel {_ _ _ _} RA%rel RB%rel _ _.
 
 Notation "RA ==> RB" := (arrow_rel RA RB)
-  (at level 55, right associativity) : signature_scope.
+  (at level 55, right associativity) : rel_scope.
 
 Notation "RA ++> RB" := (arrow_rel RA RB)
-  (at level 55, right associativity) : signature_scope.
+  (at level 55, right associativity) : rel_scope.
 
 Notation "RA --> RB" := (arrow_rel (flip RA) RB)
-  (at level 55, right associativity) : signature_scope.
+  (at level 55, right associativity) : rel_scope.
 
 Global Instance arrow_subrel {A1 A2 B1 B2}:
   Proper (subrel --> subrel ++> subrel) (@arrow_rel A1 A2 B1 B2).
@@ -194,17 +195,17 @@ Definition forall_rel {V1 V2} {E: V1->V2->Type} {FV1: V1->Type} {FV2: V2->Type}:
   fun FE f g =>
     forall v1 v2 (e: E v1 v2), FE v1 v2 e (f v1) (g v2).
 
-Arguments forall_rel {_ _ _ _ _} FE%signature _ _.
+Arguments forall_rel {_ _ _ _ _} FE%rel _ _.
 
 Notation "∀  α : E v1 v2 , R" := (forall_rel (E := E) (fun v1 v2 α => R))
   (at level 200, α ident, E at level 7, v1 ident, v2 ident, right associativity)
-  : signature_scope.
+  : rel_scope.
 
 Notation "∀  α : E , R" := (forall_rel (E := E) (fun _ _ α => R))
   (at level 200, α ident, E at level 7, right associativity)
-  : signature_scope.
+  : rel_scope.
 
 Notation "∀  α , R" := (forall_rel (fun _ _ α => R))
   (at level 200, α ident, right associativity)
-  : signature_scope.
+  : rel_scope.
 

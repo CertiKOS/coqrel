@@ -5,9 +5,9 @@ Require Export RelDefinitions.
 Definition rel_union {A B} (R1 R2: rel A B): rel A B :=
   fun x y => R1 x y \/ R2 x y.
 
-Arguments rel_union {_ _} R1%signature R2%signature _ _.
+Arguments rel_union {_ _} R1%rel R2%rel _ _.
 
-Infix "∪" := rel_union (at level 50) : signature_scope.
+Infix "∪" := rel_union (at level 50) : rel_scope.
 
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
   subrel R1 (R1 ∪ R2).
@@ -30,7 +30,7 @@ Hint Extern 0 (subrel _ (_ ∪ _)) =>
 Lemma rel_union_lub {A B} (R1 R2 R: rel A B):
   subrel R1 R ->
   subrel R2 R ->
-  subrel (R1 ∪ R2)%signature R.
+  subrel (R1 ∪ R2)%rel R.
 Proof.
   firstorder.
 Qed.
@@ -43,9 +43,9 @@ Hint Extern 2 (subrel (_ ∪ _) _) =>
 Definition rel_inter {A B} (R1 R2: rel A B): rel A B :=
   fun x y => R1 x y /\ R2 x y.
 
-Arguments rel_inter {_ _} R1%signature R2%signature _ _.
+Arguments rel_inter {_ _} R1%rel R2%rel _ _.
 
-Infix "∩" := rel_inter (at level 40) : signature_scope.
+Infix "∩" := rel_inter (at level 40) : rel_scope.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
   subrel (R1 ∩ R2) R1.
@@ -124,12 +124,12 @@ Qed.
 Definition rel_bot {A B}: rel A B :=
   fun x y => False.
 
-Notation "⊥" := rel_bot : signature_scope.
+Notation "⊥" := rel_bot : rel_scope.
 
 Definition rel_top {A B}: rel A B :=
   fun x y => True.
 
-Notation "⊤" := rel_top : signature_scope.
+Notation "⊤" := rel_top : rel_scope.
 
 Hint Resolve (fun A B (x:A) (y:B) => I : rel_top x y).
 
@@ -138,7 +138,7 @@ Hint Resolve (fun A B (x:A) (y:B) => I : rel_top x y).
 Definition eqrel {A B}: rel (rel A B) (rel A B) :=
   (subrel ∩ flip subrel).
 
-Arguments eqrel {_ _} RA%signature RB%signature.
+Arguments eqrel {_ _} RA%rel RB%rel.
 
 Global Instance eqrel_equivalence A B:
   Equivalence (@eqrel A B).
@@ -220,8 +220,8 @@ Definition rsat {A B} (P: B -> Prop): rel A B :=
 (** ** Relation versions of [ex] and [all] *)
 
 (** Ideally we would overload the [forall] and [exists] notation to
-  use the relation version under the [signature] scope. But as long as
-  we keep [signature_scope] open globally, we can't really do that
+  use the relation version under the [rel] scope. But as long as
+  we keep [rel_scope] open globally, we can't really do that
   without breaking everything. So we use our own keyword [rexists] and
   [rforall] instead. *)
 
@@ -231,7 +231,7 @@ Definition rel_all {A B C} (R: C -> rel A B): rel A B :=
 Notation "'rforall' x .. y , p" :=
   (rel_all (fun x => .. (rel_all (fun y => p)) .. ))
   (at level 200, x binder, right associativity)
-  : signature_scope.
+  : rel_scope.
 
 Definition rel_ex {A B C} (R: C -> rel A B): rel A B :=
   fun x y => exists c, R c x y.
@@ -239,5 +239,5 @@ Definition rel_ex {A B C} (R: C -> rel A B): rel A B :=
 Notation "'rexists' x .. y , p" :=
   (rel_ex (fun x => .. (rel_ex (fun y => p)) ..))
   (at level 200, x binder, right associativity)
-  : signature_scope.
+  : rel_scope.
 

@@ -28,10 +28,10 @@ Definition arrow_pointwise_rel A {B1 B2}:
   rel B1 B2 -> rel (A -> B1) (A -> B2) :=
     fun RB f g => forall a, RB (f a) (g a).
 
-Arguments arrow_pointwise_rel _ {_ _} RB%signature _ _.
+Arguments arrow_pointwise_rel _ {_ _} RB%rel _ _.
 
 Notation "- ==> R" := (arrow_pointwise_rel _ R)
-  (at level 55, right associativity) : signature_scope.
+  (at level 55, right associativity) : rel_scope.
 
 Global Instance arrow_pointwise_subrel {A B1 B2}:
   Proper (subrel ++> subrel) (@arrow_pointwise_rel A B1 B2).
@@ -60,7 +60,7 @@ Definition forall_pointwise_rel {V: Type} {FV1 FV2: V -> Type}:
   fun FE f g =>
     forall v, FE v (f v) (g v).
 
-Arguments forall_pointwise_rel {_ _ _} FE%signature _ _.
+Arguments forall_pointwise_rel {_ _ _} FE%rel _ _.
 
 Notation "∀ - , FE" := (forall_pointwise_rel (fun _ => FE))
   (at level 200).
@@ -169,7 +169,7 @@ Inductive sum_rel {A1 A2} RA {B1 B2} RB: rel (A1 + B1)%type (A2 + B2)%type :=
   | inl_rel_def: (RA ++> sum_rel RA RB) (@inl A1 B1) (@inl A2 B2)
   | inr_rel_def: (RB ++> sum_rel RA RB) (@inr A1 B1) (@inr A2 B2).
 
-Infix "+" := sum_rel : signature_scope.
+Infix "+" := sum_rel : rel_scope.
 
 (** Since it is not possible to retype the constructors after the
   fact, we use the [_def] suffix when defining them, then redeclare
@@ -216,7 +216,7 @@ Proof.
   destruct Hxy; constructor; symmetry; eassumption.
 Qed.
 
-Arguments PreOrder A%type R%signature.
+Arguments PreOrder A%type R%rel.
 
 Global Instance sum_rel_preorder {A B} (R1: rel A A) (R2: rel B B):
   PreOrder R1 -> PreOrder R2 -> PreOrder (R1 + R2).
@@ -232,7 +232,7 @@ Hint Extern 0 (Proper _ (@inr)) => exact inr_rel : typeclass_instances.
 Definition prod_rel {A1 A2} RA {B1 B2} RB: rel (A1 * B1)%type (A2 * B2)%type :=
   fun x1 x2 => RA (fst x1) (fst x2) /\ RB (snd x1) (snd x2).
 
-Infix "*" := prod_rel : signature_scope.
+Infix "*" := prod_rel : rel_scope.
 
 Local Instance pair_rel:
   Proper (∀ RA, ∀ RB, RA ++> RB ++> RA * RB) (@pair).
