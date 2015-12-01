@@ -13,7 +13,8 @@ Require Import Coq.Lists.List.
   theorems by appending the suffix [_rel] to the name of original type
   and those of its constructors. Likewise, we use the suffix [_subrel]
   for monotonicity theorems that characterize the variance of
-  corresponding relators with respect to [subrel]. *)
+  corresponding relators with respect to [subrel], and the suffix
+  [_relim] for an associated instance of [RElim]. *)
 
 (** ** Relators for function types *)
 
@@ -38,6 +39,16 @@ Global Instance arrow_pointwise_subrel {A B1 B2}:
 Proof.
   firstorder.
 Qed.
+
+Lemma arrow_pointwise_relim {A B1 B2} (R: rel B1 B2) f g (a: A) P Q:
+  RElim R (f a) (g a) P Q ->
+  RElim (- ==> R) f g P Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
+  eapply arrow_pointwise_relim : typeclass_instances.
 
 Global Instance arrow_pointwise_eq_subrel {A B1 B2} (RB1 RB2: rel B1 B2):
   subrel RB1 RB2 ->
@@ -70,6 +81,16 @@ Notation "∀ - : 'rel' , FE" := (forall_pointwise_rel (fun _ => FE))
 
 Notation "∀ - : 'rel' v , FE" := (forall_pointwise_rel (fun v => FE))
   (at level 200, a at level 0).
+
+Lemma forall_pointwise_relim {V FV1 FV2} R f g v P Q:
+  RElim (R v) (f v) (g v) P Q ->
+  RElim (@forall_pointwise_rel V FV1 FV2 R) f g P Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RElim (forall_pointwise_rel _) _ _ _ _) =>
+  eapply forall_pointwise_relim : typeclass_instances.
 
 (** *** Sets ([A -> Prop]) *)
 

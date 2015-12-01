@@ -106,6 +106,30 @@ Qed.
 
 Notation Properish R m := (Related R%rel m m) (only parsing).
 
+(** ** Using relations *)
+
+(** As we extend our relations language with new relators, we need to
+  be able to extend the ways in which corresponding relational
+  properties can be applied to a given goal. The following type class
+  expresses that the relational property [R m n] can be applied to a
+  goal of type [Q], generating the subgoal [P]. *)
+
+Class RElim {A B} (R: rel A B) (m: A) (n: B) (P Q: Prop): Prop :=
+  relim: R m n -> P -> Q.
+
+Ltac relim H :=
+  eapply (relim H).
+
+(** The resolution process is directed by the syntax of [R]. We define
+  an instance for each function relator. The base case simply uses the
+  relational property as-is. *)
+
+Global Instance relim_base {A B} (R: rel A B) m n:
+  RElim R m n True (R m n).
+Proof.
+  firstorder.
+Qed.
+
 (** ** Order on relations *)
 
 (** This is our generalization of [subrelation]. Like the original it
@@ -163,6 +187,16 @@ Proof.
   firstorder.
 Qed.
 
+Lemma arrow_relim {A1 A2 B1 B2} RA RB f g m n P Q:
+  @RElim B1 B2 RB (f m) (g n) P Q ->
+  @RElim (A1 -> B1) (A2 -> B2) (RA ++> RB) f g (RA m n /\ P) Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RElim (_ ++> _) _ _ _ _) =>
+  eapply arrow_relim : typeclass_instances.
+
 (** *** Dependent products *)
 
 (** Now we consider the dependent case. The definition of [forall_rel]
@@ -218,3 +252,33 @@ Notation "∀  α , R" := (forall_rel (fun _ _ α => R))
   (at level 200, α ident, right associativity)
   : rel_scope.
 
+Lemma forall_relim {V1 V2 E FV1 FV2} R f g v1 v2 e P Q:
+  RElim (R v1 v2 e) (f v1) (g v2) P Q ->
+  RElim (@forall_rel V1 V2 E FV1 FV2 R) f g P Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RElim (forall_rel _) _ _ _ _) =>
+  eapply forall_relim : typeclass_instances.
+
+(** ** Inverse relation *)
+
+(** We use [flip] as our inversion relator. To this end we
+  characterize its variance and introduce an [RElim] rule. *)
+
+Global Instance flip_subrel {A B}:
+  Proper (subrel ++> subrel) (@flip A B Prop).
+Proof.
+  firstorder.
+Qed.
+
+Lemma flip_relim {A B} (R: rel A B) m n P Q:
+  RElim (flip R) n m P Q ->
+  RElim R m n P Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RElim (flip _) _ _ _ _) =>
+  eapply flip_relim : typeclass_instances.
