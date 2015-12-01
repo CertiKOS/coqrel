@@ -2,6 +2,7 @@ Require Export RelDefinitions.
 Require Export RelOperators.
 Require Export Relators.
 Require Import MorphismsCompat.
+Require Import Delay.
 
 (** ** The [monotonicity] tactic *)
 
@@ -107,67 +108,10 @@ Ltac remove_params m sk fk :=
 
   This means we need to somehow include the goal to which we want to
   apply the property as part of our typeclass query, and somehow reify
-  the effect of using [eapply] as part of resolution process. That's
-  the function of the following class: an instance of [EApply P Qs Q]
-  encodes the fact that applying a hypothesis of type [P] to a goal of
-  type [Q] succeeds, and generates subgoals [Q1], [Q2], ... [Qn],
-  assuming [Qs] has the form [Q1 /\ Q2 /\ ... /\ Qn /\ True]. *)
+  the effect of using [eapply] as part of resolution process. This is
+  done using the [EApply] class from the [Delay] library.
 
-Class EApply (P Qs Q: Prop) :=
-  eapply : P -> Qs -> Q.
-
-Module EApply.
-  (** To build such an instance, we're going to progressively build
-    the conjunction [Qs], by starting with an existential variable and
-    adding conjuncts as required.
-
-    The following tactic uses the open conjunction [H] to solve the
-    current goal. The last conjunct should be an existential
-    hole. Each time we need to reify a new subgoal we will add one
-    more conjunct by unifying that hole with a new conjunction,
-    consisting of that goal and a new hole.
-
-    Note to self: when unifying, existential variable instantiation
-    works by *defining* them to a value, but does not replace them
-    with that value until ltac is done executing. Although here we
-    found a way to get away without it, sometimes we need to
-    explicitely reduce them in order to get to the definition. Simply
-    matching an evar that has been unified earlier in the execution
-    will not. *)
-
-  Ltac use_conjunction H :=
-    first [ use_conjunction (proj2 H) | eapply (proj1 H) ].
-
-  (** [use_conjunction] allows us to solve [EApply] instances in the
-    following way. Note that the conjunction will still have a
-    dangling existential hole, however we will unify that with [True]
-    when we unpack it again using [split_conjunction] below. *)
-
-  Ltac reify :=
-    let HP := fresh in
-    let HQs := fresh in
-    intros HP HQs;
-    eapply HP; use_conjunction HQs.
-
-  Hint Extern 1 (EApply ?P _ ?Q) =>
-    (*idtac "EApply:" P Q;*)
-    EApply.reify : typeclass_instances.
-
-  (** Once we've done that, we've packaged all of the goals we solved
-    using [use_conjunction] into a single hypothesis, which will be
-    the [Qs] argument to [eapply] in the [EApply] class. When we want
-    to use the reified application, we can use the following tactic to
-    split up that conjunction into individual subgoals again. *)
-
-  Ltac split_conjunction :=
-    match goal with
-      | |- _ /\ _ => split; [ | split_conjunction]
-      | |- _ => exact I
-      | |- ?Q => fail 1 "split_conjunction: improper terminator" Q
-    end.
-End EApply.
-
-(** Now that we can encode the effect of [eapply] in the typeclass
+  With effect of [eapply] encoded into the typeclass
   infrastructure, the resolution process is straightforward: find an
   instance of [Related], attempt to apply it to the goal [Q], and if
   that succeeds, use the result to build an instance of the following
@@ -220,7 +164,7 @@ Ltac monotonicity :=
     (*idtac "Query successful.";*)
     eapply H;
     clear H;
-    EApply.split_conjunction in
+    Delay.split_conjunction in
   let apply_rel_left m1 :=
     let A := type of m1 in
     let Bv := fresh "B" in evar (Bv: Type);
