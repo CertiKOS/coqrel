@@ -106,7 +106,7 @@ Class Monotonicity {A B} (R: rel A B) (x: A) (y: B) (Qs Q: Prop) :=
 
 Global Instance related_monotonicity {A B} (R: rel A B) x y Qs Q:
   Related R x y ->
-  EApply (R x y) Qs Q ->
+  RElim R x y Qs Q ->
   Monotonicity R x y Qs Q.
 Proof.
   firstorder.
