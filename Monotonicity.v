@@ -1,7 +1,6 @@
 Require Export RelDefinitions.
 Require Export RelOperators.
 Require Export Relators.
-Require Import MorphismsCompat.
 Require Import Delay.
 
 (** ** The [monotonicity] tactic *)
@@ -12,21 +11,6 @@ Require Import Delay.
   setoid rewriting, [monotonicity] is less powerful, but more direct
   and simple. This means it is easier to debug, and it can seamlessly
   handle dependent types and heterogenous relations. *)
-
-(** *** Using [Proper] instances *)
-
-(** Although [Related] won't help with setoid rewriting, it is used as
-  as the resolution mechanism for the monotonicity tactic. To make
-  sure we can use [Proper] instances as well we introduce the
-  following instance. At the moment, [monotonicity] does not use any
-  of the preprocessing phases for its [ProperQuery]. *)
-
-Global Instance query_related {A} (R: rel A A) (m: A):
-  ProperQuery nil R m ->
-  Related R m m.
-Proof.
-  firstorder.
-Qed.
 
 (** *** Truncating applications *)
 
