@@ -92,6 +92,8 @@ Notation Proper R m := (ProperDef m R).
 
 Class Related {A B} (R: rel A B) (m1: A) (m2: B) := related_prf : R m1 m2.
 
+Arguments Related {_ _} R%rel _ _.
+
 Global Instance proper_related {A} (R: rel A A) (m: A):
   Proper R m ->
   Related R m m.
