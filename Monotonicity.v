@@ -167,8 +167,18 @@ Proof.
   firstorder.
 Qed.
 
+(** The Ltac tactic simply applies [monotonicity]; typeclass
+  resolution will do the rest. Note that using [apply] naively is too
+  lenient because in a goal of type [A -> B], it will end up unifying
+  [A] with [P] and [B] with [Q] instead of setting [Q := A -> B] and
+  generating a new subgoal for [P] as expected. On the other hand,
+  using [refine] directly is too restrictive because it will not unify
+  the type of [monotonicity] against the goal if existential variables
+  are present in one or the other. Hence we constrain apply just
+  enough, so as to handle both of these cases. *)
+
 Ltac monotonicity :=
-  refine (monotonicity _);
+  lazymatch goal with |- ?Q => apply (monotonicity (Q:=Q)) end;
   Delay.split_conjunction.
 
 (** Convert goals of the form [P -> Q] to use the [impl] relation. *)
