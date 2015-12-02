@@ -168,8 +168,17 @@ Proof.
 Qed.
 
 Ltac monotonicity :=
-  apply monotonicity;
+  refine (monotonicity _);
   Delay.split_conjunction.
+
+(** Convert goals of the form [P -> Q] to use the [impl] relation. *)
+
+Global Instance impl_monotonicity P Q1 Q2:
+  Monotonicity P (impl Q1 Q2) ->
+  Monotonicity P (Q1 -> Q2).
+Proof.
+  firstorder.
+Qed.
 
 (** Our version of [Morphisms.f_equiv]. *)
 

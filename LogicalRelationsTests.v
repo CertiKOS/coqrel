@@ -94,6 +94,15 @@ Proof.
   solve_monotonic.
 Qed.
 
+Goal
+  forall P Q R,
+    impl Q R ->
+    (impl P Q) -> (impl P R).
+Proof.
+  intros P Q R HPQ.
+  solve_monotonic.
+Qed.
+
 (** ** Using [foo_subrel] instances *)
 
 Goal
