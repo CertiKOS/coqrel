@@ -92,6 +92,36 @@ Qed.
 Hint Extern 1 (RElim (forall_pointwise_rel _) _ _ _ _) =>
   eapply forall_pointwise_relim : typeclass_instances.
 
+(** *** Dependent products (restricted version) *)
+
+(** This is a restricted version of [forall_rel] with [E] in [Prop],
+  when the codomain relation only depends on the arguments. *)
+
+Definition forallp_rel {V1 V2} (E: rel V1 V2) {FV1: V1->Type} {FV2: V2->Type}:
+    (forall v1 v2, rel (FV1 v1) (FV2 v2)) ->
+    rel (forall v1, FV1 v1) (forall v2, FV2 v2) :=
+  fun FE f g =>
+    forall v1 v2, E v1 v2 -> FE v1 v2 (f v1) (g v2).
+
+Arguments forallp_rel {_ _} _ {_ _} FE%rel _ _.
+
+Notation "∀ ( v1 , v2 ) : E , R" := (forallp_rel E (fun v1 v2 => R))
+  (at level 200, E at level 7, v1 ident, v2 ident, right associativity)
+  : rel_scope.
+
+(** Since [e : E v1 v2] cannot be unified in [Q], the elimination rule
+  adds an [E v1 v2] premise to [P] instead. *)
+
+Lemma forallp_relim {V1 V2 E FV1 FV2} R f g v1 v2 P Q:
+  RElim (R v1 v2) (f v1) (g v2) P Q ->
+  RElim (@forallp_rel V1 V2 E FV1 FV2 R) f g (E v1 v2 /\ P) Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RElim (forallp_rel _ _) _ _ _ _) =>
+  eapply forallp_relim : typeclass_instances.
+
 (** *** Sets ([A -> Prop]) *)
 
 (** Sets of type [A -> Prop] can be related using the regular arrow
