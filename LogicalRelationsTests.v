@@ -103,6 +103,20 @@ Proof.
   solve_monotonic.
 Qed.
 
+(** Check that we can use relational hypotheses from the context as
+  well as [Proper] and [Related] instances. *)
+
+Goal
+  forall
+    {A B} (R: rel A A)
+    (op: A -> B) (Hop: (R ++> eq) op op)
+    (x y: A) (Hxy: R x y),
+    op x = op y.
+Proof.
+  intros.
+  solve_monotonic.
+Qed.
+
 (** ** Using [foo_subrel] instances *)
 
 Goal

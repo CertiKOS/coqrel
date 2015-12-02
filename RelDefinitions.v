@@ -106,6 +106,23 @@ Qed.
 
 Notation Properish R m := (Related R%rel m m) (only parsing).
 
+(** Sometimes we don't have a [Related] instance, but a hypothesis is
+  available. Here we assume that we will always want such hypotheses
+  to be used, at least when the left- or right-hand side match
+  exactly. There is a possibility that this ends up being too broad
+  for some applications, for which we'll want to restrict ourselves to
+  [Related] instances explicitely defined by the user. If this turns
+  out to be the case, we can introduce an intermediate class with more
+  parameters to control the sources of the relational properties we
+  use, and perhaps have some kind of normalization process akin to
+  what is done in [Coq.Classes.Morphisms]. *)
+
+Hint Extern 0 (Related ?R ?m ?n) =>
+  match goal with
+    | H: _ ?m _ |- _ => eexact H
+    | H: _ _ ?n |- _ => eexact H
+  end : typeclass_instances.
+
 (** ** Using relations *)
 
 (** As we extend our relations language with new relators, we need to
