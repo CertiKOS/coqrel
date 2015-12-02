@@ -70,121 +70,106 @@ Ltac remove_params m sk fk :=
   let t := type of m in
   get_params h ltac:(remove_from_partial m t) fk.
 
-(** *** Selecting a monotonicity property *)
+(** When [get_params] fails, we need to enumerate all possible
+  prefixes for a given application. This typeclass provides
+  corresponding instances. When conducting a query, the first argument
+  should be the application, the second argument should be an
+  existential variable to be filled in. *)
 
-(** We want [monotonicity] to first select a property, then apply it
-  to the goal with the [eapply] tactic. This way, much of the work is
-  outsourced to [eapply] and Coq's unification algorithms in terms of
-  partial application, instantiating existential variables, generating
-  multiple subgoals, etc.
+Class IsPrefixOf {A B} (m: B) (f: A).
 
-  Unfortunately, by the time we've resolved a property to apply using
-  [assert by typeclasses eauto], we've committed to one specific
-  instance of [Related], which may or may not be the right one if
-  several of them are available. To fix this, we need to somehow
-  embed the [eapply] into typeclasses resolution so that we can
-  leverage its backtracking process. This is particulaly important
-  with parametric instances of [Related] which themselves may rely on
-  further resolution, which themselves may have multiple instances. As
-  an example, in [liblayers] a common occurence is that the context
-  offers two different memory models which have to be chosen
-  appropriately.
+Global Instance is_prefix_of_self {A} (f: A):
+  IsPrefixOf f f.
 
-  This means we need to somehow include the goal to which we want to
-  apply the property as part of our typeclass query, and somehow reify
-  the effect of using [eapply] as part of resolution process. This is
-  done using the [EApply] class from the [Delay] library.
+Lemma switch_to_prefix_of {A A' B} {m: A} (m': A') (f: B):
+  IsPrefixOf m' f ->
+  IsPrefixOf m f.
+Proof.
+  constructor.
+Qed.
 
-  With effect of [eapply] encoded into the typeclass
-  infrastructure, the resolution process is straightforward: find an
-  instance of [Related], attempt to apply it to the goal [Q], and if
-  that succeeds, use the result to build an instance of the following
-  class. *)
+Hint Extern 1 (IsPrefixOf (?m ?n) ?f) =>
+  eapply (switch_to_prefix_of m) : typeclass_instances.
 
-Class Monotonicity {A B} (R: rel A B) (x: A) (y: B) (Qs Q: Prop) :=
-  monotonicity: Qs -> Q.
+(** Next, we reify [remove_params] as the [RemoveParams] class.
+  An instance of [RemoveParams m f] indicates that [f] is a possible
+  prefix of the application [m], as constrained by any declared
+  [Params] instance. *)
 
-Global Instance related_monotonicity {A B} (R: rel A B) x y Qs Q:
-  Related R x y ->
-  RElim R x y Qs Q ->
-  Monotonicity R x y Qs Q.
+Class RemoveParams {A B} (m: A) (f: B).
+
+(** To resolve [RemoveParams m f], we attempt to use [remove_params]
+  on [m]. If that succeeds, we unify the result with [f]. *)
+
+Lemma remove_params_direct {A B} {m: A} (f: B):
+  RemoveParams m f.
+Proof.
+  constructor.
+Qed.
+
+(* Otherwise, we allow any prefix of [m] to be used. *)
+
+Lemma remove_params_anyprefix {A B} (m: A) (f: B):
+  IsPrefixOf m f ->
+  RemoveParams m f.
+Proof.
+  constructor.
+Qed.
+
+Hint Extern 1 (RemoveParams ?m _) =>
+  remove_params m
+    ltac:(fun f => eapply (remove_params_direct f))
+    ltac:(eapply remove_params_anyprefix) : typeclass_instances.
+
+(** *** Selecting a relational property *)
+
+Class CandidateProperty {A B} (R: rel A B) m n (Q: Prop) :=
+  candidate_related: Related R m n.
+
+Lemma candidate_l {A B GA GB} (R: rel A B) f g (QR: rel GA GB) m n:
+  RemoveParams m f ->
+  Related R f g ->
+  CandidateProperty R f g (QR m n).
 Proof.
   firstorder.
 Qed.
 
+Hint Extern 2 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
+  not_evar m; eapply candidate_l : typeclass_instances.
+
+Lemma candidate_r {A B QA QB} (R: rel A B) f g (QR: rel QA QB) m n:
+  RemoveParams n g ->
+  Related R f g ->
+  CandidateProperty R f g (QR m n).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 3 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
+  not_evar n; eapply candidate_r : typeclass_instances.
 
 (** *** Main tactic *)
 
-(* Also, sometimes we don't have a [Proper] instance, but we do have
-  an applicable hypothesis of the form [(RA ++> RB) f g] or similar in
-  the context, for instance an induction hypothesis, or one of the
-  premises when proving the monotonicity properties of high-order
-  functions. The [monotonicity] tactic attempts to apply such
-  hypotheses as well. *)
+(** With these components, defining the [monotonicity] tactic is
+  straightforward: identify a candidate property, then figure out a
+  way to apply it to the goal [Q] using the [RElim] class. We first
+  define a [Monotonicity] typeclass that captures this behavior with
+  full backatracking ability. *)
+
+Class Monotonicity (P Q: Prop): Prop :=
+  monotonicity: P -> Q.
+
+Global Instance apply_candidate {A B} (R: rel A B) m n P Q:
+  CandidateProperty R m n Q ->
+  RElim R m n P Q ->
+  Monotonicity P Q.
+Proof.
+  firstorder.
+Qed.
 
 Ltac monotonicity :=
-  let rec iter_prefixes apply_tac m :=
-    idtac; (* needed, for some obscure reason *)
-    match m with
-      | _ => apply_tac m
-      | ?f _ => iter_prefixes apply_tac f
-    end in
-  let apply_hyp_left m1 :=
-    match goal with
-      | H: _ m1 _ |- _ => eapply H
-    end in
-  let apply_hyp_right m2 :=
-    match goal with
-      | H: _ _ m2 |- _ => eapply H
-    end in
-  let apply_rel R m1 m2 :=
-    let Qsv := fresh "Qs" in evar (Qsv: Prop);
-    let Qs := eval red in Qsv in clear Qsv;
-    let H := fresh in
-    lazymatch goal with
-      | |- ?Q =>
-        assert (H: Monotonicity R m1 m2 Qs Q) by typeclasses eauto
-    end;
-    (*idtac "Query successful.";*)
-    eapply H;
-    clear H;
-    Delay.split_conjunction in
-  let apply_rel_left m1 :=
-    let A := type of m1 in
-    let Bv := fresh "B" in evar (Bv: Type);
-    let B := eval red in Bv in clear Bv;
-    let Rv := fresh "R" in evar (Rv: rel A B);
-    let Re := eval red in Rv in clear Rv;
-    let m2v := fresh "m2" in evar (m2v: B);
-    let m2 := eval red in m2v in clear m2v;
-    apply_rel Re m1 m2 in
-  let apply_rel_right m2 :=
-    let Av := fresh "A" in evar (Av: Type);
-    let A := eval red in Av in clear Av;
-    let B := type of m2 in
-    let Rv := fresh "R" in evar (Rv: rel A B);
-    let Re := eval red in Rv in clear Rv;
-    let m1v := fresh "m1" in evar (m1v: A);
-    let m1 := eval red in m1v in clear m1v;
-    apply_rel Re m1 m2 in
-  let apply_both_left m1 :=
-    first [ apply_hyp_left m1 | apply_rel_left m1 ] in
-  let apply_both_right m2 :=
-    first [ apply_hyp_right m2 | apply_rel_right m2 ] in
-  lazymatch goal with
-    | |- ?R ?m1 ?m2 =>
-      first
-        [ not_evar m1;
-          remove_params m1
-            ltac:(fun m => first [ iter_prefixes apply_hyp_left m1 | apply_rel_left m ])
-            ltac:(iter_prefixes apply_both_left m1)
-        | not_evar m2;
-          remove_params m2
-            ltac:(fun m => first [ iter_prefixes apply_hyp_right m2 | apply_rel_right m ])
-            ltac:(iter_prefixes apply_both_right m2) ]
-    | |- ?P -> ?Q =>
-      change (impl P Q); monotonicity
-  end.
+  apply monotonicity;
+  Delay.split_conjunction.
 
 (** Our version of [Morphisms.f_equiv]. *)
 
