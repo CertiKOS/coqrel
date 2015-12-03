@@ -135,7 +135,10 @@ Class RElim {A B} (R: rel A B) (m: A) (n: B) (P Q: Prop): Prop :=
   relim: R m n -> P -> Q.
 
 Ltac relim H :=
-  eapply (relim H).
+  lazymatch goal with
+    | |- ?Q =>
+      apply (relim (Q:=Q) H)
+  end.
 
 (** The resolution process is directed by the syntax of [R]. We define
   an instance for each function relator. The base case simply uses the
