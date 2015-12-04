@@ -80,7 +80,7 @@ Module Delay.
 
   Ltac delayed tac :=
     delayed_conjunction tac;
-    [ | split_conjunction ].
+    [ .. | split_conjunction ].
 End Delay.
 
 Tactic Notation "delayed" tactic1(tac) :=
