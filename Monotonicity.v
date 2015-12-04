@@ -181,6 +181,18 @@ Ltac monotonicity :=
   lazymatch goal with |- ?Q => apply (monotonicity (Q:=Q)) end;
   Delay.split_conjunction.
 
+(** Another way to use [Monotonicity] is to hook it as an [RIntro]
+  instance. This makes sense because the introduction rules for
+  relators of inductive types are expressed as monotonicity properties
+  for their constructors. *)
+
+Global Instance monotonicity_rintro {A B} (P: Prop) (R: rel A B) m n:
+  Monotonicity P (R m n) ->
+  RIntro P R m n.
+Proof.
+  firstorder.
+Qed.
+
 (** Convert goals of the form [P -> Q] to use the [impl] relation. *)
 
 Global Instance impl_monotonicity P Q1 Q2:

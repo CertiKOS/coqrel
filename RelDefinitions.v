@@ -123,6 +123,18 @@ Hint Extern 0 (Related ?R ?m ?n) =>
     | H: _ _ ?n |- _ => eexact H
   end : typeclass_instances.
 
+(** ** *)
+
+Class RIntro {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
+  rintro: P -> R m n.
+
+Ltac rintro :=
+  lazymatch goal with
+    | |- ?R ?m ?n =>
+      apply (rintro (R:=R) (m:=m) (n:=n));
+      intros
+  end.
+
 (** ** Using relations *)
 
 (** As we extend our relations language with new relators, we need to
@@ -207,6 +219,12 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance arrow_rintro {A1 A2 B1 B2} (RA: rel A1 A2) (RB: rel B1 B2) f g:
+  RIntro (forall x y, RA x y -> RB (f x) (g y)) (RA ++> RB) f g.
+Proof.
+  firstorder.
+Qed.
+
 Lemma arrow_relim {A1 A2 B1 B2} RA RB f g m n P Q:
   @RElim B1 B2 RB (f m) (g n) P Q ->
   @RElim (A1 -> B1) (A2 -> B2) (RA ++> RB) f g (RA m n /\ P) Q.
@@ -272,6 +290,14 @@ Notation "∀  α , R" := (forall_rel (fun _ _ α => R))
   (at level 200, α ident, right associativity)
   : rel_scope.
 
+Global Instance forall_rintro {V1 V2 E F1 F2} (FE: forall x y, _ -> rel _ _) f g:
+  RIntro
+    (forall u v e, FE u v e (f u) (g v))
+    (@forall_rel V1 V2 E F1 F2 FE) f g.
+Proof.
+  firstorder.
+Qed.
+
 Lemma forall_relim {V1 V2 E FV1 FV2} R f g v1 v2 e P Q:
   RElim (R v1 v2 e) (f v1) (g v2) P Q ->
   RElim (@forall_rel V1 V2 E FV1 FV2 R) f g P Q.
@@ -289,6 +315,12 @@ Hint Extern 1 (RElim (forall_rel _) _ _ _ _) =>
 
 Global Instance flip_subrel {A B}:
   Proper (subrel ++> subrel) (@flip A B Prop).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance flip_rintro {A B} (R: rel A B) m n:
+  RIntro (R n m) (flip R) m n.
 Proof.
   firstorder.
 Qed.

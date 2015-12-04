@@ -40,6 +40,12 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
+  RIntro (forall x: A, R (f x) (g x)) (- ==> R) f g.
+Proof.
+  firstorder.
+Qed.
+
 Lemma arrow_pointwise_relim {A B1 B2} (R: rel B1 B2) f g (a: A) P Q:
   RElim R (f a) (g a) P Q ->
   RElim (- ==> R) f g P Q.
@@ -82,6 +88,14 @@ Notation "∀ - : 'rel' , FE" := (forall_pointwise_rel (fun _ => FE))
 Notation "∀ - : 'rel' v , FE" := (forall_pointwise_rel (fun v => FE))
   (at level 200, a at level 0).
 
+Global Instance forall_pointwise_rintro {V FV1 FV2} (FE: forall v, rel _ _) f g:
+  RIntro
+    (forall v, FE v (f v) (g v))
+    (@forall_pointwise_rel V FV1 FV2 FE) f g.
+Proof.
+  firstorder.
+Qed.
+
 Lemma forall_pointwise_relim {V FV1 FV2} R f g v P Q:
   RElim (R v) (f v) (g v) P Q ->
   RElim (@forall_pointwise_rel V FV1 FV2 R) f g P Q.
@@ -108,6 +122,14 @@ Arguments forallp_rel {_ _} _ {_ _} FE%rel _ _.
 Notation "∀ ( v1 , v2 ) : E , R" := (forallp_rel E (fun v1 v2 => R))
   (at level 200, E at level 7, v1 ident, v2 ident, right associativity)
   : rel_scope.
+
+Global Instance forallp_rintro {V1 V2} {E: rel V1 V2} {F1 F2} (FE: forall v1 v2, rel _ _) f g:
+  RIntro
+    (forall v1 v2, E v1 v2 -> FE v1 v2 (f v1) (g v2))
+    (@forallp_rel V1 V2 E F1 F2 FE) f g.
+Proof.
+  firstorder.
+Qed.
 
 (** Since [e : E v1 v2] cannot be unified in [Q], the elimination rule
   adds an [E v1 v2] premise to [P] instead. *)
