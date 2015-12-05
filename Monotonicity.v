@@ -167,6 +167,25 @@ Proof.
   firstorder.
 Qed.
 
+(** We also exploit [Reflexive] instances. A reflexive relation is one
+  for which all elements are proper elements. Then reflexivity is a
+  kind of general, nullary monotonicity property. In fact, in
+  principle we should use [Reflexive] to declare a generic [Proper] or
+  [Related] instance, and the instance below would follow. However,
+  such instances end up polluting the resolution process and causing
+  premature instanciations of existential variables.
+
+  Instead, we only use the following instance as a last resort, and
+  only to satisfy the goal directly (not in the search for relational
+  properties). *)
+
+Global Instance reflexive_monotonicity {A} (R: rel A A) (m: A):
+  Reflexive R ->
+  Monotonicity True (R m m) | 10.
+Proof.
+  firstorder.
+Qed.
+
 (** The Ltac tactic simply applies [monotonicity]; typeclass
   resolution will do the rest. Note that using [apply] naively is too
   lenient because in a goal of type [A -> B], it will end up unifying
