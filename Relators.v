@@ -46,15 +46,32 @@ Proof.
   firstorder.
 Qed.
 
-Lemma arrow_pointwise_relim {A B1 B2} (R: rel B1 B2) f g (a: A) P Q:
-  RElim R (f a) (g a) P Q ->
-  RElim (- ==> R) f g P Q.
+(** Note that although the elimination rule could use a single
+  variable and dispense with the equality premise, it actually uses
+  two distinct variables [m] and [n], and a premise in [P] that [m = n].
+  Hence the effect is similar to the elimination rule for the
+  equivalent relation [eq ==> R]. We do this because in contexts where
+  we have a single term [t] against which both [m] and [n] unify, it
+  is easy and cheap to automatically prove that [t = t], but in
+  contexts where we have two disctinct variables and a proof of
+  equality, it is more involved to massage the goal into a form where
+  the single-variable version of the rule could apply. *)
+
+Lemma arrow_pointwise_relim {A B1 B2} (R: rel B1 B2) f g (m n: A) P Q:
+  RElim R (f m) (g n) P Q ->
+  RElim (- ==> R) f g (m = n /\ P) Q.
 Proof.
+  intros HPQ Hfg [Hab HP].
+  subst.
   firstorder.
 Qed.
 
 Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
   eapply arrow_pointwise_relim : typeclass_instances.
+
+(** XXX not sure weather that's necessary; if it is we'll probably
+  need to restrict its use more (by using an extern hint with
+  pattern). *)
 
 Global Instance arrow_pointwise_eq_subrel {A B1 B2} (RB1 RB2: rel B1 B2):
   subrel RB1 RB2 ->
