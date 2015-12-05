@@ -115,9 +115,15 @@ Notation Properish R m := (Related R%rel m m) (only parsing).
   out to be the case, we can introduce an intermediate class with more
   parameters to control the sources of the relational properties we
   use, and perhaps have some kind of normalization process akin to
-  what is done in [Coq.Classes.Morphisms]. *)
+  what is done in [Coq.Classes.Morphisms].
+
+  Note that it is important that we reduce the goal to [?R ?m ?n]
+  before we use [eexact]: if the relation in the hypothesis is an
+  existential variable, we want it unified against [?R], rather than
+  [Related ?R]. *)
 
 Hint Extern 0 (Related ?R ?m ?n) =>
+  red;
   match goal with
     | H: _ ?m _ |- _ => eexact H
     | H: _ _ ?n |- _ => eexact H
