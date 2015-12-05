@@ -154,7 +154,7 @@ Hint Extern 3 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
   straightforward: identify a candidate property, then figure out a
   way to apply it to the goal [Q] using the [RElim] class. We first
   define a [Monotonicity] typeclass that captures this behavior with
-  full backatracking ability. *)
+  full backtracking ability. *)
 
 Class Monotonicity (P Q: Prop): Prop :=
   monotonicity: P -> Q.
