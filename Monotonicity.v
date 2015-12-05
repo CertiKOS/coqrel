@@ -263,22 +263,11 @@ Ltac solve_monotonic_tac t :=
     let H := fresh in
     assert (H: Rm m1 m2) by solve_monotonic_tac t;
     conclusion_progress ltac:(destruct H) in
-  repeat
-    match goal with
+  let step :=
+    lazymatch goal with
       | |- Proper _ _ => red
       | |- Related _ _ _ => red
-      | |- flip _ _ _ => red
-      | |- _ => progress t
-      | |- _ _ _ => monotonicity
-      | |- _ -> _ => monotonicity
-      | |- (_ --> _) _ _ => let H := fresh in intros ? ? H; red in H
-      | |- (_ ++> _) _ _ => intros ? ? ?
-      | |- (- ==> _) _ _ => intro
-      | |- (∀ _, _) _ _ => intros ? ? ?
-      | |- (∀ -, _) _ _ => intro
-      | |- (rforall _, _) _ _ => intro
-      | |- _ ?x ?x => reflexivity
-      | |- forall _, _ => intro
+      | |- ?P -> ?Q => change (impl P Q)
       | |- _ (match ?m with _ => _ end) (match ?m with _ => _ end) =>
         destruct m
       | |- _ (if ?m then _ else _) (if ?m then _ else _) =>
@@ -287,7 +276,10 @@ Ltac solve_monotonic_tac t :=
         destruct_both m1 m2
       | |- _ (if ?m1 then _ else _) (if ?m2 then _ else _) =>
         destruct_both m1 m2
-    end.
+      | |- _ =>
+        rintro
+    end in
+  first [ step; solve_monotonic_tac t | t ].
 
 Tactic Notation "solve_monotonic" :=
   solve_monotonic_tac ltac:(eassumption || congruence || (now econstructor)).
