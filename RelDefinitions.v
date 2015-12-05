@@ -129,10 +129,17 @@ Class RIntro {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rintro: P -> R m n.
 
 Ltac rintro :=
+  let rec postprocess :=
+    intros;
+    lazymatch goal with
+      | |- _ /\ _ => split; postprocess
+      | |- True => constructor
+      | _ => idtac
+    end in
   lazymatch goal with
     | |- ?R ?m ?n =>
       apply (rintro (R:=R) (m:=m) (n:=n));
-      intros
+      postprocess
   end.
 
 (** ** Using relations *)
