@@ -326,11 +326,14 @@ Proof.
   firstorder.
 Qed.
 
-Global Instance flip_rintro {A B} (R: rel A B) m n:
+Lemma flip_rintro {A B} (R: rel A B) m n:
   RIntro (R n m) (flip R) m n.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 1 (RIntro _ (flip _) _ _) =>
+  eapply flip_rintro : typeclass_instances.
 
 Lemma flip_relim {A B} (R: rel A B) m n P Q:
   RElim (flip R) n m P Q ->
