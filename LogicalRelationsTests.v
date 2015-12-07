@@ -117,6 +117,19 @@ Proof.
   solve_monotonic.
 Qed.
 
+(** Bug with relational parametricity: you can't [RElim] a relation
+  you don't know yet. *)
+
+Goal
+  forall {A B} (RA: rel A A) (RB: rel B B) (m n: (A -> B) * B) (x y: A),
+    ((- ==> RB) * RB)%rel m n ->
+    RB (fst m x) (fst n x).
+Proof.
+  intros A B RA RB m n x y Hmn.
+  try monotonicity.
+  try solve_monotonic.
+Abort.
+
 (** ** Using [foo_subrel] instances *)
 
 Goal
