@@ -177,14 +177,18 @@ Qed.
 
   Instead, we only use the following instance as a last resort, and
   only to satisfy the goal directly (not in the search for relational
-  properties). *)
+  properties). This allows us to insist the related terms be exactly
+  identical, not just unifiable. *)
 
-Global Instance reflexive_monotonicity {A} (R: rel A A) (m: A):
+Lemma reflexive_monotonicity {A} (R: rel A A) (m: A):
   Reflexive R ->
-  Monotonicity True (R m m) | 10.
+  Monotonicity True (R m m).
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 10 (Monotonicity _ (?R ?m ?m)) =>
+  eapply reflexive_monotonicity : typeclass_instances.
 
 (** The Ltac tactic simply applies [monotonicity]; typeclass
   resolution will do the rest. Note that using [apply] naively is too
