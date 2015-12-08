@@ -233,6 +233,15 @@ Notation "'rforall' x .. y , p" :=
   (at level 200, x binder, right associativity)
   : rel_scope.
 
+Lemma rel_all_rintro {A B C} (R: C -> rel A B) m n:
+  RIntro (forall c : C, R c m n) (rel_all R) m n.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ (rel_all _) _ _) =>
+  eapply rel_all_rintro : typeclass_instances.
+
 Lemma rel_all_relim {A B C} (R: C -> rel A B) x y P Q:
   (exists c, RElim (R c) x y P Q) ->
   RElim (rel_all R) x y P Q.
@@ -250,6 +259,15 @@ Notation "'rexists' x .. y , p" :=
   (rel_ex (fun x => .. (rel_ex (fun y => p)) ..))
   (at level 200, x binder, right associativity)
   : rel_scope.
+
+Lemma rel_ex_rintro {A B C} (R: C -> rel A B) m n:
+  RIntro (exists c : C, R c m n) (rel_ex R) m n.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ (rel_ex _) _ _) =>
+  eapply rel_ex_rintro : typeclass_instances.
 
 Lemma rel_ex_relim {A B C} (R: C -> rel A B) x y P Q:
   (forall c, RElim (R c) x y P Q) ->
