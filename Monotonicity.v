@@ -148,6 +148,50 @@ Qed.
 Hint Extern 3 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
   not_evar n; eapply candidate_r : typeclass_instances.
 
+(** *** Using [subrel] *)
+
+(** It is not obvious at what point in the process [subrel] should be
+  hooked in. One thing we crucially want to avoid is an open-ended
+  [subrel] search enumerating all possibilities to be filtered later,
+  with a high potential for exponential blow-up should the user be a
+  little too liberal with the [subrel] instances they declare.
+
+  Here I choose to have it kick in after a candidate property has been
+  selected, and we know how to apply it to a goal. Then we use
+  [subrel] to bridge any gap between that goal and the actual one,
+  through the [RImpl] class below.
+
+  This is a conservative solution which precludes many interesting
+  usages of [subrel]. For instance, suppose we have a relational
+  property alogn the lines of [Proper ((R1 ++> R1) ∩ (R2 ++> R2)) f].
+  We would want to be able to use it to show that [f] preserve [R1] or
+  [R2] individually (because [subrel (R1 ++> R1) ((R1 ++> R1) ∩ (R2
+  ++> R2))], but also together (because [subrel (R1 ∩ R2 ++> R1 ∩ R2)
+  ((R1 ++> R1) ∩ (R2 ++> R2))]). This cannot be done using this
+  approach, which does not act on the relational property itself but
+  only the goal we're attempting to prove.
+
+  Perhaps in the future we can extend this by acting at the level of
+  [RElim]. In any case, we should provide explicit guidelines for when
+  to declare [subrel] instances, and how. *)
+
+Class RImpl (P Q: Prop): Prop :=
+  rimpl: P -> Q.
+
+Global Instance rimpl_refl P:
+  RImpl P P.
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rimpl_subrel {A B} (R R': rel A B) m n:
+  subrel R R' ->
+  Unconvertible _ R R' -> (* should be by convention on instances of [subrel]? *)
+  RImpl (R m n) (R' m n).
+Proof.
+  firstorder.
+Qed.
+
 (** *** Main tactic *)
 
 (** With these components, defining the [monotonicity] tactic is
@@ -159,9 +203,10 @@ Hint Extern 3 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
 Class Monotonicity (P Q: Prop): Prop :=
   monotonicity: P -> Q.
 
-Global Instance apply_candidate {A B} (R: rel A B) m n P Q:
+Global Instance apply_candidate {A B} (R: rel A B) m n P Q Q':
   CandidateProperty R m n Q ->
-  RElim R m n P Q ->
+  RElim R m n P Q' ->
+  RImpl Q' Q ->
   Monotonicity P Q.
 Proof.
   firstorder.
