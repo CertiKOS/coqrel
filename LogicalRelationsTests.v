@@ -130,6 +130,19 @@ Proof.
   try solve_monotonic.
 Abort.
 
+(** Pattern matching *)
+
+Goal
+  forall {A B} (RA: rel A A) (RB: rel B B) (x y: A) (f: A -> A + B),
+    RA x y ->
+    (RA ++> RA + RB) f f ->
+    RA (match f x with inl a => a | inr b => x end)
+       (match f y with inl a => a | inr b => y end).
+Proof.
+  intros.
+  solve_monotonic.
+Qed.
+
 (** ** Using [foo_subrel] instances *)
 
 Goal
