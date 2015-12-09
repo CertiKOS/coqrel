@@ -198,6 +198,15 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance eq_subrel {A} (R: rel A A):
+  Reflexive R ->
+  subrel eq R.
+Proof.
+  intros HR x y H.
+  subst.
+  reflexivity.
+Qed.
+
 
 (** * Core relators *)
 
