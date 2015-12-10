@@ -205,7 +205,16 @@ Ltac split_hyps :=
   note that it is important that we first let [solve_monotonic] unify
   all it can, then use the [split_hyp] tactic, which can now split
   things that use [prod_rel], which are common in contexts where
-  [rel_uncurry] is involved. *)
+  [rel_uncurry] is involved.
+
+  Another pitfall we want to avoid is illustrated by the [option_rel]
+  case. When we have a hypothesis of the form [H: m = Some a], but no
+  interesting way to relate [m] to something else, then the search for
+  [(option_rel ?R) m ?n] can end up using [H] itself (because
+  [option_rel eq] is reflexive, hence [subrel_eq] applies). To prevent
+  such cases we need to make sure that the hypothesis being
+  transported is not used to discharge the relational premise, and so
+  we [clear H] prior to invoking [solve_monotonic]. *)
 
 Ltac transport H :=
   let Av := fresh "A" in evar (Av: Type);
@@ -223,7 +232,7 @@ Ltac transport H :=
   let PB := eval red in PBv in clear PBv;
   let HT := fresh in
   assert (HT: Transport R a b PA PB) by typeclasses eauto;
-  eapply HT in H; clear HT; [ | solve [solve_monotonic]];
+  eapply HT in H; clear HT; [ | solve [clear H; solve_monotonic]];
   split_hyp H.
 
 (** Again we provide a tactic which attempts to transport all
