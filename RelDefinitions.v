@@ -1,5 +1,6 @@
 Require Export Coq.Program.Basics.
 Require Export Coq.Classes.Morphisms.
+Require Setoid.
 
 (** * Prerequisites *)
 
