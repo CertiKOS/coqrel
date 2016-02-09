@@ -103,7 +103,7 @@ Notation "∀ - : 'rel' , FE" := (forall_pointwise_rel (fun _ => FE))
   (at level 200).
 
 Notation "∀ - : 'rel' v , FE" := (forall_pointwise_rel (fun v => FE))
-  (at level 200, a at level 0).
+  (at level 200, v at level 0).
 
 Global Instance forall_pointwise_rintro {V FV1 FV2} (FE: forall v, rel _ _) f g:
   RIntro
