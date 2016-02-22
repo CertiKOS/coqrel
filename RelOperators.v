@@ -187,27 +187,107 @@ Proof.
   split; intros x y; firstorder; congruence.
 Qed.
 
+(** ** Pulling a relation along functions *)
+
+Definition rel_pull {A B A' B'} f g (R: rel A' B'): rel A B :=
+  fun x y => R (f x) (g y).
+
+Notation "R @@ f" := (rel_pull f f R)
+  (at level 30, right associativity) : rel_scope.
+
+Notation "R @@ ( f , g )" := (rel_pull f g R)
+  (at level 30, right associativity) : rel_scope.
+
+Global Instance rel_pull_subrel {A B A' B'} (f: A -> A') (g: B -> B'):
+  Proper (subrel ++> subrel) (rel_pull f g).
+Proof.
+  firstorder.
+Qed.
+
+(** In the restricted case where [f = g], [rel_pull] preserves many
+  properties of the underlying relation. *)
+
+Lemma rel_pull_refl {A B} (f: A -> B) (R: rel B B):
+  Reflexive R ->
+  Reflexive (R @@ f).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (rel_pull _ _ _)) =>
+  eapply rel_pull_refl : typeclass_instances.
+
+Lemma rel_pull_sym {A B} (f: A -> B) R:
+  Symmetric R ->
+  Symmetric (R @@ f).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Symmetric (rel_pull _ _ _)) =>
+  eapply rel_pull_sym : typeclass_instances.
+
+Lemma rel_pull_trans {A B} (f: A -> B) R:
+  Transitive R ->
+  Transitive (R @@ f).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Transitive (rel_pull _ _ _)) =>
+  eapply rel_pull_trans : typeclass_instances.
+
+(** We can also reuse instances of [RIntro] and [RElim] for the
+  underlying relation to provide corresponding instances for the
+  pulled relation. *)
+
+Lemma rel_pull_rintro {A B A' B'} (f: A -> A') (g: B -> B') P R x y:
+  RIntro P R (f x) (g y) ->
+  RIntro P (R @@ (f, g)) x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RIntro _ (_ @@ (_, _)) _ _) =>
+  eapply rel_pull_rintro : typeclass_instances.
+
+Lemma rel_pull_relim {A B A' B'} (f: A -> A') (g: B -> B') R x y P Q:
+  RElim R (f x) (g y) P Q ->
+  RElim (R @@ (f, g)) x y P Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RElim (_ @@ (_, _)) _ _ _ _) =>
+  eapply rel_pull_relim : typeclass_instances.
+
 (** ** Relation currying *)
 
-(* [rel_curry] is particularly useful when two (curried) arguments
+(* An interesting special case of [rel_pull] is [rel_curry], which
+  takes a relation over [A * B -> C] and turns it into a relation
+  over [A -> B -> C].
+
+  [rel_curry] is particularly useful when two (curried) arguments
   to a given function have to be related in a dependent way. For
   example in Compcert, memory injections relate memory blocks and
   offsets jointly, but many operations have those as two separate
   arguments. To state the relational property of such operations, we
-  can uncurry a joint relation on (block, offset) pairs. *)
+  can uncurry a joint relation on (block, offset) pairs.
 
-Definition rel_curry {A1 A2 B1 B2 C1 C2}:
-    rel (A1  * B1 -> C1) (A2  * B2 -> C2) ->
-    rel (A1 -> B1 -> C1) (A2 -> B2 -> C2) :=
-  fun R f g =>
-    R (fun x => f (fst x) (snd x))
-      (fun y => g (fst y) (snd y)).
+  [rel_curry] can be obtained by pulling back the original relation
+  along [uncurry]: *)
 
-Global Instance rel_curry_subrel A1 A2 B1 B2 C1 C2:
-  Proper (subrel ++> subrel) (@rel_curry A1 A2 B1 B2 C1 C2).
-Proof.
-  firstorder.
-Qed.
+Definition curry {A B C} (f: A * B -> C): A -> B -> C :=
+  fun a b => f (a, b).
+
+Definition uncurry {A B C} (f: A -> B -> C): A * B -> C :=
+  fun ab => f (fst ab) (snd ab).
+
+Notation rel_curry :=
+  (fun R => R @@ (uncurry, uncurry)).
+
+Notation rel_uncurry :=
+  (fun R => R @@ (curry, curry)).
 
 (** ** Checking predicates on the left and right elements *)
 
