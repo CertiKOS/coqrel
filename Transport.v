@@ -91,10 +91,10 @@ Ltac set_rel_transport keyword :=
   end.
       
 (** We defined a few more relation patterns based on [set_rel] and
-  [rel_uncurry], with a similar strategy. *)
+  [rel_curry], with a similar strategy. *)
 
-Lemma rel_uncurry_set_rel_transport {A1 A2 B1 B2} R sA sB (a1: A1) (a2: A2):
-  Transport (rel_uncurry (set_rel R)) sA sB
+Lemma rel_curry_set_rel_transport {A1 A2 B1 B2} R sA sB (a1: A1) (a2: A2):
+  Transport (rel_curry (set_rel R)) sA sB
     (sA a1 a2)
     (exists (b1: B1) (b2: B2), sB b1 b2 /\ R (a1, a2) (b1, b2)).
 Proof.
@@ -102,7 +102,7 @@ Proof.
   destruct (HsAB (a1, a2)) as ([b1 b2] & Hb & Hab); eauto.
 Qed.
 
-Ltac rel_uncurry_set_rel_transport keyword :=
+Ltac rel_curry_set_rel_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
@@ -112,12 +112,12 @@ Ltac rel_uncurry_set_rel_transport keyword :=
           let Yv := fresh "Y" in evar (Yv: Type);
           let Y := eval red in Yv in clear Yv;
           unify B (X -> Y -> Prop);
-          eapply rel_uncurry_set_rel_transport
+          eapply rel_curry_set_rel_transport
       end
   end.
 
-Lemma rel_uncurry2_set_rel_transport {A1 A2 A3 B1 B2 B3} R sA sB (a1: A1) (a2: A2) (a3: A3):
-  Transport (rel_uncurry (rel_uncurry (set_rel R))) sA sB
+Lemma rel_curry2_set_rel_transport {A1 A2 A3 B1 B2 B3} R sA sB (a1: A1) (a2: A2) (a3: A3):
+  Transport (rel_curry (rel_curry (set_rel R))) sA sB
     (sA a1 a2 a3)
     (exists (b1: B1) (b2: B2) (b3: B3), sB b1 b2 b3 /\ R (a1, a2, a3) (b1, b2, b3)).
 Proof.
@@ -125,7 +125,7 @@ Proof.
   destruct (HsAB (a1, a2, a3)) as ([[b1 b2] b3] & Hb & Hab); eauto.
 Qed.
 
-Ltac rel_uncurry2_set_rel_transport keyword :=
+Ltac rel_curry2_set_rel_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
@@ -137,7 +137,7 @@ Ltac rel_uncurry2_set_rel_transport keyword :=
           let Zv := fresh "Y" in evar (Yv: Type);
           let Z := eval red in Yv in clear Yv;
           unify B (X -> Y -> Z -> Prop);
-          eapply rel_uncurry2_set_rel_transport
+          eapply rel_curry2_set_rel_transport
       end
   end.
 
@@ -205,7 +205,7 @@ Ltac split_hyps :=
   note that it is important that we first let [solve_monotonic] unify
   all it can, then use the [split_hyp] tactic, which can now split
   things that use [prod_rel], which are common in contexts where
-  [rel_uncurry] is involved.
+  [rel_curry] is involved.
 
   Another pitfall we want to avoid is illustrated by the [option_rel]
   case. When we have a hypothesis of the form [H: m = Some a], but no

@@ -189,22 +189,22 @@ Qed.
 
 (** ** Relation currying *)
 
-(* [rel_uncurry] is particularly useful when two (curried) arguments
+(* [rel_curry] is particularly useful when two (curried) arguments
   to a given function have to be related in a dependent way. For
   example in Compcert, memory injections relate memory blocks and
   offsets jointly, but many operations have those as two separate
   arguments. To state the relational property of such operations, we
   can uncurry a joint relation on (block, offset) pairs. *)
 
-Definition rel_uncurry {A1 A2 B1 B2 C1 C2}:
+Definition rel_curry {A1 A2 B1 B2 C1 C2}:
     rel (A1  * B1 -> C1) (A2  * B2 -> C2) ->
     rel (A1 -> B1 -> C1) (A2 -> B2 -> C2) :=
   fun R f g =>
     R (fun x => f (fst x) (snd x))
       (fun y => g (fst y) (snd y)).
 
-Global Instance rel_uncurry_subrel A1 A2 B1 B2 C1 C2:
-  Proper (subrel ++> subrel) (@rel_uncurry A1 A2 B1 B2 C1 C2).
+Global Instance rel_curry_subrel A1 A2 B1 B2 C1 C2:
+  Proper (subrel ++> subrel) (@rel_curry A1 A2 B1 B2 C1 C2).
 Proof.
   firstorder.
 Qed.
