@@ -232,7 +232,8 @@ Ltac transport H :=
   let PB := eval red in PBv in clear PBv;
   let HT := fresh in
   assert (HT: Transport R a b PA PB) by typeclasses eauto;
-  eapply HT in H; clear HT; [ | solve [clear H; solve_monotonic]];
+  eapply (transport (Transport := HT)) in H; clear HT;
+  [ | solve [clear H; solve_monotonic]];
   split_hyp H.
 
 (** Again we provide a tactic which attempts to transport all
