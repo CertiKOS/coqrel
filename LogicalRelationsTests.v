@@ -143,6 +143,17 @@ Proof.
   solve_monotonic.
 Qed.
 
+(** [rel_curry] *)
+
+Goal
+  forall {A B C} R R' S (f: A -> B -> B -> C) (x1 y1: A) (x2 y2: B),
+    Proper (rel_curry (R ++> R' ++> S)) f ->
+    S (f x1 x2 x2) (f y1 y2 y2).
+Proof.
+  intros A B C R R' S f x1 y1 x2 y2 Hf.
+  monotonicity.
+Abort.
+
 (** ** Using [foo_subrel] instances *)
 
 Goal

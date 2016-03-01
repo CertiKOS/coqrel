@@ -192,10 +192,10 @@ Qed.
 Definition rel_pull {A B A' B'} f g (R: rel A' B'): rel A B :=
   fun x y => R (f x) (g y).
 
-Notation "R @@ f" := (rel_pull f f R)
+Notation "R @@ ( f , g )" := (rel_pull f g R)
   (at level 30, right associativity) : rel_scope.
 
-Notation "R @@ ( f , g )" := (rel_pull f g R)
+Notation "R @@ f" := (rel_pull f f R)
   (at level 30, right associativity) : rel_scope.
 
 Global Instance rel_pull_subrel {A B A' B'} (f: A -> A') (g: B -> B'):
@@ -281,13 +281,77 @@ Definition curry {A B C} (f: A * B -> C): A -> B -> C :=
   fun a b => f (a, b).
 
 Definition uncurry {A B C} (f: A -> B -> C): A * B -> C :=
-  fun ab => f (fst ab) (snd ab).
+  fun ab => match ab with (a, b) => f a b end.
 
-Notation rel_curry :=
-  (fun R => R @@ (uncurry, uncurry)).
+Definition rel_curry {A1 B1 C1 A2 B2 C2} (R: rel (A1*B1->C1) (A2*B2->C2)) :=
+  R @@ uncurry.
 
-Notation rel_uncurry :=
-  (fun R => R @@ (curry, curry)).
+Definition rel_uncurry {A1 B1 C1 A2 B2 C2} (R: rel (A1->B1->C1) (A2->B2->C2)) :=
+  R @@ curry.
+
+(** In order to provide an [RElim] instance for [rel_curry], we will
+  rely on the fact that:
+
+      uncurry f (x1, x2) x3 ... xn = f x1 x2 x3 ... xn,
+
+  and that:
+
+      rel_curry R f g <-> R (uncurry f) (uncurry g),
+
+  so that when the instance of [RElim] associated with [R] allows us
+  to show:
+
+      Rcod (uncurry f (x1, x2) x3 ... xn) (uncurry g (y1, y2) y3 ... yn)
+
+  we can convert it into an instance for proving:
+
+      Rcod (f x1 x2 x3 ... xn) (g y1 y2 y3 ... yn),
+
+  which is what will be expected for [monotonicity]. To accomplish
+  this, we need to [unfold uncurry] in the result provided for [R]
+  before we use it to solve the [rel_uncurry] case. This helper class
+  does this. *)
+
+Class UnfoldUncurry {A} (before: A) (after: A) :=
+  unfold_uncurry_before_after: before = after.
+
+Ltac unfold_uncurry :=
+  match goal with
+    | |- appcontext C[uncurry ?f ?p] =>
+      is_evar p;
+      lazymatch type of p with
+        | prod ?A ?B =>
+          let av := fresh in evar (av : A);
+          let a := eval red in av in clear av;
+          let bv := fresh in evar (bv : B);
+          let b := eval red in bv in clear bv;
+          let G := context C[f a b] in
+          unify p (a, b);
+          change G
+      end
+  end.
+
+Hint Extern 1 (UnfoldUncurry ?P ?Q) =>
+  repeat unfold_uncurry; constructor : typeclass_instances.
+
+(** Now we can provide a somewhat general [RElim] instance for
+  [rel_uncurry]. *)
+
+Lemma rel_curry_relim {A1 B1 C1 A2 B2 C2} R f g P Q Q':
+  @RElim (A1 * B1 -> C1) (A2 * B2 -> C2) R (uncurry f) (uncurry g) P Q ->
+  UnfoldUncurry Q Q' ->
+  @RElim (A1 -> B1 -> C1) (A2 -> B2 -> C2) (rel_curry R) f g P Q'.
+Proof.
+  unfold UnfoldUncurry.
+  intros; subst.
+  assumption.
+Qed.
+
+Hint Extern 1 (RIntro _ (rel_curry _) _ _) =>
+  eapply rel_pull_rintro : typeclass_instances.
+
+Hint Extern 1 (RElim (rel_curry _) _ _ _ _) =>
+  eapply rel_curry_relim : typeclass_instances.
 
 (** ** Checking predicates on the left and right elements *)
 
