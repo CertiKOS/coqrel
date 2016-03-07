@@ -198,6 +198,9 @@ Notation "R @@ ( f , g )" := (rel_pull f g R)
 Notation "R @@ f" := (rel_pull f f R)
   (at level 30, right associativity) : rel_scope.
 
+Notation "R @@ ( f )" := (rel_pull f f R)
+  (at level 30, right associativity) : rel_scope.
+
 Global Instance rel_pull_subrel {A B A' B'} (f: A -> A') (g: B -> B'):
   Proper (subrel ++> subrel) (rel_pull f g).
 Proof.
