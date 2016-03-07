@@ -322,16 +322,19 @@ Ltac unfold_uncurry :=
   match goal with
     | |- appcontext C[uncurry ?f ?p] =>
       is_evar p;
-      lazymatch type of p with
-        | prod ?A ?B =>
-          let av := fresh in evar (av : A);
-          let a := eval red in av in clear av;
-          let bv := fresh in evar (bv : B);
-          let b := eval red in bv in clear bv;
-          let G := context C[f a b] in
-          unify p (a, b);
-          change G
-      end
+      let T := type of p in
+      let Av := fresh in evar (Av: Type);
+      let A := eval red in Av in clear Av;
+      let Bv := fresh in evar (Bv: Type);
+      let B := eval red in Bv in clear Bv;
+      unify T (prod A B)%type;
+      let av := fresh in evar (av : A);
+      let a := eval red in av in clear av;
+      let bv := fresh in evar (bv : B);
+      let b := eval red in bv in clear bv;
+      let G := context C[f a b] in
+      unify p (a, b);
+      change G
   end.
 
 Hint Extern 1 (UnfoldUncurry ?P ?Q) =>
