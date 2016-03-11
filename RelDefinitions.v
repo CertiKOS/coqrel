@@ -130,24 +130,51 @@ Hint Extern 0 (Related ?R ?m ?n) =>
     | H: _ _ ?n |- _ => eexact H
   end : typeclass_instances.
 
-(** ** *)
+(** ** Resolution step *)
+
+(** This is a catch-all class for any applicable strategy allowing us
+  to make progress when resolving a relational goal. The new goal [P]
+  may not be a relational goal itself. In the corresponding tactic,
+  quantified variables in [P] are intro'ed and conjunctions are split. *)
+
+Class RStep {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
+  rstep: P -> R m n.
+
+Ltac rstep_postprocess :=
+  intros;
+  lazymatch goal with
+    | |- _ /\ _ => split; rstep_postprocess
+    | |- True => constructor
+    | _ => idtac
+  end.
+
+Ltac rstep :=
+  lazymatch goal with
+    | |- ?R ?m ?n =>
+      apply (rstep (R:=R) (m:=m) (n:=n));
+      rstep_postprocess
+  end.
+
+(** ** Introduction rules *)
+
+(** In effect, [RIntro] is pretty much identical to [RStep], but we
+  like to separate introduction rules and the [rintro] tactic. *)
 
 Class RIntro {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rintro: P -> R m n.
 
 Ltac rintro :=
-  let rec postprocess :=
-    intros;
-    lazymatch goal with
-      | |- _ /\ _ => split; postprocess
-      | |- True => constructor
-      | _ => idtac
-    end in
   lazymatch goal with
     | |- ?R ?m ?n =>
       apply (rintro (R:=R) (m:=m) (n:=n));
-      postprocess
+      rstep_postprocess
   end.
+
+Global Instance rintro_rstep:
+  forall `(RIntro), RStep P R m n.
+Proof.
+  firstorder.
+Qed.
 
 (** ** Using relations *)
 
