@@ -198,3 +198,16 @@ Proof.
   intros A1 A2 B1 B2 C1 C2 R1 R2 R1' R HR12 x y H.
   try rewrite HR12.
 Abort.
+
+(** ** The [preorder] tactic *)
+
+Goal
+  forall {A} (R S T: rel A A),
+    subrel R S ->
+    subrel S R ->
+    subrel S T ->
+    subrel R T.
+Proof.
+  intros.
+  rstep.
+Qed.

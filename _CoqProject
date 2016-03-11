@@ -7,5 +7,6 @@ Relators.v
 MorphismsCompat.v
 Monotonicity.v
 Transport.v
+PreOrderTactic.v
 LogicalRelations.v
 LogicalRelationsTests.v
