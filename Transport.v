@@ -239,6 +239,7 @@ Ltac transport H :=
   assert (HT: Transport R a b PA PB) by typeclasses eauto;
   eapply (transport (Transport := HT)) in H; clear HT;
   [ | solve [clear H; solve_monotonic]];
+  try (unify a b; fail 1 "no progress");
   split_hyp H.
 
 (** Again we provide a tactic which attempts to transport all
