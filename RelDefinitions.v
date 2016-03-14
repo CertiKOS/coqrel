@@ -61,11 +61,14 @@ Open Scope rel_scope.
   and the more general, slow tactics that are likely to instantiate
   evars incorrectly should have lower priority (higher numbers):
 
-    - 10 [RIntro]
     - 20 [Related]
     - 30 [preorder]
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
- *)
+    - 70 [RIntro]
+
+  Note that [RIntro] is last because it can sometimes be irreversible
+  (even though in most cases, there is a corresponding [RElim]
+  instance which [Monotonicity] can use to compensate for that). *)
 
 Class RStep {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rstep: P -> R m n.
@@ -193,7 +196,7 @@ Ltac rintro :=
   end.
 
 Global Instance rintro_rstep:
-  forall `(RIntro), RStep P R m n | 10.
+  forall `(RIntro), RStep P R m n | 70.
 Proof.
   firstorder.
 Qed.
