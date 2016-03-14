@@ -178,6 +178,11 @@ Ltac split_hyp H :=
     | prod_rel ?Rx ?Ry (?x1, ?y1) (?x2, ?y2) =>
       change (Rx x1 x2 /\ Ry y1 y2) in H;
       split_hyp H
+    | rel_incr ?acc ?R ?w ?x ?y =>
+      let w' := fresh w "'" in
+      let Hw' := fresh "H" w' in
+      destruct H as (w' & Hw' & H);
+      split_hyp H
     | _ =>
       idtac
   end.

@@ -211,3 +211,19 @@ Proof.
   intros.
   rstep.
 Qed.
+
+(** ** The [transport] tactic *)
+
+Goal
+  forall W acc A B C (R1: W -> rel A A) (R2: W -> rel B B) (R3: W -> rel C C) f g a b x w,
+    Proper (rforall w, R1 w ++> R2 w) f ->
+    Proper (rforall w, R2 w ++> option_rel (rel_incr acc R3 w)) g ->
+    R1 w a b ->
+    g (f a) = Some x ->
+    exists y, rel_incr acc R3 w x y.
+Proof.
+  intros.
+  transport H2.
+  eexists.
+  solve_monotonic.
+Qed.

@@ -428,3 +428,26 @@ Qed.
 
 Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
   eapply rel_ex_relim : typeclass_instances.
+
+(** ** The [rel_incr] construction *)
+
+(** When dealing with Kripke logical relations, we have a family of
+  relations indexed by a type of world, as well as an accessibility
+  relation over this type of worlds. We often want to state that there
+  exists a world accessible from a base one in which the relation
+  holds. The following construction expresses this. *)
+
+Definition rel_incr {W A B} (acc: rel W W) (R: W -> rel A B): W -> rel A B :=
+  fun w a b => exists w', acc w w' /\ R w' a b.
+
+(** Note the order of the premises in our intro rule. We want to first
+  determine what [w'] should be, then prove [acc w w']. *)
+
+Lemma rel_incr_rintro {W A B} (acc: rel W W) (R: W -> rel A B) w w' m n:
+  RIntro (R w' m n /\ acc w w') (rel_incr acc R w) m n.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ (rel_incr _ _ _) _ _) =>
+  eapply rel_incr_rintro : typeclass_instances.
