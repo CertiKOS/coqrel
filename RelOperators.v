@@ -440,14 +440,34 @@ Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
 Definition rel_incr {W A B} (acc: rel W W) (R: W -> rel A B): W -> rel A B :=
   fun w a b => exists w', acc w w' /\ R w' a b.
 
-(** Note the order of the premises in our intro rule. We want to first
-  determine what [w'] should be, then prove [acc w w']. *)
+(** For most relators, we want to [RIntro] first before we use
+  [Monotonicity]/[RElim], because nothing is lost when we do so,
+  and it would be costly to try monotonicity at every step. Hence,
+  [RIntro] is used first by [RStep].
+
+  The situation is different with [rel_incr] though: something *is*
+  lost when we apply the corresponding introduction rule because a new
+  existential variable is created, making it impossible to use the
+  outcome of subsequent [destruct]ions to instantiate that variable.
+  This is particularly problematic when using monotonicity properties
+  written in terms of [rel_incr] in the codomain to resolve [rel_incr]
+  goals: if we just leave the relation as-is, we're good, but if we
+  try to first apply the introduction rule for [rel_incr], all hope is
+  lost.
+
+  To sidestep this problem, we register our introduction rule directly
+  as an [RStep] instance with very low priority, rather than using an
+  [RIntro] instance (which would be at a fixed priority relative to
+  other [RStep]s).
+
+  Also note the order of the premises in our intro rule. We want to
+  first determine what [w'] should be, then prove [acc w w']. *)
 
 Lemma rel_incr_rintro {W A B} (acc: rel W W) (R: W -> rel A B) w w' m n:
-  RIntro (R w' m n /\ acc w w') (rel_incr acc R w) m n.
+  RStep (R w' m n /\ acc w w') (rel_incr acc R w) m n.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (rel_incr _ _ _) _ _) =>
+Hint Extern 90 (RStep _ (rel_incr _ _ _) _ _) =>
   eapply rel_incr_rintro : typeclass_instances.
