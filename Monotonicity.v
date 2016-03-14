@@ -225,15 +225,13 @@ Qed.
   properties). This allows us to insist the related terms be exactly
   identical, not just unifiable. *)
 
-Lemma reflexive_monotonicity {A} (R: rel A A) (m: A):
+Global Instance reflexive_monotonicity {A} (R: rel A A) (m: A):
+  NotEvar R ->
   Reflexive R ->
-  Monotonicity True (R m m).
+  Monotonicity True (R m m) | 10.
 Proof.
   firstorder.
 Qed.
-
-Hint Extern 10 (Monotonicity _ (?R ?m ?m)) =>
-  eapply reflexive_monotonicity : typeclass_instances.
 
 (** The Ltac tactic simply applies [monotonicity]; typeclass
   resolution will do the rest. Note that using [apply] naively is too
