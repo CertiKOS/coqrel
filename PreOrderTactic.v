@@ -33,10 +33,6 @@ Ltac preorder :=
             exact Hn
           | cons (exist _ ?t ?Ht) ?tail =>
             gather tail t Ht
-          | nil =>
-            fail 0 n "is not reachable from" m "using hypotheses from the context"
-          | _ =>
-            fail "inconsistent queue state" q
         end
       with gather q t Ht :=
         lazymatch goal with
@@ -46,7 +42,9 @@ Ltac preorder :=
           | _ =>
             step q
         end in
-      step (cons (exist (R m) m (reflexivity m)) nil)
+      first
+        [ step (cons (exist (R m) m (reflexivity m)) nil)
+        | fail 1 n "not reachable from" m "using hypotheses from the context" ]
     | _ =>
       fail "the goal is not an applied relation"
   end.
