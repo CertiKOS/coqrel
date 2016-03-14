@@ -48,6 +48,43 @@ Notation rel := (fun A1 A2 => A1 -> A2 -> Prop).
 Delimit Scope rel_scope with rel.
 Open Scope rel_scope.
 
+(** ** Proof step *)
+
+(** This is a catch-all class for any applicable strategy allowing us
+  to make progress towards solving a relational goal. The new goal [P]
+  may not be a relational goal itself. In the corresponding tactic,
+  quantified variables in [P] are intro'ed and conjunctions are split.
+
+  At the moment, the following priorities are used for our different
+  [RStep] instances. Generally speaking, the most specific, quick
+  tactics should be registered with higher priority (lower numbers),
+  and the more general, slow tactics that are likely to instantiate
+  evars incorrectly should have lower priority (higher numbers):
+
+    - 10 [RIntro]
+    - 20 [Related]
+    - 30 [preorder]
+    - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
+ *)
+
+Class RStep {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
+  rstep: P -> R m n.
+
+Ltac rstep_postprocess :=
+  intros;
+  lazymatch goal with
+    | |- _ /\ _ => split; rstep_postprocess
+    | |- True => constructor
+    | _ => idtac
+  end.
+
+Ltac rstep :=
+  lazymatch goal with
+    | |- ?R ?m ?n =>
+      apply (rstep (R:=R) (m:=m) (n:=n));
+      rstep_postprocess
+  end.
+
 (** ** Proper elements *)
 
 (** I follow [Coq.Classes.Morphisms] and define morphisms as proper
@@ -130,30 +167,15 @@ Hint Extern 0 (Related ?R ?m ?n) =>
     | H: _ _ ?n |- _ => eexact H
   end : typeclass_instances.
 
-(** ** Resolution step *)
+(** The simplest way to make progress when working on a relational
+  goal is to use a matching [Related] instance directly. *)
 
-(** This is a catch-all class for any applicable strategy allowing us
-  to make progress when resolving a relational goal. The new goal [P]
-  may not be a relational goal itself. In the corresponding tactic,
-  quantified variables in [P] are intro'ed and conjunctions are split. *)
-
-Class RStep {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
-  rstep: P -> R m n.
-
-Ltac rstep_postprocess :=
-  intros;
-  lazymatch goal with
-    | |- _ /\ _ => split; rstep_postprocess
-    | |- True => constructor
-    | _ => idtac
-  end.
-
-Ltac rstep :=
-  lazymatch goal with
-    | |- ?R ?m ?n =>
-      apply (rstep (R:=R) (m:=m) (n:=n));
-      rstep_postprocess
-  end.
+Global Instance related_rstep {A B} (R: rel A B) m n:
+  Related R m n ->
+  RStep True R m n | 20.
+Proof.
+  firstorder.
+Qed.
 
 (** ** Introduction rules *)
 
@@ -171,7 +193,7 @@ Ltac rintro :=
   end.
 
 Global Instance rintro_rstep:
-  forall `(RIntro), RStep P R m n.
+  forall `(RIntro), RStep P R m n | 10.
 Proof.
   firstorder.
 Qed.
