@@ -373,6 +373,18 @@ Hint Extern 1 (RIntro _ (rel_curry _) _ _) =>
 Hint Extern 1 (RElim (rel_curry _) _ _ _ _) =>
   eapply rel_curry_relim : typeclass_instances.
 
+(** ** The [req] relation *)
+
+(** The relation [req a] asserts that both elements are equal to [a].
+  This comes in handy when expressing the relational properties of
+  functions: it can be used to fix the value of an argument, or
+  parametrize it using a variable with a broader scope. *)
+
+Inductive req {A} (a: A): rel A A :=
+  req_intro: req a a a.
+
+Hint Constructors req.
+
 (** ** Checking predicates on the left and right elements *)
 
 Definition lsat {A B} (P: A -> Prop): rel A B :=
