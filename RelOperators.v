@@ -9,6 +9,13 @@ Arguments rel_union {_ _} R1%rel R2%rel _ _.
 
 Infix "∪" := rel_union (at level 50) : rel_scope.
 
+Global Instance rel_union_subrel {A B}:
+  Proper (subrel ++> subrel ++> subrel) (@rel_union A B).
+Proof.
+  clear.
+  firstorder.
+Qed.
+
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
   subrel R1 (R1 ∪ R2).
 Proof.
@@ -46,6 +53,13 @@ Definition rel_inter {A B} (R1 R2: rel A B): rel A B :=
 Arguments rel_inter {_ _} R1%rel R2%rel _ _.
 
 Infix "∩" := rel_inter (at level 40) : rel_scope.
+
+Global Instance rel_inter_subrel {A B}:
+  Proper (subrel ++> subrel ++> subrel) (@rel_inter A B).
+Proof.
+  clear.
+  firstorder.
+Qed.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
   subrel (R1 ∩ R2) R1.
