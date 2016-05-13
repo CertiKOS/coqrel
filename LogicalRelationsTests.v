@@ -143,6 +143,16 @@ Proof.
   solve_monotonic.
 Qed.
 
+Goal
+  forall {A B} (RA: rel A A) (RB: rel B B) (x y: A * B),
+    prod_rel RA RB x y ->
+    RA (let (a, b) := x in a)
+       (let (a, b) := y in a).
+Proof.
+  intros.
+  solve_monotonic.
+Qed.
+
 (** [rel_curry] *)
 
 Goal

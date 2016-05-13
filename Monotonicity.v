@@ -288,7 +288,8 @@ Ltac f_equiv :=
   and for record types, we usually prefer to define associated
   relations as conjunctions of statements that the projections are
   related, in which case the terms would need to be destructed on
-  their own as well. At the moment we don't do that. *)
+  their own as well. At the moment we only have a special case for
+  [prod_rel]. *)
 
 Ltac solve_monotonic_tac t :=
   let conclusion_progress t :=
@@ -300,6 +301,19 @@ Ltac solve_monotonic_tac t :=
           | |- _ => idtac
         end
     end in
+  let destruct_rel H :=
+    idtac;
+    match type of H with
+      | prod_rel _ _ ?x ?y =>
+        let H1 := fresh in
+        let H2 := fresh in
+        destruct x, y;
+        destruct H as [H1 H2];
+        simpl fst in H1, H2;
+        simpl snd in H1, H2
+      | _ =>
+        destruct H
+    end in
   let destruct_both m1 m2 :=
     let t1 := type of m1 in
     let t2 := type of m2 in
@@ -307,7 +321,7 @@ Ltac solve_monotonic_tac t :=
     let Rm := eval red in Rv in clear Rv;
     let H := fresh in
     assert (H: Rm m1 m2) by solve_monotonic_tac t;
-    conclusion_progress ltac:(destruct H) in
+    conclusion_progress ltac:(destruct_rel H) in
   let step :=
     lazymatch goal with
       | |- Proper _ _ => red
