@@ -32,22 +32,13 @@ Module Delay.
     introduces a so-called "open conjunction" to the context. The open
     conjunction starts as a hypothesis of type [?P], and remains of
     the form [P1 /\ ... /\ Pn /\ ?Q] throughout. Each invocation of
-    [delay] unifies [?Q] with a new node [Pi /\ ?Q']. *)
+    [delay] unifies [?Q] with a new node [Pi /\ ?Q']. [Pi] will be of
+    the form [forall x1 .. xn, delayed_goal G], where [G] is the
+    original goal and the [xi]s are the new variables which were
+    introduced after the open conjunction was created. *)
 
   Ltac use_conjunction H :=
     first [ use_conjunction (proj2 H) | eapply (proj1 H) ].
-
-  (** Once we're done, we've packaged all of the goals we solved using
-    [use_conjunction] into a single hypothesis. We can use the
-    following tactic to split up that conjunction into individual
-    subgoals again. *)
-
-  Ltac split_conjunction :=
-    match goal with
-      | |- _ /\ _ => split; [ | split_conjunction]
-      | |- _ => exact I
-      | |- ?Q => fail 1 "split_conjunction: improper terminator" Q
-    end.
 
   (** As much as possible, our open conjunction should remain hidden
     from the user's point of view. To avoid interfering with random
@@ -59,12 +50,48 @@ Module Delay.
       open_conjunction_proj: P
     }.
 
+  (** The evar can only be instantiated to refer to variables that
+    existed at the point where the evar is spawned. As a consequence,
+    in order to use it, we must first get rid of all of the new
+    variables, which the goal potentially depends on. We do this by
+    reverting the context one variable at a time from the bottom up,
+    until we hit our [open_conjunction]. *)
+
+  Ltac revert_until_conjunction Hdelayed :=
+    match goal with
+      | |- open_conjunction _ -> _ =>
+        intro Hdelayed
+      | H : _ |- _ =>
+        revert H;
+        revert_until_conjunction Hdelayed
+    end.
+
+  (** To make sure this operation is reversible, we first wrap the
+    goal using the following marker. *)
+
+  Definition delayed_goal (P: Prop) := P.
+
+  (** Once we're done, we've packaged all of the goals we solved using
+    [use_conjunction] into a single hypothesis. We can use the
+    following tactic to split up that conjunction into individual
+    subgoals again. *)
+
+  Ltac split_conjunction :=
+    match goal with
+      | |- _ /\ _ => split; [intros; unfold delayed_goal | split_conjunction]
+      | |- _ => exact I
+      | |- ?Q => fail 1 "split_conjunction: improper terminator" Q
+    end.
+
   (** Now we can defined [delayed], [delayed_conjunction] and [delay]. *)
 
   Ltac delay :=
     idtac;
     lazymatch goal with
-      | Hdelayed: open_conjunction _ |- _ =>
+      | _ : open_conjunction _ |- ?G =>
+        change (delayed_goal G);
+        let Hdelayed := fresh "Hdelayed" in
+        revert_until_conjunction Hdelayed;
         use_conjunction (open_conjunction_proj _ Hdelayed)
       | _ =>
         fail "delay can only be used under the 'delayed' tactical"
