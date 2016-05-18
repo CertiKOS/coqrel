@@ -59,16 +59,14 @@ Open Scope rel_scope.
   [RStep] instances. Generally speaking, the most specific, quick
   tactics should be registered with higher priority (lower numbers),
   and the more general, slow tactics that are likely to instantiate
-  evars incorrectly should have lower priority (higher numbers):
+  evars incorrectly or spawn them too early should have lower priority
+  (higher numbers):
 
+    - 10 [RIntro]
     - 20 [Related]
     - 30 [preorder]
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
-    - 70 [RIntro]
-
-  Note that [RIntro] is last because it can sometimes be irreversible
-  (even though in most cases, there is a corresponding [RElim]
-  instance which [Monotonicity] can use to compensate for that). *)
+    - 70 [RExists] *)
 
 Class RStep {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rstep: P -> R m n.
@@ -196,7 +194,40 @@ Ltac rintro :=
   end.
 
 Global Instance rintro_rstep:
-  forall `(RIntro), RStep P R m n | 70.
+  forall `(RIntro), RStep P R m n | 10.
+Proof.
+  firstorder.
+Qed.
+
+(** Most introduction rules are entierly reversible. For instance,
+  suppose we use the introduction rule for [++>] on a goal of the form
+  [(R1 ++> R2) f g], to obtain [Hxy: R1 x y |- R2 (f x) (g y)]. If at
+  a later stage we manage to prove our old goal [Hfg: (R1 ++> R2) f g],
+  we can always use the elimination rule for [++>] in conjunction with
+  the two hypotheses to prove [R2 (f x) (g y)].
+
+  On the other hand, whenever a new existential variable is involved,
+  this reversibility is lost: the time of introduction of the evar
+  determines what a valid instantiation is, and there is no way to go
+  back if we want to use components introduced later, say by
+  destructing one of the hypotheses.
+
+  For this reason, we want such introduction rules to be used only as
+  a last resort, and segregate them as instances of the following
+  class rather than [RIntro]. *)
+
+Class RExists {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
+  rexists: P -> R m n.
+
+Ltac rexists :=
+  lazymatch goal with
+    | |- ?R ?m ?n =>
+      apply (rexists (R:=R) (m:=m) (n:=n));
+      rstep_postprocess
+  end.
+
+Global Instance rexists_rstep:
+  forall `(RExists), RStep P R m n | 70.
 Proof.
   firstorder.
 Qed.

@@ -437,12 +437,12 @@ Notation "'rexists' x .. y , p" :=
   : rel_scope.
 
 Lemma rel_ex_rintro {A B C} (R: C -> rel A B) m n:
-  RIntro (exists c : C, R c m n) (rel_ex R) m n.
+  RExists (exists c : C, R c m n) (rel_ex R) m n.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (rel_ex _) _ _) =>
+Hint Extern 0 (RExists _ (rel_ex _) _ _) =>
   eapply rel_ex_rintro : typeclass_instances.
 
 Lemma rel_ex_relim {A B C} (R: C -> rel A B) x y P Q:
@@ -470,10 +470,10 @@ Definition rel_incr {W A B} (acc: rel W W) (R: W -> rel A B): W -> rel A B :=
   determine what [w'] should be, then prove [acc w w']. *)
 
 Lemma rel_incr_rintro {W A B} (acc: rel W W) (R: W -> rel A B) w w' m n:
-  RIntro (R w' m n /\ acc w w') (rel_incr acc R w) m n.
+  RExists (R w' m n /\ acc w w') (rel_incr acc R w) m n.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (rel_incr _ _ _) _ _) =>
+Hint Extern 0 (RExists _ (rel_incr _ _ _) _ _) =>
   eapply rel_incr_rintro : typeclass_instances.
