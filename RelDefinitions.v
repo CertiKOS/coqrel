@@ -68,8 +68,8 @@ Open Scope rel_scope.
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
     - 70 [RExists] *)
 
-Class RStep {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
-  rstep: P -> R m n.
+Class RStep (P Q: Prop) :=
+  rstep: P -> Q.
 
 Ltac rstep_postprocess :=
   intros;
@@ -81,8 +81,8 @@ Ltac rstep_postprocess :=
 
 Ltac rstep :=
   lazymatch goal with
-    | |- ?R ?m ?n =>
-      apply (rstep (R:=R) (m:=m) (n:=n));
+    | |- ?Q =>
+      apply (rstep (Q := Q));
       rstep_postprocess
   end.
 
@@ -173,7 +173,7 @@ Hint Extern 0 (Related ?R ?m ?n) =>
 
 Global Instance related_rstep {A B} (R: rel A B) m n:
   Related R m n ->
-  RStep True R m n | 20.
+  RStep True (R m n) | 20.
 Proof.
   firstorder.
 Qed.
@@ -194,7 +194,7 @@ Ltac rintro :=
   end.
 
 Global Instance rintro_rstep:
-  forall `(RIntro), RStep P R m n | 10.
+  forall `(RIntro), RStep P (R m n) | 10.
 Proof.
   firstorder.
 Qed.
@@ -227,7 +227,7 @@ Ltac rexists :=
   end.
 
 Global Instance rexists_rstep:
-  forall `(RExists), RStep P R m n | 70.
+  forall `(RExists), RStep P (R m n) | 70.
 Proof.
   firstorder.
 Qed.

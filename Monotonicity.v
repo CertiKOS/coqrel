@@ -252,7 +252,7 @@ Ltac monotonicity :=
 
 Global Instance monotonicity_rstep {A B} (P: Prop) (R: rel A B) m n:
   Monotonicity P (R m n) ->
-  RStep P R m n | 50.
+  RStep P (R m n) | 50.
 Proof.
   firstorder.
 Qed.

@@ -51,5 +51,5 @@ Ltac preorder :=
 
 (** Hook [preorder] for providing [RStep]s *)
 
-Hint Extern 30 (@RStep ?A ?B ?P ?R ?a ?b) =>
+Hint Extern 30 (RStep ?P (_ _ _)) =>
   try unify P True; intro; preorder : typeclass_instances.
