@@ -319,6 +319,15 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance prod_rdestruct {A1 B1 A2 B2} (RA: rel A1 A2) (RB: rel B1 B2):
+  RDestruct
+    (RA * RB)%rel
+    (fun P => forall a1 a2 b1 b2, RA a1 a2 -> RB b1 b2 -> P (a1, b1) (a2, b2)).
+Proof.
+  intros [a1 b1] [a2 b2] [Ha Hb] P HP.
+  firstorder.
+Qed.
+
 Global Instance prod_rel_refl {A B} (R1: rel A A) (R2: rel B B):
   Reflexive R1 -> Reflexive R2 -> Reflexive (R1 * R2).
 Proof.

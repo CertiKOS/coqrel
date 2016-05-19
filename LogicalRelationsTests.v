@@ -144,10 +144,11 @@ Proof.
 Qed.
 
 Goal
-  forall {A B} (RA: rel A A) (RB: rel B B) (x y: A * B),
+  forall {A B} (RA: rel A A) (RB: rel B B) (x y: A * B) (z: A),
+    RA z z ->
     prod_rel RA RB x y ->
-    RA (let (a, b) := x in a)
-       (let (a, b) := y in a).
+    RA (let (a, b) := x in z)
+       (let (a, b) := y in z).
 Proof.
   intros.
   solve_monotonic.

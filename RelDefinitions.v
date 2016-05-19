@@ -67,6 +67,7 @@ Open Scope rel_scope.
     - 10 [RIntro]
     - 20 [Related]
     - 30 [preorder]
+    - 40 [RDestruct]
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
     - 70 [RExists] *)
 
@@ -252,6 +253,113 @@ Global Instance relim_base {A B} (R: rel A B) m n:
 Proof.
   firstorder.
 Qed.
+
+(** ** Destructing relational hypotheses *)
+
+(** To make progress when the goal relates two pattern matching
+  constructions, we need to show that the two matched terms are
+  related, then destruct that hypothesis in a such a way that the two
+  terms reduce to constructors.
+
+  For most relators of inductive types, the constructors of the
+  relator will simply follow the constructors of the corresponding
+  type, so that destructing the relational hypothesis in the usual way
+  will produce the desired outcome. However, sometimes it is more
+  convenient to define such relators in a different way (see for
+  instance [prod_rel]). In that case, we can use the following
+  typeclass to specify an alternative way to destruct corresponding
+  hypotheses.
+
+  An instance of [RDestruct] is somewhat similar to a stylized
+  induction principle. [T] expands to a conjunction of subgoals in the
+  format expected by [Delay.split_conjunction]. For instance, the
+  induction principle for [sum_rel] is:
+
+  <<<
+  sum_rel_ind:
+    forall ...,
+      (forall a1 a2, RA a1 a2 -> P (inl a1) (inl a2)) ->
+      (forall b1 b2, RB b1 b2 -> P (inr b1) (inr b2)) ->
+      (forall p1 p2, (RA + RB) p1 p2 -> P p1 p2)
+  >>>
+
+  A corresponding instance of [RDestruct] would be:
+
+  <<<
+  sum_rdestruct:
+    RDestruct
+      (sum_rel RA RB)
+      (fun P =>
+        (forall a1 a2, RA a1 a2 -> P (inl a1) (inl a2)) /\
+        (forall b1 b2, RB b1 b2 -> P (inr b1) (inr b2)))
+  >>>
+
+  In the case of [sum_rel] however, which is defined as an inductive
+  type with similar structure to [sum], we can rely on the default
+  instance of [RDestruct], which simply uses the [destruct] tactic. *)
+
+Class RDestruct {A B: Type} (R: rel A B) (T: rel A B -> Prop) :=
+  rdestruct m n: R m n -> forall P, T P -> P m n.
+
+Ltac rdestruct H :=
+  lazymatch type of H with
+    | ?R ?m ?n =>
+      not_evar R;
+      pattern m, n;
+      apply (rdestruct (R:=R) m n H);
+      clear H;
+      Delay.split_conjunction
+  end.
+
+Ltac default_rdestruct :=
+  let m := fresh "m" in
+  let n := fresh "n" in
+  let Hmn := fresh "H" m n in
+  let P := fresh "P" in
+  let H := fresh in
+  intros m n Hmn P H;
+  revert m n Hmn;
+  delayed_conjunction (intros m n Hmn; destruct Hmn; delay);
+  pattern P;
+  eexact H.
+
+Hint Extern 100 (RDestruct _ _) =>
+  default_rdestruct : typeclass_instances.
+
+(** To use [RDestruct] instances to reduce a goal involving pattern
+  matching [G] := [_ (match m with _ end) (match n with _ end)], we
+  proceed in two steps. The first step creates a new existential
+  variable [?R] and spawns two subgoals. The first one is [?R m n] and
+  should be solved by regular means. The second one is an instance of
+  [use_destruct] as defined below, and triggers the destruction of a
+  [?R m n] hypothesis. By the time we reach the second goal, [?R] will
+  have been instantiated, so that we can locate an appropriate
+  instance of [RDestruct]. *)
+
+Definition use_rdestruct {A B} (R: rel A B) m n (Q: Prop) :=
+  R m n -> Q.
+
+Lemma rdestruct_rstep {A B} m n (Q: Prop) (R: rel A B):
+  RStep (R m n /\ use_rdestruct R m n Q) Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 40 (RStep _ (_ (match ?m with _=>_ end) (match ?n with _=>_ end))) =>
+  eapply (rdestruct_rstep m n) : typeclass_instances.
+
+Ltac use_rdestruct_rstep R m n :=
+  let H := fresh in
+  let Hmn := fresh in
+  intros H Hmn;
+  not_evar R;
+  pattern m, n;
+  apply (rdestruct (R:=R) m n Hmn);
+  clear Hmn;
+  eexact H.
+
+Hint Extern 1 (RStep _ (use_rdestruct ?R ?m ?n _)) =>
+  use_rdestruct_rstep R m n : typeclass_instances.
 
 (** ** Order on relations *)
 

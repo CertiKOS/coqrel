@@ -301,27 +301,6 @@ Ltac solve_monotonic_tac t :=
           | |- _ => idtac
         end
     end in
-  let destruct_rel H :=
-    idtac;
-    match type of H with
-      | prod_rel _ _ ?x ?y =>
-        let H1 := fresh in
-        let H2 := fresh in
-        destruct x, y;
-        destruct H as [H1 H2];
-        simpl fst in H1, H2;
-        simpl snd in H1, H2
-      | _ =>
-        destruct H
-    end in
-  let destruct_both m1 m2 :=
-    let t1 := type of m1 in
-    let t2 := type of m2 in
-    let Rv := fresh "R" in evar (Rv: rel t1 t2);
-    let Rm := eval red in Rv in clear Rv;
-    let H := fresh in
-    assert (H: Rm m1 m2) by solve_monotonic_tac t;
-    conclusion_progress ltac:(destruct_rel H) in
   let step :=
     lazymatch goal with
       | |- Proper _ _ => red
@@ -331,10 +310,6 @@ Ltac solve_monotonic_tac t :=
         destruct m
       | |- _ (if ?m then _ else _) (if ?m then _ else _) =>
         destruct m
-      | |- _ (match ?m1 with _ => _ end) (match ?m2 with _ => _ end) =>
-        destruct_both m1 m2
-      | |- _ (if ?m1 then _ else _) (if ?m2 then _ else _) =>
-        destruct_both m1 m2
       | |- _ =>
         rstep
     end in
