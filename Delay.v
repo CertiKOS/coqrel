@@ -74,13 +74,21 @@ Module Delay.
   (** Once we're done, we've packaged all of the goals we solved using
     [use_conjunction] into a single hypothesis. We can use the
     following tactic to split up that conjunction into individual
-    subgoals again. *)
+    subgoals again.
+
+    Although we expect the conjunctions produced by [use_conjunction]
+    to be terminated by [True] and this should be regarded as the
+    canonical format, when the last conjunct is a non-[True]
+    proposition we consider it as an additional subgoal. Likewise we
+    don't require the conclusions to be wrapped in [delayed_goal].
+    This allows for some flexibility when dealing with manually
+    written goals. *)
 
   Ltac split_conjunction :=
     match goal with
       | |- _ /\ _ => split; [intros; unfold delayed_goal | split_conjunction]
       | |- _ => exact I
-      | |- ?Q => fail 1 "split_conjunction: improper terminator" Q
+      | |- _ => intros; unfold delayed_goal
     end.
 
   (** Now we can defined [delayed], [delayed_conjunction] and [delay]. *)

@@ -1,6 +1,7 @@
 Require Export Coq.Program.Basics.
 Require Export Coq.Classes.Morphisms.
 Require Setoid.
+Require Export Delay.
 
 (** * Prerequisites *)
 
@@ -51,9 +52,10 @@ Open Scope rel_scope.
 (** ** Proof step *)
 
 (** This is a catch-all class for any applicable strategy allowing us
-  to make progress towards solving a relational goal. The new goal [P]
-  may not be a relational goal itself. In the corresponding tactic,
-  quantified variables in [P] are intro'ed and conjunctions are split.
+  to make progress towards solving a relational goal. The proposition
+  [P] should encode the new subgoals, in the format expected by
+  [Delay.split_conjunction], and is decomposed accordingly in the
+  [rstep] tactic.
 
   At the moment, the following priorities are used for our different
   [RStep] instances. Generally speaking, the most specific, quick
@@ -71,19 +73,11 @@ Open Scope rel_scope.
 Class RStep (P Q: Prop) :=
   rstep: P -> Q.
 
-Ltac rstep_postprocess :=
-  intros;
-  lazymatch goal with
-    | |- _ /\ _ => split; rstep_postprocess
-    | |- True => constructor
-    | _ => idtac
-  end.
-
 Ltac rstep :=
   lazymatch goal with
     | |- ?Q =>
       apply (rstep (Q := Q));
-      rstep_postprocess
+      Delay.split_conjunction
   end.
 
 (** ** Proper elements *)
@@ -190,7 +184,7 @@ Ltac rintro :=
   lazymatch goal with
     | |- ?R ?m ?n =>
       apply (rintro (R:=R) (m:=m) (n:=n));
-      rstep_postprocess
+      Delay.split_conjunction
   end.
 
 Global Instance rintro_rstep:
@@ -223,7 +217,7 @@ Ltac rexists :=
   lazymatch goal with
     | |- ?R ?m ?n =>
       apply (rexists (R:=R) (m:=m) (n:=n));
-      rstep_postprocess
+      Delay.split_conjunction
   end.
 
 Global Instance rexists_rstep:
