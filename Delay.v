@@ -71,6 +71,11 @@ Module Delay.
 
   Definition delayed_goal (P: Prop) := P.
 
+  (** In some contexts, we actually want a nested saved goal to be
+    split up further instead. The following marker does that. *)
+
+  Definition unpack (P: Prop) := P.
+
   (** Once we're done, we've packaged all of the goals we solved using
     [use_conjunction] into a single hypothesis. We can use the
     following tactic to split up that conjunction into individual
@@ -85,10 +90,17 @@ Module Delay.
     written goals. *)
 
   Ltac split_conjunction :=
+    let handle_subgoal :=
+      intros;
+      match goal with
+        | |- delayed_goal _ => red
+        | |- unpack _ => red; split_conjunction
+        | |- _ => idtac
+      end in
     match goal with
-      | |- _ /\ _ => split; [intros; unfold delayed_goal | split_conjunction]
+      | |- _ /\ _ => split; [handle_subgoal | split_conjunction]
       | |- _ => exact I
-      | |- _ => intros; unfold delayed_goal
+      | |- _ => handle_subgoal
     end.
 
   (** Now we can defined [delayed], [delayed_conjunction] and [delay]. *)

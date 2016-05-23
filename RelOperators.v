@@ -477,3 +477,20 @@ Qed.
 
 Hint Extern 0 (RExists _ (rel_incr _ _ _) _ _) =>
   eapply rel_incr_rintro : typeclass_instances.
+
+Lemma rel_incr_rdestruct {W A B} acc R w T:
+  (forall w, exists Tw, RDestruct (R w) Tw /\ Convertible (T w) Tw) ->
+  RDestruct
+    (@rel_incr W A B acc R w)
+    (fun P => forall w', acc w w' -> Delay.unpack (T w' P)).
+Proof.
+  clear.
+  intros HR m n (w' & Hw' & Hmn) P H.
+  destruct (HR w') as (Tw & HRw' & HTw).
+  eapply rdestruct; eauto.
+  destruct HTw.
+  eapply H; eauto.
+Qed.
+
+Hint Extern 2 (RDestruct (rel_incr _ _ _) _) =>
+  eapply rel_incr_rdestruct; intro; eexists; split : typeclass_instances.
