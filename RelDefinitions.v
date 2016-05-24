@@ -65,7 +65,6 @@ Open Scope rel_scope.
   (higher numbers):
 
     - 10 [RIntro]
-    - 20 [Related]
     - 30 [preorder]
     - 40 [RDestruct]
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
@@ -139,39 +138,6 @@ Qed.
   use the following shorthand. *)
 
 Notation Properish R m := (Related R%rel m m) (only parsing).
-
-(** Sometimes we don't have a [Related] instance, but a hypothesis is
-  available. Here we assume that we will always want such hypotheses
-  to be used, at least when the left- or right-hand side match
-  exactly. There is a possibility that this ends up being too broad
-  for some applications, for which we'll want to restrict ourselves to
-  [Related] instances explicitely defined by the user. If this turns
-  out to be the case, we can introduce an intermediate class with more
-  parameters to control the sources of the relational properties we
-  use, and perhaps have some kind of normalization process akin to
-  what is done in [Coq.Classes.Morphisms].
-
-  Note that it is important that we reduce the goal to [?R ?m ?n]
-  before we use [eexact]: if the relation in the hypothesis is an
-  existential variable, we want it unified against [?R], rather than
-  [Related ?R]. *)
-
-Hint Extern 0 (Related ?R ?m ?n) =>
-  red;
-  match goal with
-    | H: _ ?m _ |- _ => eexact H
-    | H: _ _ ?n |- _ => eexact H
-  end : typeclass_instances.
-
-(** The simplest way to make progress when working on a relational
-  goal is to use a matching [Related] instance directly. *)
-
-Global Instance related_rstep {A B} (R: rel A B) m n:
-  Related R m n ->
-  RStep True (R m n) | 20.
-Proof.
-  firstorder.
-Qed.
 
 (** ** Introduction rules *)
 

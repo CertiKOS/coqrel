@@ -124,7 +124,43 @@ Hint Extern 1 (RemoveParams ?m _) =>
 (** *** Selecting a relational property *)
 
 Class CandidateProperty {A B} (R: rel A B) m n (Q: Prop) :=
-  candidate_related: Related R m n.
+  candidate_related: R m n.
+
+(** We first attempt to use any matching hypothesis. This takes
+  priority and bypasses any [Params] declaration. We assume that we
+  will always want such hypotheses to be used, at least when the left-
+  or right-hand side match exactly. There is a possibility that this
+  ends up being too broad for some applications, for which we'll want
+  to restrict ourselves to [Related] instances explicitely defined by
+  the user. If this turns out to be the case, we can introduce an
+  intermediate class with more parameters to control the sources of
+  the relational properties we use, and perhaps have some kind of
+  normalization process akin to what is done in [Coq.Classes.Morphisms].
+
+  Note that it is important that we reduce the goal to [?R ?m ?n]
+  before we use [eexact]: if the relation in the hypothesis is an
+  existential variable, we don't want unified against
+  [CandidateProperty _ _ _ (_ ?m ?n)]. *)
+
+Ltac context_candidate :=
+  let rec is_prefix f m :=
+    lazymatch m with
+      | f => idtac
+      | ?n _ => is_prefix f n
+    end in
+  match goal with
+    | H: _ ?f ?g |- CandidateProperty _ _ _ (_ ?m ?n) =>
+      red;
+      first
+        [ is_prefix f m; eexact H
+        | is_prefix g n; eexact H ]
+  end.
+
+Hint Extern 1 (CandidateProperty _ _ _ _) =>
+  context_candidate : typeclass_instances.
+
+(** After we've tried the relevant hypotheses, we use [Related]
+  instances as described above. *)
 
 Lemma candidate_l {A B GA GB} (R: rel A B) f g (QR: rel GA GB) m n:
   RemoveParams m f ->
