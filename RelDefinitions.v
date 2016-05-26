@@ -503,8 +503,8 @@ Hint Extern 1 (RIntro _ (flip _) _ _) =>
   eapply flip_rintro : typeclass_instances.
 
 Lemma flip_relim {A B} (R: rel A B) m n P Q:
-  RElim (flip R) n m P Q ->
-  RElim R m n P Q.
+  RElim R n m P Q ->
+  RElim (flip R) m n P Q.
 Proof.
   firstorder.
 Qed.
