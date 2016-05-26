@@ -121,6 +121,13 @@ Ltac rauto_split :=
 Hint Extern 1 (RAutoSubgoals _) =>
   rauto_split : typeclass_instances.
 
+(** If [rauto] is run under the [delayed] tactical and we don't know
+  how to make progress, bail out. Note that this will inhibit
+  backtracking. *)
+
+Hint Extern 1000 (RAuto _) =>
+  red; delay : typeclass_instances.
+
 (** ** Proper elements *)
 
 (** I follow [Coq.Classes.Morphisms] and define morphisms as proper
