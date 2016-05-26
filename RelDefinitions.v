@@ -80,6 +80,47 @@ Ltac rstep :=
       Delay.split_conjunction
   end.
 
+(** ** Proof automation *)
+
+(** The following class solves the goal [Q] automatically. The
+  typeclass resolution process allows for backtracking, trying every
+  possible [RStep] at a given time. *)
+
+Class RAuto (Q: Prop) :=
+  rauto : Q.
+
+Ltac rauto :=
+  lazymatch goal with
+    | |- ?Q =>
+      apply (rauto (Q := Q));
+      Delay.split_conjunction
+  end.
+
+(** After applying each step, we need to decompose the premise into
+  individual subgoals, wrapping each one into a new [RAuto] goal so
+  that the process continues. *)
+
+Class RAutoSubgoals (P: Prop) :=
+  rauto_subgoals : P.
+
+Global Instance rauto_rstep P Q:
+  RStep P Q ->
+  RAutoSubgoals P ->
+  RAuto Q.
+Proof.
+  firstorder.
+Qed.
+
+Ltac rauto_split :=
+  red;
+  Delay.split_conjunction;
+  lazymatch goal with
+    | |- ?Q => change (RAuto Q)
+  end.
+
+Hint Extern 1 (RAutoSubgoals _) =>
+  rauto_split : typeclass_instances.
+
 (** ** Proper elements *)
 
 (** I follow [Coq.Classes.Morphisms] and define morphisms as proper
