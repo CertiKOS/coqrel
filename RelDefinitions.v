@@ -111,6 +111,18 @@ Notation "'@' 'Proper' T R m" := (@ProperDef T m R)
 
 Notation Proper R m := (ProperDef m R).
 
+(** To solve [Proper] goals, simply unfold and proceed to prove the
+  corresponding relational property. *)
+
+Lemma proper_rstep {A} R (m: A):
+  RStep (R m m) (Proper R m).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RStep _ (Proper _ _)) =>
+  eapply proper_rstep : typeclass_instances.
+
 (** ** Related elements *)
 
 (** In addition to full-blown [Proper] elements, sometimes we need a
@@ -138,6 +150,17 @@ Qed.
   use the following shorthand. *)
 
 Notation Properish R m := (Related R%rel m m) (only parsing).
+
+(** As with [Proper], this [RStep] instance unfolds [Related]. *)
+
+Lemma related_rstep {A B} (R: rel A B) m n:
+  RStep (R m n) (Related R m n).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RStep _ (Related _ _ _)) =>
+  eapply related_rstep : typeclass_instances.
 
 (** ** Introduction rules *)
 
@@ -326,6 +349,24 @@ Ltac use_rdestruct_rstep R m n :=
 
 Hint Extern 1 (RStep _ (use_rdestruct ?R ?m ?n _)) =>
   use_rdestruct_rstep R m n : typeclass_instances.
+
+(** In the special case where the terms matched on the left- and
+  right-hand sides are identical, we want to destruct that term
+  instead. At the moment, it's unclear to me whether this could be
+  formulated as an [RDestruct] instance for [eq], or whether the
+  process above could subsume this (we should conduct experiments with
+  real code at some point). *)
+
+Ltac destruct_rstep m :=
+  let H := fresh in
+  let n := fresh in
+  intros H;
+  generalize m;
+  delayed_conjunction (intros n; destruct n; delay);
+  eexact H.
+
+Hint Extern 39 (RStep _ (_ (match ?m with _=>_ end) (match ?m with _=>_ end))) =>
+  destruct_rstep m : typeclass_instances.
 
 (** ** Order on relations *)
 

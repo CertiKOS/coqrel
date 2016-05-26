@@ -468,6 +468,15 @@ Qed.
 
 (** ** Monotonicity of logical connectives *)
 
+Lemma fold_impl_rstep (A B: Prop):
+  RStep (impl A B) (A -> B).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RStep _ (_ -> _)) =>
+  eapply fold_impl_rstep : typeclass_instances.
+
 Global Instance all_monotonic A:
   Proper ((- ==> impl) ++> impl) (@all A).
 Proof.

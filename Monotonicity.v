@@ -328,28 +328,7 @@ Ltac f_equiv :=
   [prod_rel]. *)
 
 Ltac solve_monotonic_tac t :=
-  let conclusion_progress t :=
-    lazymatch goal with
-      | |- ?G =>
-        t;
-        lazymatch goal with
-          | |- G => fail "No progress in conclusion"
-          | |- _ => idtac
-        end
-    end in
-  let step :=
-    lazymatch goal with
-      | |- Proper _ _ => red
-      | |- Related _ _ _ => red
-      | |- ?P -> ?Q => change (impl P Q)
-      | |- _ (match ?m with _ => _ end) (match ?m with _ => _ end) =>
-        destruct m
-      | |- _ (if ?m then _ else _) (if ?m then _ else _) =>
-        destruct m
-      | |- _ =>
-        rstep
-    end in
-  first [ step; solve_monotonic_tac t | t ].
+  first [ rstep; solve_monotonic_tac t | t ].
 
 Tactic Notation "solve_monotonic" :=
   solve_monotonic_tac ltac:(eassumption || congruence || (now econstructor)).
