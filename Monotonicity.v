@@ -131,7 +131,7 @@ Class CandidateProperty {A B} (R: rel A B) m n (Q: Prop) :=
   will always want such hypotheses to be used, at least when the left-
   or right-hand side match exactly. There is a possibility that this
   ends up being too broad for some applications, for which we'll want
-  to restrict ourselves to [Related] instances explicitely defined by
+  to restrict ourselves to [Monotonic] instances explicitely defined by
   the user. If this turns out to be the case, we can introduce an
   intermediate class with more parameters to control the sources of
   the relational properties we use, and perhaps have some kind of
@@ -159,12 +159,12 @@ Ltac context_candidate :=
 Hint Extern 1 (CandidateProperty _ _ _ _) =>
   context_candidate : typeclass_instances.
 
-(** After we've tried the relevant hypotheses, we use [Related]
+(** After we've tried the relevant hypotheses, we use [Monotonic]
   instances as described above. *)
 
 Lemma candidate_l {A B GA GB} (R: rel A B) f g (QR: rel GA GB) m n:
   RemoveParams m f ->
-  Related R f g ->
+  MonotonicPair f g R ->
   CandidateProperty R f g (QR m n).
 Proof.
   firstorder.
@@ -175,7 +175,7 @@ Hint Extern 2 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
 
 Lemma candidate_r {A B QA QB} (R: rel A B) f g (QR: rel QA QB) m n:
   RemoveParams n g ->
-  Related R f g ->
+  MonotonicPair f g R ->
   CandidateProperty R f g (QR m n).
 Proof.
   firstorder.
@@ -251,7 +251,7 @@ Qed.
 (** We also exploit [Reflexive] instances. A reflexive relation is one
   for which all elements are proper elements. Then reflexivity is a
   kind of general, nullary monotonicity property. In fact, in
-  principle we should use [Reflexive] to declare a generic [Proper] or
+  principle we should use [Reflexive] to declare a generic [Monotonic] or
   [Related] instance, and the instance below would follow. However,
   such instances end up polluting the resolution process and causing
   premature instanciations of existential variables.

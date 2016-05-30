@@ -230,13 +230,13 @@ Infix "+" := sum_rel : rel_scope.
   fact, we use the [_def] suffix when defining them, then redeclare
   a corresponding, full-blown [Proper] instance. *)
 
-Local Instance inl_rel:
+Global Instance inl_rel:
   Proper (∀ RA, ∀ RB, RA ++> RA + RB) (@inl).
 Proof.
   exact @inl_rel_def.
 Qed.
 
-Local Instance inr_rel:
+Global Instance inr_rel:
   Proper (∀ RA, ∀ RB, RB ++> RA + RB) (@inr).
 Proof.
   exact @inr_rel_def.
@@ -279,9 +279,6 @@ Proof.
   split; typeclasses eauto.
 Qed.
 
-Hint Extern 0 (Proper _ (@inl)) => exact inl_rel : typeclass_instances.
-Hint Extern 0 (Proper _ (@inr)) => exact inr_rel : typeclass_instances.
-
 (** *** Pairs *)
 
 Definition prod_rel {A1 A2} RA {B1 B2} RB: rel (A1 * B1)%type (A2 * B2)%type :=
@@ -289,7 +286,7 @@ Definition prod_rel {A1 A2} RA {B1 B2} RB: rel (A1 * B1)%type (A2 * B2)%type :=
 
 Infix "*" := prod_rel : rel_scope.
 
-Local Instance pair_rel:
+Global Instance pair_rel:
   Proper (∀ RA, ∀ RB, RA ++> RB ++> RA * RB) (@pair).
 Proof.
   intros A1 A2 RA B1 B2 RB a1 a2 Ha b1 b2 Hb.
@@ -297,7 +294,7 @@ Proof.
   eauto.
 Qed.
 
-Local Instance fst_rel:
+Global Instance fst_rel:
   Proper (∀ RA, ∀ RB, RA * RB ==> RA) (@fst).
 Proof.
   intros A1 A2 RA B1 B2 RB.
@@ -305,7 +302,7 @@ Proof.
   assumption.
 Qed.
 
-Local Instance snd_rel:
+Global Instance snd_rel:
   Proper (∀ RA, ∀ RB, RA * RB ==> RB) (@snd).
 Proof.
   intros A1 A2 RA B1 B2 RB.
@@ -355,23 +352,19 @@ Proof.
   split; typeclasses eauto.
 Qed.
 
-Hint Extern 0 (Proper _ (@pair)) => exact pair_rel : typeclass_instances.
-Hint Extern 0 (Proper _ (@fst)) => exact fst_rel : typeclass_instances.
-Hint Extern 0 (Proper _ (@snd)) => exact snd_rel : typeclass_instances.
-
 (** *** Option types *)
 
 Inductive option_rel {A1 A2} (RA: rel A1 A2): rel (option A1) (option A2) :=
   | Some_rel_def: (RA ++> option_rel RA) (@Some A1) (@Some A2)
   | None_rel_def: option_rel RA (@None A1) (@None A2).
 
-Local Instance Some_rel:
+Global Instance Some_rel:
   Proper (∀ R : rel A1 A2, R ++> option_rel R) (@Some).
 Proof.
   exact @Some_rel_def.
 Qed.
 
-Local Instance None_rel:
+Global Instance None_rel:
   Proper (∀ R, option_rel R) (@None).
 Proof.
   exact @None_rel_def.
@@ -384,9 +377,6 @@ Proof.
   intros x1 x2 Hx.
   destruct Hx; constructor; eauto.
 Qed.
-
-Hint Extern 0 (Proper _ (@Some)) => exact Some_rel : typeclass_instances.
-Hint Extern 0 (Proper _ (@None)) => exact None_rel : typeclass_instances.
 
 Lemma option_rel_some_inv A B (R: rel A B) (x: option A) (y: option B) (a: A):
   option_rel R x y ->
@@ -404,20 +394,17 @@ Inductive list_rel {A1 A2} (R: rel A1 A2): rel (list A1) (list A2) :=
   | nil_rel_def: (list_rel R) (@nil A1) (@nil A2)
   | cons_rel_def: (R ++> list_rel R ++> list_rel R) (@cons A1) (@cons A2).
 
-Local Instance nil_rel:
+Global Instance nil_rel:
   Proper (∀ R, list_rel R) (@nil).
 Proof.
   exact @nil_rel_def.
 Qed.
 
-Local Instance cons_rel:
+Global Instance cons_rel:
   Proper (∀ R, R ++> list_rel R ++> list_rel R) (@cons).
 Proof.
   exact @cons_rel_def.
 Qed.
-
-Hint Extern 0 (Proper _ (@nil)) => exact nil_rel : typeclass_instances.
-Hint Extern 0 (Proper _ (@cons)) => exact cons_rel : typeclass_instances.
 
 Global Instance list_subrel {A1 A2}:
   Proper (subrel ++> subrel) (@list_rel A1 A2).

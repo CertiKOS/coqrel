@@ -65,6 +65,7 @@ Open Scope rel_scope.
   (higher numbers):
 
     - 10 [RIntro]
+    - 20 [Related]
     - 30 [preorder]
     - 40 [RDestruct]
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
@@ -128,87 +129,34 @@ Hint Extern 1 (RAutoSubgoals _) =>
 Hint Extern 1000 (RAuto _) =>
   red; delay : typeclass_instances.
 
-(** ** Proper elements *)
-
-(** I follow [Coq.Classes.Morphisms] and define morphisms as proper
-  elements of a corresponding logical relation. They can be registered
-  by declaring instances of the [Proper] typeclass.
-  However, we will build up logical relations from our own set of
-  relators, and use our own tactics to deduce new instances of
-  [Proper] from the existing ones. To prevent the two systems from
-  interfering with one another, I will use the following nearly
-  identical, but distinct definition of [Proper]. *)
-
-(** There is one ugly tweak that we need, compared with the original.
-  Namely, we want the type parameter [A] to be unified in priority
-  with the type of element [m], rather than that of the relation [R].
-  That is because by necessity, the relator [forall_rel] defined below
-  yields an eta-expanded type of the form [(fun x => T x) x].
-  As a consequence, some instances declared using [forall_rel] become
-  unusable because [A] takes this peculiar form. To work around this,
-  we flip the order of arguments in our version of [Proper], so that
-  [A] is unified against the type of [m], then use notations to fake
-  the original order. *)
-
-Class ProperDef {A} (m: A) (R: rel A A) := proper_prf : R m m.
-
-Arguments ProperDef {_} _ R%rel.
-
-Notation "'@' 'Proper' T R m" := (@ProperDef T m R)
-  (at level 10, T at next level, R at next level, m at next level).
-
-Notation Proper R m := (ProperDef m R).
-
-(** To solve [Proper] goals, simply unfold and proceed to prove the
-  corresponding relational property. *)
-
-Lemma proper_rstep {A} R (m: A):
-  RStep (R m m) (Proper R m).
-Proof.
-  firstorder.
-Qed.
-
-Hint Extern 1 (RStep _ (Proper _ _)) =>
-  eapply proper_rstep : typeclass_instances.
-
 (** ** Related elements *)
 
-(** In addition to full-blown [Proper] elements, sometimes we need a
-  more general way to declare that two *different* terms are related.
-  This is especially the case when the terms have two related by
-  different types, for instance when type dependencies and typeclass
-  instances are involved. Note that dependencies can often be handled
-  by [forall_rel] and connected relators, and when possible without a
-  major headache, declaring general [Proper] instances is preferable
-  to more specific [Related] instances. However, for the remaining
-  cases we use the following type class. *)
+(** One of the simplest ways to solve a relational goal is to use a
+  lemma from a database of known related terms. To register such
+  lemmas we use the following typeclass. *)
 
 Class Related {A B} (R: rel A B) (m1: A) (m2: B) := related_prf : R m1 m2.
 
 Arguments Related {_ _} R%rel _ _.
 
-Global Instance proper_related {A} (R: rel A A) (m: A):
-  Proper R m ->
-  Related R m m.
+Global Instance related_rstep {A B} (R: rel A B) m1 m2:
+  Related R m1 m2 ->
+  RStep True (R m1 m2) | 20.
 Proof.
   firstorder.
 Qed.
 
-(** When the two terms only differ in their implicit arguments, we can
-  use the following shorthand. *)
+(** Conversely, when solving a goal of the form [Related ?R ?m ?n],
+  go ahead and simply unfold [Related]. *)
 
-Notation Properish R m := (Related R%rel m m) (only parsing).
-
-(** As with [Proper], this [RStep] instance unfolds [Related]. *)
-
-Lemma related_rstep {A B} (R: rel A B) m n:
+Lemma unfold_related_rstep {A B} (R: rel A B) m n:
   RStep (R m n) (Related R m n).
 Proof.
   firstorder.
 Qed.
 
 Hint Extern 1 (RStep _ (Related _ _ _)) =>
-  eapply related_rstep : typeclass_instances.
+  eapply unfold_related_rstep : typeclass_instances.
 
 (** ** Introduction rules *)
 
@@ -447,6 +395,81 @@ Proof.
   subst.
   reflexivity.
 Qed.
+
+(** ** Monotonicity properties *)
+
+(** We use the following class for the user to declare monotonicity
+  properties. This is a generalization of [Morphisms.Proper] from the
+  Coq standard library: although we expect that most of the time the
+  left- and right-hand side terms will be identical, they could be
+  slightly different partial applications of the same function.
+
+  Usually the differing arguments will be implicit, so that the user
+  can still rely on the [Monotonic] notation below. Occasionally, you
+  may need to spell out the two different terms and use the actual
+  class [MonotonicPair] instead.
+
+  Note that the argument order below eschews the precedent of
+  [Morphisms.Proper] and our own [Related] class, which have the
+  relation first, followed by the related term or terms. This is
+  deliberate: we want the type parameters [A] and [B] to be unified in
+  priority against the type of [f] and [g], rather than that of [R].
+  In particular, the relator [forall_rel] yields an eta-expanded type
+  of the form [(fun x => T x) x] for its arguments. When [A] and [B]
+  take this peculiar form, instances declared using [forall_rel]
+  become unusable (I assume because no second-order unification is
+  performed when looking up the typeclass instance database). By
+  contrast the type of [f] and [g] is much more likely to be in a
+  "reasonable" form.
+
+  We could flip those again in the [Monotonic] notation the the sake
+  of aesthetics. But I feel it actually makes sense to list the
+  monotonic function first, followed by the corresponding signature,
+  akin to a typing judgement. *)
+
+Class MonotonicPair {A B} (f: A) (g: B) (R: rel A B) :=
+  monotonic: R f g.
+
+Arguments MonotonicPair {_ _} _ _ R%rel.
+
+Notation "'@' 'Monotonic' T m R" := (@MonotonicPair T T m m R)
+  (at level 10, T at next level, R at next level, m at next level).
+
+Notation Monotonic m R := (MonotonicPair m m R).
+
+(** Another issue related to unification of type arguments: because
+  [rel] is not a proper definition, sometimes Coq beta-reduces
+  expressions spontaneously which interferes with typeclass
+  resolution. As a result we need the following hint for
+  [arrow_subrel] below to be used by the [monotonicity] tactic. When
+  we upgrade to Coq 8.5 and make [rel] a universe-polymorphic
+  definition instead of a notation, we can drop this. *)
+
+Hint Extern 50 (MonotonicPair _ _ _) =>
+  progress cbv beta : typeclass_instances.
+
+(** For the sake of backwards compatibility, we override
+  [Morphisms.Proper] with the following notation. However the plan is
+  to drop this at some point, and perhaps even use [Proper] as a
+  special case of [Related], so please do not rely on this. *)
+
+Notation "'@' 'Proper' T R m" := (@Monotonic T m R)
+  (at level 10, T at next level, R at next level, m at next level, only parsing).
+
+Notation Proper R m := (Monotonic m R) (only parsing).
+Notation Properish R m := (Monotonic m R) (only parsing).
+
+(** As for [Related], we provide a [RStep] instance for unfolding
+  [MonotonicPair]. *)
+
+Lemma unfold_monotonic_rstep {A B} (R: rel A B) m n:
+  RStep (R m n) (MonotonicPair m n R).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RStep _ (MonotonicPair _ _ _)) =>
+  eapply unfold_monotonic_rstep : typeclass_instances.
 
 
 (** * Core relators *)
