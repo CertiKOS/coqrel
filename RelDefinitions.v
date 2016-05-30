@@ -313,38 +313,34 @@ Hint Extern 100 (RDestruct _ _) =>
 
 (** To use [RDestruct] instances to reduce a goal involving pattern
   matching [G] := [_ (match m with _ end) (match n with _ end)], we
-  proceed in two steps. The first step creates a new existential
-  variable [?R] and spawns two subgoals. The first one is [?R m n] and
-  should be solved by regular means. The second one is an instance of
-  [use_destruct] as defined below, and triggers the destruction of a
-  [?R m n] hypothesis. By the time we reach the second goal, [?R] will
-  have been instantiated, so that we can locate an appropriate
-  instance of [RDestruct]. *)
+  need to establish that [m] and [n] are related by some relation [R],
+  then locate an instance of [RDestruct] that corresponds to [R]. It
+  is essential that this happens in one step. At some point, I tried
+  to split the process in two different [RStep]s, so that the user
+  could control the resolution of the [?R m n] subgoal. However, in
+  situation where [RDestruct] is not the right strategy, this may
+  push a [delayed rauto] into a dead end. Thankfully, now we can use
+  the [RAuto] typeclass to solve the [?R m n] subgoal in one swoop. *)
 
-Definition use_rdestruct {A B} (R: rel A B) m n (Q: Prop) :=
-  R m n -> Q.
-
-Lemma rdestruct_rstep {A B} m n (Q: Prop) (R: rel A B):
-  RStep (R m n /\ use_rdestruct R m n Q) Q.
+Lemma rdestruct_rstep {A B} m n (R: rel A B) P Q:
+  RAuto (R m n) ->
+  RDestruct R P ->
+  P Q ->
+  Q m n.
 Proof.
+  intros Hmn HR H.
   firstorder.
 Qed.
 
-Hint Extern 40 (RStep _ (_ (match ?m with _=>_ end) (match ?n with _=>_ end))) =>
-  eapply (rdestruct_rstep m n) : typeclass_instances.
-
-Ltac use_rdestruct_rstep R m n :=
+Ltac use_rdestruct_rstep m n :=
   let H := fresh in
-  let Hmn := fresh in
-  intros H Hmn;
-  not_evar R;
+  intro H;
   pattern m, n;
-  apply (rdestruct (R:=R) m n Hmn);
-  clear Hmn;
-  eexact H.
+  eapply (rdestruct_rstep m n);
+  [ .. | eexact H].
 
-Hint Extern 1 (RStep _ (use_rdestruct ?R ?m ?n _)) =>
-  use_rdestruct_rstep R m n : typeclass_instances.
+Hint Extern 40 (RStep _ (_ (match ?m with _=>_ end) (match ?n with _=>_ end))) =>
+  use_rdestruct_rstep m n : typeclass_instances.
 
 (** In the special case where the terms matched on the left- and
   right-hand sides are identical, we want to destruct that term
