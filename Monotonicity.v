@@ -214,6 +214,15 @@ Hint Extern 3 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
 Class RImpl (P Q: Prop): Prop :=
   rimpl: P -> Q.
 
+(** While we give priority to [rimpl_refl] below, when it doesn't work
+  we use [RAuto] to establish a [subrel] property. The [Proper]
+  instances we declared alongside relators can be used conjunction
+  with [Monotonicity] to break up [subrel] goals along the structure
+  of the relations being considered. This may end up causing loops
+  (especially in failure cases), so it may be necessary to add some
+  flag in the context to prevent [subrel_related] from being used when
+  discharging the [subrel] goals themselves. *)
+
 Global Instance rimpl_refl P:
   RImpl P P.
 Proof.
@@ -221,11 +230,23 @@ Proof.
 Qed.
 
 Global Instance rimpl_subrel {A B} (R R': rel A B) m n:
-  subrel R R' ->
-  Unconvertible _ R R' -> (* should be by convention on instances of [subrel]? *)
+  RAuto (subrel R R') ->
+  Unconvertible _ R R' ->
   RImpl (R m n) (R' m n).
 Proof.
   firstorder.
+Qed.
+
+(** As an aside, the following instance of [subrel] enables the use of
+  [foo_subrel] instances for rewriting along within applied relations.
+  So that for instance, a hypothesis [H: subrel R1 R2] can be used for
+  rewriting in a goal of the form [(R1 * R1' ++> R) x y]. *)
+
+Instance subrel_pointwise_subrel {A B}:
+  subrel (@subrel A B) (eq ==> eq ==> impl).
+Proof.
+  intros R1 R2 HR x1 x2 Hx y1 y2 Hy H; subst.
+  eauto.
 Qed.
 
 (** *** Main tactic *)
@@ -326,26 +347,3 @@ Tactic Notation "solve_monotonic" :=
 
 Tactic Notation "solve_monotonic" tactic(t) :=
   solve_monotonic_tac ltac:(eassumption || congruence || (now econstructor)|| t).
-
-(** ** Exploiting [foo_subrel] instances *)
-
-(** Although we declared [Proper] instances for the relation
-  constructors we defined, so far the usefulness of these instances
-  has been limited. But now we can use them in conjunction with our
-  [monotonicity] tactic to break up [subrel] goals along the structure
-  of the relations being considered. *)
-
-Hint Extern 5 (subrel _ _) =>
-  monotonicity; unfold flip : typeclass_instances.
-
-(** Furthermore, the following instance of [subrel] enables the use of
-  [foo_subrel] instances for rewriting along within applied relations.
-  So that for instance, a hypothesis [H: subrel R1 R2] can be used for
-  rewriting in a goal of the form [(R1 * R1' ++> R) x y]. *)
-
-Instance subrel_pointwise_subrel {A B}:
-  subrel (@subrel A B) (eq ==> eq ==> impl).
-Proof.
-  intros R1 R2 HR x1 x2 Hx y1 y2 Hy H; subst.
-  eauto.
-Qed.

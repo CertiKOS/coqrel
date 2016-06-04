@@ -392,6 +392,17 @@ Proof.
   reflexivity.
 Qed.
 
+(** TODO: perhaps [subrel] doesn't need to be a class: we should drop
+  the following instance and just use [Related subrel] for declaring
+  subrelations. *)
+
+Global Instance subrel_related {A B} (R R': rel A B):
+  subrel R R' ->
+  Related subrel R R'.
+Proof.
+  firstorder.
+Qed.
+
 (** ** Monotonicity properties *)
 
 (** We use the following class for the user to declare monotonicity
