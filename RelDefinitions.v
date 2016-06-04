@@ -127,7 +127,7 @@ Hint Extern 1 (RAutoSubgoals _) =>
   backtracking. *)
 
 Hint Extern 1000 (RAuto _) =>
-  red; delay : typeclass_instances.
+  red; solve [ delay ] : typeclass_instances.
 
 (** ** Related elements *)
 
