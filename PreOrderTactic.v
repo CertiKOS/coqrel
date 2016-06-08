@@ -23,6 +23,9 @@ Definition preorder_tactic_done {A B} (R: rel A B) a b := R a b.
 Ltac preorder :=
   lazymatch goal with
     | |- ?R ?m ?n =>
+      not_evar R;
+      not_evar m;
+      not_evar n;
       let HR := fresh "HR" in
       first
         [ assert (HR: PreOrder R) by typeclasses eauto
@@ -52,4 +55,4 @@ Ltac preorder :=
 (** Hook [preorder] for providing [RStep]s *)
 
 Hint Extern 30 (RStep ?P (_ _ _)) =>
-  try unify P True; intro; preorder : typeclass_instances.
+  solve [ try unify P True; intro; preorder ] : typeclass_instances.
