@@ -129,13 +129,21 @@ Class CandidateProperty {A B} (R: rel A B) m n (Q: Prop) :=
 (** We first attempt to use any matching hypothesis. This takes
   priority and bypasses any [Params] declaration. We assume that we
   will always want such hypotheses to be used, at least when the left-
-  or right-hand side match exactly. There is a possibility that this
+  or right-hand side matches exactly. There is a possibility that this
   ends up being too broad for some applications, for which we'll want
   to restrict ourselves to [Monotonic] instances explicitely defined by
   the user. If this turns out to be the case, we can introduce an
   intermediate class with more parameters to control the sources of
   the relational properties we use, and perhaps have some kind of
   normalization process akin to what is done in [Coq.Classes.Morphisms].
+
+  We don't hesitate to instantiate evars in the goal or hypothesis; if
+  the types or skeletons are compatible this is likely what we want.
+  In one practical case where this is needed, my hypothesis is
+  something like form [R (f ?x1 ?y1 42) (f ?x2 ?y2 24)], and I want
+  [?x1], [?x2], [?y1], [?y2] to be matched against the goal. In case
+  the use of [unify] below is too broad, we could develop a strategy
+  whereby at least one of the head terms [f], [g] should match exactly.
 
   Note that it is important that we reduce the goal to [?R ?m ?n]
   before we use [eexact]: if the relation in the hypothesis is an
@@ -144,10 +152,9 @@ Class CandidateProperty {A B} (R: rel A B) m n (Q: Prop) :=
 
 Ltac context_candidate :=
   let rec is_prefix f m :=
-    lazymatch m with
-      | f => idtac
-      | ?n _ => is_prefix f n
-    end in
+    first
+      [ unify f m
+      | lazymatch m with ?n _ => is_prefix f n end ] in
   match goal with
     | H: _ ?f ?g |- CandidateProperty _ _ _ (_ ?m ?n) =>
       red;
