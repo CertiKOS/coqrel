@@ -265,7 +265,7 @@ Hint Extern 2 (ProperQuery (proper_partial_app::_) _ _) =>
 
 Global Instance do_proper_subrel {A} φs (R1 R2: rel A A) (m: A):
   ProperQuery φs R1 m ->
-  RAuto (subrel R1 R2) ->
+  NonDelayed (RAuto (subrel R1 R2)) ->
   ProperQuery (proper_subrel::φs) R2 m.
 Proof.
   firstorder.
