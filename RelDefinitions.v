@@ -201,7 +201,7 @@ Qed.
 Class RExists {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rexists: P -> R m n.
 
-Ltac rexists :=
+Ltac reexists :=
   lazymatch goal with
     | |- ?R ?m ?n =>
       apply (rexists (R:=R) (m:=m) (n:=n));
