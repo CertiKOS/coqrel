@@ -128,10 +128,22 @@ Module Delay.
   Ltac delayed tac :=
     delayed_conjunction tac;
     [ .. | split_conjunction ].
+
+  Ltac undelay :=
+    lazymatch goal with
+      | Hdelayed : open_conjunction _ |- _ =>
+        clear Hdelayed
+    end.
+
+  Ltac nondelayed tac :=
+    undelay; tac.
 End Delay.
 
 Tactic Notation "delayed" tactic1(tac) :=
   Delay.delayed tac.
+
+Tactic Notation "nondelayed" tactic1(tac) :=
+  Delay.nondelayed tac.
 
 Tactic Notation "delayed_conjunction" tactic1(tac) :=
   Delay.delayed_conjunction tac.
@@ -151,6 +163,15 @@ Definition delay (P: Prop) := P.
 Hint Extern 0 (delay _) => delay.
 
 Hint Extern 100 => delay : delay.
+
+(** This typeclass wrapper is convenient for performing a nested
+  search outside of a potential "delayed" context. *)
+
+Class NonDelayed (P: Prop) :=
+  nondelayed : P.
+
+Hint Extern 1 (NonDelayed _) =>
+  red; try Delay.undelay : typeclass_instances.
 
 
 (** * Example: reifying [eapply] *)

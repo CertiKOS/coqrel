@@ -194,7 +194,9 @@ Qed.
 
   For this reason, we want such introduction rules to be used only as
   a last resort, and segregate them as instances of the following
-  class rather than [RIntro]. *)
+  class rather than [RIntro]. Moreover, to make sure that we don't
+  leave the user in a dead-end, we only use it if we can immediately
+  solve the resulting subgoal. *)
 
 Class RExists {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rexists: P -> R m n.
@@ -206,8 +208,10 @@ Ltac rexists :=
       Delay.split_conjunction
   end.
 
-Global Instance rexists_rstep:
-  forall `(RExists), RStep P (R m n) | 70.
+Global Instance rexists_rstep {A B} P R (m:A) (n:B):
+  RExists P R m n ->
+  NonDelayed (RAutoSubgoals P) ->
+  RStep True (R m n) | 70.
 Proof.
   firstorder.
 Qed.
