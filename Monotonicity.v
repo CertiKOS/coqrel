@@ -155,12 +155,19 @@ Ltac context_candidate :=
     first
       [ unify f m
       | lazymatch m with ?n _ => is_prefix f n end ] in
+  let rec is_prefixable f m :=
+    first
+      [ is_evar f
+      | is_evar m
+      | unify f m
+      | lazymatch m with ?n _ => is_prefixable f n end ] in
   match goal with
     | H: _ ?f ?g |- CandidateProperty _ _ _ (_ ?m ?n) =>
       red;
       first
-        [ is_prefix f m; eexact H
-        | is_prefix g n; eexact H ]
+        [ is_prefix f m; is_prefixable g n
+        | is_prefix g n; is_prefixable f m ];
+      eexact H
   end.
 
 Hint Extern 1 (CandidateProperty _ _ _ _) =>

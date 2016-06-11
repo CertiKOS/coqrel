@@ -122,6 +122,17 @@ Proof.
   monotonicity.
 Abort.
 
+(** Hypotheses from the context. This used to fail because [Hyy] would
+  shadow [Hxy] (the hypothesis we want). *)
+
+Goal
+  forall {A} (R: rel A A) (x y: A),
+    R x y -> eq y y -> R x y.
+Proof.
+  intros A R x y Hxy Hyy.
+  monotonicity.
+Qed.
+
 (** ** Using [foo_subrel] instances *)
 
 Goal
