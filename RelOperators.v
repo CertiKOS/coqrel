@@ -1,4 +1,5 @@
 Require Export RelDefinitions.
+Require Import Relators.
 
 (** ** Union of relations *)
 
@@ -465,6 +466,22 @@ Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
 
 Definition rel_incr {W A B} (acc: rel W W) (R: W -> rel A B): W -> rel A B :=
   fun w a b => exists w', acc w w' /\ R w' a b.
+
+(** While it's possible to define a more general monotonicity property
+  for [rel_incr], this one is well-behaved and usually corresponds to
+  what we want. *)
+
+Global Instance rel_incr_subrel {W A B} acc:
+  Transitive acc ->
+  Proper ((- ==> subrel) ++> acc --> subrel) (@rel_incr W A B acc).
+Proof.
+  intros Hacc R1 R2 HR w1 w2 Hw a b (w1' & Hw1' & Hab).
+  eexists; split.
+  - transitivity w1;
+    eassumption.
+  - apply HR.
+    assumption.
+Qed.
 
 (** Note the order of the premises in our intro rule. We want to first
   determine what [w'] should be, then prove [acc w w']. *)
