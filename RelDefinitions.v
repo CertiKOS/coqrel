@@ -15,6 +15,19 @@ Class NotEvar {A} (x: A).
 Hint Extern 1 (NotEvar ?x) =>
   not_evar x; constructor : typeclass_instances.
 
+(** This version of [Unconvertible] does not assume that [a] and [b]
+  have convertible types. *)
+
+Class Unconvertible {A B} (a: A) (b: B) := unconvertible : unit.
+
+Ltac unconvertible a b :=
+  first
+    [ unify a b with typeclass_instances; fail 1
+    | exact tt ].
+
+Hint Extern 1 (Unconvertible ?a ?b) =>
+  unconvertible a b : typeclass_instances.
+
 (** Sometimes we may want to introduce an auxiliary variable to help
   with unification. *)
 

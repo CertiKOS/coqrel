@@ -245,7 +245,7 @@ Qed.
 
 Global Instance rimpl_subrel {A B} (R R': rel A B) m n:
   NonDelayed (RAuto (subrel R R')) ->
-  Unconvertible _ R R' ->
+  Unconvertible R R' ->
   RImpl (R m n) (R' m n).
 Proof.
   firstorder.
