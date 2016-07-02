@@ -148,7 +148,7 @@ Tactic Notation "nondelayed" tactic1(tac) :=
 Tactic Notation "delayed_conjunction" tactic1(tac) :=
   Delay.delayed_conjunction tac.
 
-Ltac delay := Delay.delay.
+Tactic Notation "delay" := Delay.delay.
 
 
 (** * Hints *)
