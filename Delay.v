@@ -38,7 +38,12 @@ Module Delay.
     introduced after the open conjunction was created. *)
 
   Ltac use_conjunction H :=
-    first [ use_conjunction (proj2 H) | eapply (proj1 H) ].
+    lazymatch type of H with
+      | ?A /\ ?B =>
+        use_conjunction (@proj2 A B H)
+      | _ =>
+        eapply (proj1 H)
+    end.
 
   (** As much as possible, our open conjunction should remain hidden
     from the user's point of view. To avoid interfering with random
