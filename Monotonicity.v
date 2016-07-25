@@ -14,43 +14,48 @@ Require Import Delay.
 
 (** *** Truncating applications *)
 
-(** The search is guided by the left-hand side term, so that if the
-  goal has the form [?R (?f ?x1 ?x2 ?x3 ... ?xn) ?y], we will seek a
-  [Proper] instance for some prefix [f x1 ... xk]. This allows both
-  [R] and [y] to be existential variables, which is required in
+(** The search is at first guided by the left-hand side term, so that
+  if the goal has the form [?R (?f ?x1 ?x2 ?x3 ... ?xn) ?y], we will
+  seek a [Related] instance for some prefix [f x1 ... xk]. This allows
+  both [R] and [y] to be existential variables, which is required in
   particular by the [transport] tactic.
 
-  However, since peeling off the [xi]s one by one and conducting a
-  full-blown search at every step is very time-consuming, we narrow
-  down the search to only one option whenever a [Params] instance has
-  been declared. The [get_params] tactic queries the declared number
-  of parameters for a given head term [h] and passes it to the
-  continuation [sk]. The [remove_params] tactic drops applied
-  arguments from its argument [m] so that the result expects the
-  declared number of parameters. We are careful to skip an appropriate
-  number of parameters when the type of term indicates that it is
-  already a partial application. *)
+  However, peeling off the [xi]s one by one and conducting a
+  full-blown search at every step is very time-consuming. To deal with
+  this issue we narrow down the search to (in this order):
+    - the whole application [f x1 ... xk];
+    - prefixes constructed from user-declared [Params] instances;
+    - the head term [f] alone.
 
-Ltac get_params h sk fk :=
-  let nv := fresh "nparams" in evar (nv : nat);
-  let n := eval red in nv in clear nv;
-  let H := fresh in
-  first
-    [ assert (H: Params h n) by typeclasses eauto;
-      clear H;
-      let n := eval compute in n in first [ sk n | fail 2 ]
-    | unify n O; (* make sure [n] is instantciated *)
-      (* idtac "Warning: no Params instance for" h; *)
-      fk ].
+  In the following we define some tactics and classes to implement
+  this search process. *)
 
-Ltac remove_params m sk fk :=
+(** [ApplicationHead] finds the head term [f] for an application [m]. *)
+
+Ltac application_head m f :=
+  lazymatch m with
+    | ?m' _ => application_head m' f
+    | _ => unify m f
+  end.
+
+Class ApplicationHead {A B} (m: A) (f: B).
+
+Hint Extern 1 (ApplicationHead ?m ?f) =>
+  application_head m f; constructor : typeclass_instances.
+
+(** [RemoveParams] drops some arguments from the application [m] so
+  that the result [f] expects [n] parameters. We are careful to skip
+  an appropriate number of parameters when the type of term indicates
+  that it is already a partial application. *)
+
+Ltac remove_params m n f :=
   let rec remove m n :=
     lazymatch n with
       | S ?n' =>
         lazymatch m with
           | ?m' _ => remove m' n'
         end
-      | O => sk m
+      | O => unify m f
     end in
   let rec remove_from_partial m t n :=
     lazymatch t with
@@ -61,65 +66,31 @@ Ltac remove_params m sk fk :=
       | _ =>
         remove m n
     end in
-  let rec head m :=
-    lazymatch m with
-      | ?m' _ => head m'
-      | _ => constr:m
-    end in
-  let h := head m in
   let t := type of m in
-  get_params h ltac:(remove_from_partial m t) fk.
+  remove_from_partial m t n.
 
-(** When [get_params] fails, we need to enumerate all possible
-  prefixes for a given application. This typeclass provides
-  corresponding instances. When conducting a query, the first argument
-  should be the application, the second argument should be an
-  existential variable to be filled in. *)
+Class RemoveParams {A B} (m: A) (n: nat) (f: B).
 
-Class IsPrefixOf {A B} (m: B) (f: A).
+Hint Extern 1 (RemoveParams ?m ?n ?f) =>
+  remove_params m n f; constructor : typeclass_instances.
 
-Global Instance is_prefix_of_self {A} (f: A):
-  IsPrefixOf f f.
+(** With these, we can define [CandidatePrefix m f], which serves as
+  the source of possible prefixes [f] of the application [m]. *)
 
-Lemma switch_to_prefix_of {A A' B} {m: A} (m': A') (f: B):
-  IsPrefixOf m' f ->
-  IsPrefixOf m f.
-Proof.
-  constructor.
-Qed.
+Class CandidatePrefix {A B} (m: A) (f: B).
 
-Hint Extern 1 (IsPrefixOf (?m ?n) ?f) =>
-  eapply (switch_to_prefix_of m) : typeclass_instances.
+Global Instance candidate_prefix_self {A} (m: A):
+  CandidatePrefix m m | 10.
 
-(** Next, we reify [remove_params] as the [RemoveParams] class.
-  An instance of [RemoveParams m f] indicates that [f] is a possible
-  prefix of the application [m], as constrained by any declared
-  [Params] instance. *)
+Global Instance candidate_prefix_params {A B C} (m: A) (h: B) (n: nat) (f: C):
+  ApplicationHead m h ->
+  Params h n ->
+  RemoveParams m n f ->
+  CandidatePrefix m f | 20.
 
-Class RemoveParams {A B} (m: A) (f: B).
-
-(** To resolve [RemoveParams m f], we attempt to use [remove_params]
-  on [m]. If that succeeds, we unify the result with [f]. *)
-
-Lemma remove_params_direct {A B} {m: A} (f: B):
-  RemoveParams m f.
-Proof.
-  constructor.
-Qed.
-
-(* Otherwise, we allow any prefix of [m] to be used. *)
-
-Lemma remove_params_anyprefix {A B} (m: A) (f: B):
-  IsPrefixOf m f ->
-  RemoveParams m f.
-Proof.
-  constructor.
-Qed.
-
-Hint Extern 1 (RemoveParams ?m _) =>
-  remove_params m
-    ltac:(fun f => eapply (remove_params_direct f))
-    ltac:(eapply remove_params_anyprefix) : typeclass_instances.
+Global Instance candidate_prefix_head {A B} (m: A) (h: B):
+  ApplicationHead m h ->
+  CandidatePrefix m h | 30.
 
 (** *** Selecting a relational property *)
 
@@ -140,7 +111,7 @@ Class CandidateProperty {A B} (R: rel A B) m n (Q: Prop) :=
   We don't hesitate to instantiate evars in the goal or hypothesis; if
   the types or skeletons are compatible this is likely what we want.
   In one practical case where this is needed, my hypothesis is
-  something like form [R (f ?x1 ?y1 42) (f ?x2 ?y2 24)], and I want
+  something like [R (f ?x1 ?y1 42) (f ?x2 ?y2 24)], and I want
   [?x1], [?x2], [?y1], [?y2] to be matched against the goal. In case
   the use of [unify] below is too broad, we could develop a strategy
   whereby at least one of the head terms [f], [g] should match exactly.
@@ -177,7 +148,7 @@ Hint Extern 1 (CandidateProperty _ _ _ _) =>
   instances as described above. *)
 
 Lemma candidate_l {A B GA GB} (R: rel A B) f g (QR: rel GA GB) m n:
-  RemoveParams m f ->
+  CandidatePrefix m f ->
   MonotonicPair f g R ->
   CandidateProperty R f g (QR m n).
 Proof.
@@ -188,7 +159,7 @@ Hint Extern 2 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
   not_evar m; eapply candidate_l : typeclass_instances.
 
 Lemma candidate_r {A B QA QB} (R: rel A B) f g (QR: rel QA QB) m n:
-  RemoveParams n g ->
+  CandidatePrefix n g ->
   MonotonicPair f g R ->
   CandidateProperty R f g (QR m n).
 Proof.

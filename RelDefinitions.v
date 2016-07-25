@@ -529,6 +529,9 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance arrow_subrel_params:
+  Params (@arrow_rel) 2.
+
 Global Instance arrow_rintro {A1 A2 B1 B2} (RA: rel A1 A2) (RB: rel B1 B2) f g:
   RIntro (forall x y, RA x y -> RB (f x) (g y)) (RA ++> RB) f g.
 Proof.
@@ -628,6 +631,9 @@ Global Instance flip_subrel {A B}:
 Proof.
   firstorder.
 Qed.
+
+Global Instance flip_subrel_params:
+  Params (@flip) 1.
 
 Lemma flip_rintro {A B} (R: rel A B) m n:
   RIntro (R n m) (flip R) m n.

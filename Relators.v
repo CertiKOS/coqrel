@@ -40,6 +40,9 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance arrow_pointwise_subrel_params:
+  Params (@arrow_pointwise_rel) 1.
+
 Global Instance arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
   RIntro (forall x: A, R (f x) (g x)) (- ==> R) f g.
 Proof.
@@ -183,6 +186,9 @@ Proof.
   intros x Hx.
   destruct (Hs x) as (y & Hy & Hxy); eauto.
 Qed.
+
+Global Instance set_subrel_params:
+  Params (@set_rel) 1.
 
 (** ** Inductive types *)
 
@@ -472,6 +478,9 @@ Proof.
   apply H.
 Qed.
 
+Global Instance all_monotonic_param:
+  Params (@all) 1.
+
 Global Instance ex_monotonic A:
   Proper ((- ==> impl) ++> impl) (@ex A).
 Proof.
@@ -480,6 +489,9 @@ Proof.
   apply HPQ.
   assumption.
 Qed.
+
+Global Instance ex_monotonic_params:
+  Params (@ex) 1.
 
 Global Instance and_monotonic:
   Proper (impl ++> impl ++> impl) and.

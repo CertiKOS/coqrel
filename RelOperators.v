@@ -17,6 +17,9 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance rel_union_subrel_params:
+  Params (@rel_union) 2.
+
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
   subrel R1 (R1 ∪ R2).
 Proof.
@@ -61,6 +64,9 @@ Proof.
   clear.
   firstorder.
 Qed.
+
+Global Instance rel_inter_subrel_params:
+  Params (@rel_inter) 2.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
   subrel (R1 ∩ R2) R1.
@@ -179,6 +185,9 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance rel_compose_params:
+  Params (@rel_compose) 2.
+
 Lemma rel_compose_id_left {A B} (R: rel A B):
   eqrel (rel_compose R eq) R.
 Proof.
@@ -221,6 +230,9 @@ Global Instance rel_pull_subrel {A B A' B'} (f: A -> A') (g: B -> B'):
 Proof.
   firstorder.
 Qed.
+
+Global Instance rel_pull_subrel_params:
+  Params (@rel_pull) 1.
 
 (** In the restricted case where [f = g], [rel_pull] preserves many
   properties of the underlying relation. *)
@@ -482,6 +494,9 @@ Proof.
   - apply HR.
     assumption.
 Qed.
+
+Global Instance rel_incr_params:
+  Params (@rel_incr) 2.
 
 (** Note the order of the premises in our intro rule. We want to first
   determine what [w'] should be, then prove [acc w w']. *)
