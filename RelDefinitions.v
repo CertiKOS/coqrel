@@ -78,7 +78,6 @@ Open Scope rel_scope.
   (higher numbers):
 
     - 10 [RIntro]
-    - 20 [Related]
     - 30 [preorder]
     - 40 [RDestruct]
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
@@ -141,35 +140,6 @@ Hint Extern 1 (RAutoSubgoals _) =>
 
 Hint Extern 1000 (RAuto _) =>
   red; solve [ delay ] : typeclass_instances.
-
-(** ** Related elements *)
-
-(** One of the simplest ways to solve a relational goal is to use a
-  lemma from a database of known related terms. To register such
-  lemmas we use the following typeclass. *)
-
-Class Related {A B} (R: rel A B) (m1: A) (m2: B) := related_prf : R m1 m2.
-
-Arguments Related {_ _} R%rel _ _.
-
-Global Instance related_rstep {A B} (R: rel A B) m1 m2:
-  Related R m1 m2 ->
-  RStep True (R m1 m2) | 20.
-Proof.
-  firstorder.
-Qed.
-
-(** Conversely, when solving a goal of the form [Related ?R ?m ?n],
-  go ahead and simply unfold [Related]. *)
-
-Lemma unfold_related_rstep {A B} (R: rel A B) m n:
-  RStep (R m n) (Related R m n).
-Proof.
-  firstorder.
-Qed.
-
-Hint Extern 1 (RStep _ (Related _ _ _)) =>
-  eapply unfold_related_rstep : typeclass_instances.
 
 (** ** Introduction rules *)
 
@@ -409,17 +379,6 @@ Proof.
   reflexivity.
 Qed.
 
-(** TODO: perhaps [subrel] doesn't need to be a class: we should drop
-  the following instance and just use [Related subrel] for declaring
-  subrelations. *)
-
-Global Instance subrel_related {A B} (R R': rel A B):
-  subrel R R' ->
-  Related subrel R R'.
-Proof.
-  firstorder.
-Qed.
-
 (** ** Monotonicity properties *)
 
 (** We use the following class for the user to declare monotonicity
@@ -477,9 +436,14 @@ Hint Extern 50 (MonotonicPair _ _ _) =>
   to drop this at some point, and perhaps even use [Proper] as a
   special case of [Related], so please do not rely on this. *)
 
+Notation "'@' 'Related' T R m n" := (@MonotonicPair T m n R)
+  (at level 10, T at next level, R at next level, m at next level,
+   n at next level, only parsing).
+
 Notation "'@' 'Proper' T R m" := (@Monotonic T m R)
   (at level 10, T at next level, R at next level, m at next level, only parsing).
 
+Notation Related R m n := (MonotonicPair m n R) (only parsing).
 Notation Proper R m := (Monotonic m R) (only parsing).
 Notation Properish R m := (Monotonic m R) (only parsing).
 
@@ -494,6 +458,17 @@ Qed.
 
 Hint Extern 1 (RStep _ (MonotonicPair _ _ _)) =>
   eapply unfold_monotonic_rstep : typeclass_instances.
+
+(** TODO: perhaps [subrel] doesn't need to be a class: we should drop
+  the following instance and just use [Related subrel] for declaring
+  subrelations. *)
+
+Global Instance subrel_related {A B} (R R': rel A B):
+  subrel R R' ->
+  Related subrel R R'.
+Proof.
+  firstorder.
+Qed.
 
 
 (** * Core relators *)
