@@ -175,7 +175,7 @@ Class ProperApplies A (B: A -> Type) R (a: A) R' (m: forall a, B a) :=
 
 Ltac proper_applies :=
   let H := fresh in
-  unfold ProperApplies, MonotonicPair;
+  unfold ProperApplies, Related;
   intro H;
   eapply H;
   eapply (@proper_query_outcome (proper_partial_arg::nil)).

@@ -381,7 +381,7 @@ Qed.
 
 (** ** Monotonicity properties *)
 
-(** We use the following class for the user to declare monotonicity
+(** We use the class [Related] for the user to declare monotonicity
   properties. This is a generalization of [Morphisms.Proper] from the
   Coq standard library: although we expect that most of the time the
   left- and right-hand side terms will be identical, they could be
@@ -390,11 +390,10 @@ Qed.
   Usually the differing arguments will be implicit, so that the user
   can still rely on the [Monotonic] notation below. Occasionally, you
   may need to spell out the two different terms and use the actual
-  class [MonotonicPair] instead.
+  class instead.
 
-  Note that the argument order below eschews the precedent of
-  [Morphisms.Proper] and our own [Related] class, which have the
-  relation first, followed by the related term or terms. This is
+  Note that the argument order below eschews the precedent of [Proper],
+  which has the relation first, followed by the proper element. This is
   deliberate: we want the type parameters [A] and [B] to be unified in
   priority against the type of [f] and [g], rather than that of [R].
   In particular, the relator [forall_rel] yields an eta-expanded type
@@ -403,22 +402,17 @@ Qed.
   become unusable (I assume because no second-order unification is
   performed when looking up the typeclass instance database). By
   contrast the type of [f] and [g] is much more likely to be in a
-  "reasonable" form.
+  "reasonable" form. *)
 
-  We could flip those again in the [Monotonic] notation the the sake
-  of aesthetics. But I feel it actually makes sense to list the
-  monotonic function first, followed by the corresponding signature,
-  akin to a typing judgement. *)
+Class Related {A B} (f: A) (g: B) (R: rel A B) :=
+  related: R f g.
 
-Class MonotonicPair {A B} (f: A) (g: B) (R: rel A B) :=
-  monotonic: R f g.
+Arguments Related {_ _} _ _ R%rel.
 
-Arguments MonotonicPair {_ _} _ _ R%rel.
-
-Notation "'@' 'Monotonic' T m R" := (@MonotonicPair T T m m R)
+Notation "'@' 'Monotonic' T m R" := (@Related T T m m R)
   (at level 10, T at next level, R at next level, m at next level).
 
-Notation Monotonic m R := (MonotonicPair m m R).
+Notation Monotonic m R := (Related m m R).
 
 (** Another issue related to unification of type arguments: because
   [rel] is not a proper definition, sometimes Coq beta-reduces
@@ -428,35 +422,26 @@ Notation Monotonic m R := (MonotonicPair m m R).
   we upgrade to Coq 8.5 and make [rel] a universe-polymorphic
   definition instead of a notation, we can drop this. *)
 
-Hint Extern 50 (MonotonicPair _ _ _) =>
+Hint Extern 50 (Related _ _ _) =>
   progress cbv beta : typeclass_instances.
 
 (** For the sake of backwards compatibility, we override
-  [Morphisms.Proper] with the following notation. However the plan is
-  to drop this at some point, and perhaps even use [Proper] as a
-  special case of [Related], so please do not rely on this. *)
-
-Notation "'@' 'Related' T R m n" := (@MonotonicPair T m n R)
-  (at level 10, T at next level, R at next level, m at next level,
-   n at next level, only parsing).
+  [Morphisms.Proper] with the following notation. *)
 
 Notation "'@' 'Proper' T R m" := (@Monotonic T m R)
   (at level 10, T at next level, R at next level, m at next level, only parsing).
 
-Notation Related R m n := (MonotonicPair m n R) (only parsing).
 Notation Proper R m := (Monotonic m R) (only parsing).
-Notation Properish R m := (Monotonic m R) (only parsing).
 
-(** As for [Related], we provide a [RStep] instance for unfolding
-  [MonotonicPair]. *)
+(** We provide a [RStep] instance for unfolding [Related]. *)
 
 Lemma unfold_monotonic_rstep {A B} (R: rel A B) m n:
-  RStep (R m n) (MonotonicPair m n R).
+  RStep (R m n) (Related m n R).
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RStep _ (MonotonicPair _ _ _)) =>
+Hint Extern 1 (RStep _ (Related _ _ _)) =>
   eapply unfold_monotonic_rstep : typeclass_instances.
 
 (** TODO: perhaps [subrel] doesn't need to be a class: we should drop
@@ -465,7 +450,7 @@ Hint Extern 1 (RStep _ (MonotonicPair _ _ _)) =>
 
 Global Instance subrel_related {A B} (R R': rel A B):
   subrel R R' ->
-  Related subrel R R'.
+  Related R R' subrel.
 Proof.
   firstorder.
 Qed.
