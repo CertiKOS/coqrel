@@ -61,6 +61,12 @@ Notation rel := (fun A1 A2 => A1 -> A2 -> Prop).
 
 Delimit Scope rel_scope with rel.
 Open Scope rel_scope.
+Open Scope type_scope.
+
+(** Make sure that the existing definitions based on
+  [Relation_Definitions.relation] use our [rel_scope] as well. *)
+
+Bind Scope rel_scope with Relation_Definitions.relation.
 
 (** ** Proof step *)
 

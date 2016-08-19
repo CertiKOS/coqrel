@@ -44,7 +44,7 @@ Qed.
 Goal
   forall A (a b: A) (R: rel A A) (H: R a b),
     let f (x y: A * A) := (@pair (A+A) (A+A) (inr (fst x)) (inl (snd y))) in
-    Proper (R * ⊤ ++> ⊤ * R ++> (⊥ + R) * (R + ⊥)) f.
+    Proper (R * ⊤ ++> ⊤ * R ++> (⊥ + R) * (R + ⊥))%rel f.
 Proof.
   intros; unfold f.
   solve_monotonic.

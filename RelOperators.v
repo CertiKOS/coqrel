@@ -8,7 +8,7 @@ Definition rel_union {A B} (R1 R2: rel A B): rel A B :=
 
 Arguments rel_union {_ _} R1%rel R2%rel _ _.
 
-Infix "∪" := rel_union (at level 50) : rel_scope.
+Infix "\/" := rel_union : rel_scope.
 
 Global Instance rel_union_subrel {A B}:
   Proper (subrel ++> subrel ++> subrel) (@rel_union A B).
@@ -21,32 +21,32 @@ Global Instance rel_union_subrel_params:
   Params (@rel_union) 2.
 
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
-  subrel R1 (R1 ∪ R2).
+  subrel R1 (R1 \/ R2).
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (subrel _ (_ ∪ _)) =>
+Hint Extern 0 (subrel _ (_ \/ _)) =>
   eapply rel_union_introl : typeclass_instances.
 
 Lemma rel_union_intror {A B} (R1 R2: rel A B):
-  subrel R2 (R1 ∪ R2).
+  subrel R2 (R1 \/ R2).
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (subrel _ (_ ∪ _)) =>
+Hint Extern 0 (subrel _ (_ \/ _)) =>
   eapply rel_union_introl : typeclass_instances.
 
 Lemma rel_union_lub {A B} (R1 R2 R: rel A B):
   subrel R1 R ->
   subrel R2 R ->
-  subrel (R1 ∪ R2)%rel R.
+  subrel (R1 \/ R2)%rel R.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 2 (subrel (_ ∪ _) _) =>
+Hint Extern 2 (subrel (_ \/ _) _) =>
   eapply rel_union_lub : typeclass_instances.
 
 (** ** Intersection of relations *)
@@ -56,7 +56,7 @@ Definition rel_inter {A B} (R1 R2: rel A B): rel A B :=
 
 Arguments rel_inter {_ _} R1%rel R2%rel _ _.
 
-Infix "∩" := rel_inter (at level 40) : rel_scope.
+Infix "/\" := rel_inter : rel_scope.
 
 Global Instance rel_inter_subrel {A B}:
   Proper (subrel ++> subrel ++> subrel) (@rel_inter A B).
@@ -69,72 +69,72 @@ Global Instance rel_inter_subrel_params:
   Params (@rel_inter) 2.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
-  subrel (R1 ∩ R2) R1.
+  subrel (R1 /\ R2) R1.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (subrel (_ ∩ _) _) =>
+Hint Extern 0 (subrel (_ /\ _) _) =>
   eapply rel_inter_eliml : typeclass_instances.
 
 Lemma rel_inter_elimr {A B} (R1 R2: rel A B):
-  subrel (R1 ∩ R2) R2.
+  subrel (R1 /\ R2) R2.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (subrel (_ ∩ _) _) =>
+Hint Extern 0 (subrel (_ /\ _) _) =>
   eapply rel_inter_elimr : typeclass_instances.
 
 Lemma rel_inter_glb {A B} (R R1 R2: rel A B):
   subrel R R1 ->
   subrel R R2 ->
-  subrel R (R1 ∩ R2).
+  subrel R (R1 /\ R2).
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 2 (subrel _ (_ ∩ _)) =>
+Hint Extern 2 (subrel _ (_ /\ _)) =>
   eapply rel_inter_glb : typeclass_instances.
 
 Lemma rel_inter_refl {A} (R1 R2: rel A A):
   Reflexive R1 ->
   Reflexive R2 ->
-  Reflexive (R1 ∩ R2).
+  Reflexive (R1 /\ R2).
 Proof.
   intros H1 H2.
   split; reflexivity.
 Qed.
 
-Hint Extern 2 (Reflexive (_ ∩ _)) =>
+Hint Extern 2 (Reflexive (_ /\ _)) =>
   eapply rel_inter_refl : typeclass_instances.
 
 Lemma rel_inter_trans {A} (R1 R2: rel A A):
   Transitive R1 ->
   Transitive R2 ->
-  Transitive (R1 ∩ R2).
+  Transitive (R1 /\ R2).
 Proof.
   intros H1 H2 x y z [Hxy1 Hxy2] [Hyz1 Hyz2].
   split; etransitivity; eassumption.
 Qed.
 
-Hint Extern 2 (Transitive (_ ∩ _)) =>
+Hint Extern 2 (Transitive (_ /\ _)) =>
   eapply rel_inter_trans : typeclass_instances.
 
 Lemma rel_inter_sym {A} (R1 R2: rel A A):
   Symmetric R1 ->
   Symmetric R2 ->
-  Symmetric (R1 ∩ R2).
+  Symmetric (R1 /\ R2).
 Proof.
   intros H1 H2 x y [Hxy1 Hxy2].
   split; symmetry; assumption.
 Qed.
 
-Hint Extern 2 (Symmetric (_ ∩ _)) =>
+Hint Extern 2 (Symmetric (_ /\ _)) =>
   eapply rel_inter_sym : typeclass_instances.
 
 Global Instance rel_inter_flip_sym {A} (R: rel A A):
-  Symmetric (R ∩ flip R).
+  Symmetric (R /\ flip R).
 Proof.
   intros x y [Hxy Hyx].
   split; assumption.
@@ -157,7 +157,7 @@ Hint Resolve (fun A B (x:A) (y:B) => I : rel_top x y).
 (** ** Relation equivalence *)
 
 Definition eqrel {A B}: rel (rel A B) (rel A B) :=
-  (subrel ∩ flip subrel).
+  (subrel /\ flip subrel)%rel.
 
 Arguments eqrel {_ _} RA%rel RB%rel.
 
