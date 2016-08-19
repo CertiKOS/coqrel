@@ -172,6 +172,11 @@ Qed.
 Hint Extern 1 (RElim (forallp_rel _ _) _ _ _ _) =>
   eapply forallp_relim : typeclass_instances.
 
+(** TODO: A further specialization could be [foralln_rel], which does
+  not even require that [v1], [v2] be related (let alone care about
+  the proof). In other words, a [forallr v1 v2, R] which would
+  essentially boil down to [forallr v1 v2 : ⊤, R]. *)
+
 (** *** Sets ([A -> Prop]) *)
 
 (** Sets of type [A -> Prop] can be related using the regular arrow
