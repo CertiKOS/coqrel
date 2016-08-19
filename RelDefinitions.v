@@ -149,6 +149,8 @@ Hint Extern 1000 (RAuto _) =>
 Class RIntro {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rintro: P -> R m n.
 
+Arguments RIntro {A%type B%type} P%type R%rel m n.
+
 Ltac rintro :=
   lazymatch goal with
     | |- ?R ?m ?n =>
@@ -184,6 +186,8 @@ Qed.
 Class RExists {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rexists: P -> R m n.
 
+Arguments RExists {A%type B%type} P%type R%rel m n.
+
 Ltac reexists :=
   lazymatch goal with
     | |- ?R ?m ?n =>
@@ -209,6 +213,8 @@ Qed.
 
 Class RElim {A B} (R: rel A B) (m: A) (n: B) (P Q: Prop): Prop :=
   relim: R m n -> P -> Q.
+
+Arguments RElim {A%type B%type} R%rel m n P%type Q%type.
 
 Ltac relim H :=
   lazymatch goal with
@@ -356,7 +362,7 @@ Hint Extern 39 (RStep _ (_ (match ?m with _=>_ end) (match ?m with _=>_ end))) =
 Class subrel {A B} (R1 R2: rel A B) :=
   subrel_at x y: R1 x y -> R2 x y.
 
-Arguments subrel {A B} R1%rel R2%rel.
+Arguments subrel {A%type B%type} R1%rel R2%rel.
 
 Global Instance subrel_preorder A B:
   @PreOrder (rel A B) subrel.
@@ -407,7 +413,7 @@ Qed.
 Class Related {A B} (f: A) (g: B) (R: rel A B) :=
   related: R f g.
 
-Arguments Related {_ _} _ _ R%rel.
+Arguments Related {A%type B%type} _ _ R%rel.
 
 Notation "'@' 'Monotonic' T m R" := (@Related T T m m R)
   (at level 10, T at next level, R at next level, m at next level).
@@ -472,7 +478,7 @@ Definition arrow_rel {A1 A2 B1 B2}:
   rel A1 A2 -> rel B1 B2 -> rel (A1 -> B1) (A2 -> B2) :=
     fun RA RB f g => forall x y, RA x y -> RB (f x) (g y).
 
-Arguments arrow_rel {_ _ _ _} RA%rel RB%rel _ _.
+Arguments arrow_rel {A1%type A2%type B1%type B2%type} RA%rel RB%rel _ _.
 
 Notation "RA ==> RB" := (arrow_rel RA RB)
   (at level 55, right associativity) : rel_scope.
@@ -549,7 +555,7 @@ Definition forall_rel {V1 V2} {E: V1->V2->Type} {FV1: V1->Type} {FV2: V2->Type}:
   fun FE f g =>
     forall v1 v2 (e: E v1 v2), FE v1 v2 e (f v1) (g v2).
 
-Arguments forall_rel {_ _ _ _ _} FE%rel _ _.
+Arguments forall_rel {V1%type V2%type E%type FV1%type FV2%type} FE%rel _ _.
 
 Notation "'forallr' e @ v1 v2 : E , R" :=
   (forall_rel (E := E) (fun v1 v2 e => R))

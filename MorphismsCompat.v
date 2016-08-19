@@ -66,7 +66,7 @@ Qed.
 Class FlipsTo {A B} (R: rel A B) (R': rel B A) :=
   flips_to: eqrel (flip R) R'.
 
-Arguments FlipsTo {_ _} R%rel R'%rel.
+Arguments FlipsTo {A%type B%type} R%rel R'%rel.
 
 (** Catch-all, default instance. *)
 

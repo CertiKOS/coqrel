@@ -29,7 +29,7 @@ Definition arrow_pointwise_rel A {B1 B2}:
   rel B1 B2 -> rel (A -> B1) (A -> B2) :=
     fun RB f g => forall a, RB (f a) (g a).
 
-Arguments arrow_pointwise_rel _ {_ _} RB%rel _ _.
+Arguments arrow_pointwise_rel A%type {B1%type B2%type} RB%rel _ _.
 
 Notation "- ==> R" := (arrow_pointwise_rel _ R)
   (at level 55, right associativity) : rel_scope.
@@ -97,7 +97,7 @@ Definition forall_pointwise_rel {V: Type} {FV1 FV2: V -> Type}:
   fun FE f g =>
     forall v, FE v (f v) (g v).
 
-Arguments forall_pointwise_rel {_ _ _} FE%rel _ _.
+Arguments forall_pointwise_rel {V%type FV1%type FV2%type} FE%rel _ _.
 
 Notation "'forallr' - @ v : V , FE" :=
   (forall_pointwise_rel (V := V) (fun v => FE))
@@ -144,7 +144,7 @@ Definition forallp_rel {V1 V2} (E: rel V1 V2) {FV1: V1->Type} {FV2: V2->Type}:
   fun FE f g =>
     forall v1 v2, E v1 v2 -> FE v1 v2 (f v1) (g v2).
 
-Arguments forallp_rel {_ _} _ {_ _} FE%rel _ _.
+Arguments forallp_rel {V1%type V2%type} E%rel {FV1%type FV2%type} FE%rel _ _.
 
 Notation "'forallr' v1 v2 : E , R" :=
   (forallp_rel E (fun v1 v2 => R))
