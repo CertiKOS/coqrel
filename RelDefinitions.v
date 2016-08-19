@@ -551,17 +551,21 @@ Definition forall_rel {V1 V2} {E: V1->V2->Type} {FV1: V1->Type} {FV2: V2->Type}:
 
 Arguments forall_rel {_ _ _ _ _} FE%rel _ _.
 
-Notation "∀  α : E v1 v2 , R" := (forall_rel (E := E) (fun v1 v2 α => R))
-  (at level 200, α ident, E at level 7, v1 ident, v2 ident, right associativity)
-  : rel_scope.
+Notation "'forallr' e @ v1 v2 : E , R" :=
+  (forall_rel (E := E) (fun v1 v2 e => R))
+  (at level 200, e ident, v1 ident, v2 ident, right associativity) : rel_scope.
 
-Notation "∀  α : E , R" := (forall_rel (E := E) (fun _ _ α => R))
-  (at level 200, α ident, E at level 7, right associativity)
-  : rel_scope.
+Notation "'forallr' e @ v1 v2 , R" :=
+  (forall_rel (fun v1 v2 e => R))
+  (at level 200, e ident, v1 ident, v2 ident, right associativity) : rel_scope.
 
-Notation "∀  α , R" := (forall_rel (fun _ _ α => R))
-  (at level 200, α ident, right associativity)
-  : rel_scope.
+Notation "'forallr' e : E , R" :=
+  (forall_rel (E := E) (fun _ _ e => R))
+  (at level 200, e ident, right associativity) : rel_scope.
+
+Notation "'forallr' e , R" :=
+  (forall_rel (fun _ _ e => R))
+  (at level 200, e ident, right associativity) : rel_scope.
 
 Global Instance forall_rintro {V1 V2 E F1 F2} (FE: forall x y, _ -> rel _ _) f g:
   RIntro

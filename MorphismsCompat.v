@@ -298,7 +298,7 @@ Ltac convert_proper :=
       | |- appcontext C[respectful ?R1 ?R2] =>
         let T' := context C[R1 ==> R2] in change T'
       | |- appcontext C[forall_relation ?R] =>
-        let T' := context C[∀ -, R] in change T'
+        let T' := context C[forallr -, R] in change T'
       | |- Morphisms.Proper ?R ?m =>
         change (ProperQuery rewrite_proper_query R m)
     end.

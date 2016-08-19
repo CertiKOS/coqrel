@@ -99,14 +99,21 @@ Definition forall_pointwise_rel {V: Type} {FV1 FV2: V -> Type}:
 
 Arguments forall_pointwise_rel {_ _ _} FE%rel _ _.
 
-Notation "∀ - , FE" := (forall_pointwise_rel (fun _ => FE))
+Notation "'forallr' - @ v : V , FE" :=
+  (forall_pointwise_rel (V := V) (fun v => FE))
+  (v ident, at level 200).
+
+Notation "'forallr' - @ v , FE" :=
+  (forall_pointwise_rel (fun v => FE))
+  (v ident, at level 200).
+
+Notation "'forallr' - : V , FE" :=
+  (forall_pointwise_rel (V := V) (fun _ => FE))
   (at level 200).
 
-Notation "∀ - : 'rel' , FE" := (forall_pointwise_rel (fun _ => FE))
+Notation "'forallr' - , FE" :=
+  (forall_pointwise_rel (fun _ => FE))
   (at level 200).
-
-Notation "∀ - : 'rel' v , FE" := (forall_pointwise_rel (fun v => FE))
-  (at level 200, v at level 0).
 
 Global Instance forall_pointwise_rintro {V FV1 FV2} (FE: forall v, rel _ _) f g:
   RIntro
@@ -139,8 +146,9 @@ Definition forallp_rel {V1 V2} (E: rel V1 V2) {FV1: V1->Type} {FV2: V2->Type}:
 
 Arguments forallp_rel {_ _} _ {_ _} FE%rel _ _.
 
-Notation "∀ ( v1 , v2 ) : E , R" := (forallp_rel E (fun v1 v2 => R))
-  (at level 200, E at level 7, v1 ident, v2 ident, right associativity)
+Notation "'forallr' v1 v2 : E , R" :=
+  (forallp_rel E (fun v1 v2 => R))
+  (at level 200, v1 ident, v2 ident, right associativity)
   : rel_scope.
 
 Global Instance forallp_rintro {V1 V2} {E: rel V1 V2} {F1 F2} (FE: forall v1 v2, rel _ _) f g:
@@ -237,19 +245,21 @@ Infix "+" := sum_rel : rel_scope.
   a corresponding, full-blown [Proper] instance. *)
 
 Global Instance inl_rel:
-  Proper (∀ RA, ∀ RB, RA ++> RA + RB) (@inl).
+  Proper (forallr RA, forallr RB, RA ++> RA + RB) (@inl).
 Proof.
   exact @inl_rel_def.
 Qed.
 
 Global Instance inr_rel:
-  Proper (∀ RA, ∀ RB, RB ++> RA + RB) (@inr).
+  Proper (forallr RA, forallr RB, RB ++> RA + RB) (@inr).
 Proof.
   exact @inr_rel_def.
 Qed.
 
 Global Instance sum_subrel:
-  Proper (∀ -, ∀ -, subrel ++> ∀ -, ∀ -, subrel ++> subrel) (@sum_rel).
+  Proper
+    (forallr -, forallr -, subrel ++> forallr -, forallr -, subrel ++> subrel)
+    (@sum_rel).
 Proof.
   intros A1 A2 RA1 RA2 HRA B1 B2 RB1 RB2 HRB.
   intros x1 x2 Hx.
@@ -293,7 +303,7 @@ Definition prod_rel {A1 A2} RA {B1 B2} RB: rel (A1 * B1)%type (A2 * B2)%type :=
 Infix "*" := prod_rel : rel_scope.
 
 Global Instance pair_rel:
-  Proper (∀ RA, ∀ RB, RA ++> RB ++> RA * RB) (@pair).
+  Proper (forallr RA, forallr RB, RA ++> RB ++> RA * RB) (@pair).
 Proof.
   intros A1 A2 RA B1 B2 RB a1 a2 Ha b1 b2 Hb.
   red.
@@ -301,7 +311,7 @@ Proof.
 Qed.
 
 Global Instance fst_rel:
-  Proper (∀ RA, ∀ RB, RA * RB ==> RA) (@fst).
+  Proper (forallr RA, forallr RB, RA * RB ==> RA) (@fst).
 Proof.
   intros A1 A2 RA B1 B2 RB.
   intros x1 x2 [Ha Hb].
@@ -309,7 +319,7 @@ Proof.
 Qed.
 
 Global Instance snd_rel:
-  Proper (∀ RA, ∀ RB, RA * RB ==> RB) (@snd).
+  Proper (forallr RA, forallr RB, RA * RB ==> RB) (@snd).
 Proof.
   intros A1 A2 RA B1 B2 RB.
   intros x1 x2 [Ha Hb].
@@ -317,7 +327,9 @@ Proof.
 Qed.
 
 Global Instance prod_subrel:
-  Proper (∀ -, ∀ -, subrel ++> ∀ -, ∀ -, subrel ++> subrel) (@prod_rel).
+  Proper
+    (forallr -, forallr -, subrel ++> forallr -, forallr -, subrel ++> subrel)
+    (@prod_rel).
 Proof.
   firstorder.
 Qed.
@@ -365,19 +377,19 @@ Inductive option_rel {A1 A2} (RA: rel A1 A2): rel (option A1) (option A2) :=
   | None_rel_def: option_rel RA (@None A1) (@None A2).
 
 Global Instance Some_rel:
-  Proper (∀ R : rel A1 A2, R ++> option_rel R) (@Some).
+  Proper (forallr R @ A1 A2 : rel, R ++> option_rel R) (@Some).
 Proof.
   exact @Some_rel_def.
 Qed.
 
 Global Instance None_rel:
-  Proper (∀ R, option_rel R) (@None).
+  Proper (forallr R, option_rel R) (@None).
 Proof.
   exact @None_rel_def.
 Qed.
 
 Global Instance option_subrel:
-  Proper (∀ -, ∀ -, subrel ++> subrel) (@option_rel).
+  Proper (forallr -, forallr -, subrel ++> subrel) (@option_rel).
 Proof.
   intros A1 A2 RA1 RA2 HRA.
   intros x1 x2 Hx.
@@ -401,13 +413,13 @@ Inductive list_rel {A1 A2} (R: rel A1 A2): rel (list A1) (list A2) :=
   | cons_rel_def: (R ++> list_rel R ++> list_rel R) (@cons A1) (@cons A2).
 
 Global Instance nil_rel:
-  Proper (∀ R, list_rel R) (@nil).
+  Proper (forallr R, list_rel R) (@nil).
 Proof.
   exact @nil_rel_def.
 Qed.
 
 Global Instance cons_rel:
-  Proper (∀ R, R ++> list_rel R ++> list_rel R) (@cons).
+  Proper (forallr R, R ++> list_rel R ++> list_rel R) (@cons).
 Proof.
   exact @cons_rel_def.
 Qed.
@@ -421,7 +433,7 @@ Proof.
 Qed.
 
 Global Instance app_rel:
-  Proper (∀ R : rel, list_rel R ++> list_rel R ++> list_rel R) (@app).
+  Proper (forallr R : rel, list_rel R ++> list_rel R ++> list_rel R) (@app).
 Proof.
   intros A1 A2 R l1 l2 Hl.
   induction Hl as [ | x1 x2 Hx l1 l2 Hl IHl]; simpl.
@@ -430,7 +442,9 @@ Proof.
 Qed.
 
 Global Instance map_rel:
-  Proper (∀ RA, ∀ RB, (RA ++> RB) ++> list_rel RA ++> list_rel RB) map.
+  Proper
+    (forallr RA, forallr RB, (RA ++> RB) ++> list_rel RA ++> list_rel RB)
+    map.
 Proof.
   intros A1 A2 RA B1 B2 RB f g Hfg l1 l2 Hl.
   induction Hl; constructor; eauto.
@@ -438,7 +452,7 @@ Qed.
 
 Global Instance fold_right_rel:
   Proper
-    (∀ RA, ∀ RB, (RB ++> RA ++> RA) ++> RA ++> list_rel RB ++> RA)
+    (forallr RA, forallr RB, (RB ++> RA ++> RA) ++> RA ++> list_rel RB ++> RA)
     fold_right.
 Proof.
   intros A1 A2 RA B1 B2 RB f g Hfg a1 a2 Ha l1 l2 Hl.
@@ -448,7 +462,7 @@ Qed.
 
 Global Instance fold_left_rel:
   Proper
-    (∀ RA, ∀ RB, (RA ++> RB ++> RA) ++> list_rel RB ++> RA ++> RA)
+    (forallr RA, forallr RB, (RA ++> RB ++> RA) ++> list_rel RB ++> RA ++> RA)
     fold_left.
 Proof.
   intros A1 A2 RA B1 B2 RB f g Hfg l1 l2 Hl.
