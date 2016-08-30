@@ -68,6 +68,15 @@ Open Scope type_scope.
 
 Bind Scope rel_scope with Relation_Definitions.relation.
 
+(** For Coq 8.4 we need to rescope the arguments for common
+  definitions; in 8.5 it seems it is done automatically. *)
+
+Arguments Reflexive {A%type} R%rel.
+Arguments Transitive {A%type} R%rel.
+Arguments Symmetric {A%type} R%rel.
+Arguments PreOrder {A%type} R%rel.
+Arguments Equivalence {A%type} R%rel.
+
 (** ** Proof step *)
 
 (** This is a catch-all class for any applicable strategy allowing us
