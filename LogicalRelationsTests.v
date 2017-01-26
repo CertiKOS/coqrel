@@ -206,3 +206,18 @@ Proof.
   eexists.
   solve_monotonic.
 Qed.
+
+(** ** Tests for specific relators *)
+
+(** [list_subrel] use to not work because of a missing [Params] declaration. *)
+
+Goal
+  forall A B (R R': rel A B) l1 l2 x y,
+    subrel R R' ->
+    list_rel R l1 l2 ->
+    R' x y ->
+    list_rel R' (x :: l1) (y :: l2).
+Proof.
+  intros.
+  rauto.
+Qed.

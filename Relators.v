@@ -437,6 +437,9 @@ Proof.
   induction 1; constructor; eauto.
 Qed.
 
+Global Instance list_subrel_params:
+  Params (@list_rel) 1.
+
 Global Instance app_rel:
   Proper (forallr R : rel, list_rel R ++> list_rel R ++> list_rel R) (@app).
 Proof.
