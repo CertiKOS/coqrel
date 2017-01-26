@@ -192,16 +192,13 @@ Hint Extern 1 (RElim (forallp_rel _ _) _ _ _ _) =>
 Definition set_rel {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
   fun sA sB => forall a, sA a -> exists b, sB b /\ R a b.
 
-Global Instance set_subrel A B:
-  Proper (subrel ++> subrel) (@set_rel A B).
+Global Instance set_subrel:
+  Proper (forallr -, forallr -, subrel ++> subrel) (@set_rel).
 Proof.
-  intros R1 R2 HR sA sB Hs.
+  intros A B R1 R2 HR sA sB Hs.
   intros x Hx.
   destruct (Hs x) as (y & Hy & Hxy); eauto.
 Qed.
-
-Global Instance set_subrel_params:
-  Params (@set_rel) 1.
 
 (** ** Inductive types *)
 
@@ -429,16 +426,13 @@ Proof.
   exact @cons_rel_def.
 Qed.
 
-Global Instance list_subrel {A1 A2}:
-  Proper (subrel ++> subrel) (@list_rel A1 A2).
+Global Instance list_subrel:
+  Proper (forallr -, forallr -, subrel ++> subrel) (@list_rel).
 Proof.
-  intros R S HRS x y.
+  intros A B R S HRS x y.
   red in HRS.
   induction 1; constructor; eauto.
 Qed.
-
-Global Instance list_subrel_params:
-  Params (@list_rel) 1.
 
 Global Instance list_rel_refl `(HR: Reflexive):
   Reflexive (list_rel R).
