@@ -440,6 +440,28 @@ Qed.
 Global Instance list_subrel_params:
   Params (@list_rel) 1.
 
+Global Instance list_rel_refl `(HR: Reflexive):
+  Reflexive (list_rel R).
+Proof.
+  intros l.
+  induction l; constructor; eauto.
+Qed.
+
+Global Instance list_rel_sym `(HR: Symmetric):
+  Symmetric (list_rel R).
+Proof.
+  intros l1 l2 Hl.
+  induction Hl; constructor; eauto.
+Qed.
+
+Global Instance list_rel_trans `(HR: Transitive):
+  Transitive (list_rel R).
+Proof.
+  intros l1 l2 l3 Hl12 Hl23.
+  revert l3 Hl23.
+  induction Hl12; inversion 1; constructor; eauto.
+Qed.
+
 Global Instance app_rel:
   Proper (forallr R : rel, list_rel R ++> list_rel R ++> list_rel R) (@app).
 Proof.
