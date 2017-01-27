@@ -1,0 +1,371 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link href="coqdoc.css" rel="stylesheet" type="text/css"/>
+<title>coqrel.Transport</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library coqrel.Transport</h1>
+
+<div class="code">
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Export</span> <a class="idref" href="coqrel.Monotonicity.html#"><span class="id" type="library">Monotonicity</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab9"></a><h2 class="section">The <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#transport"><span class="id" type="projection">transport</span></a></span> tactic</h2>
+
+<div class="paragraph"> </div>
+
+ Often, we know that a number of terms are related, and need to
+  transport hypotheses built out the the left-hand sides into ones
+  with similar shapes, but built out of the right-hand sides. For
+  instance, in cirumstances where <span class="inlinecode"><span class="id" type="var">solve_monotonic</span></span> can establish
+  <span class="inlinecode"><span class="id" type="var">option_le</span></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x"><span class="id" type="variable">x</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a></span>, we will want to turn a hypothesis of the form
+  <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x"><span class="id" type="variable">x</span></a></span> <span class="inlinecode">=</span> <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#Some"><span class="id" type="constructor">Some</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#a"><span class="id" type="variable">a</span></a></span> into one of the form <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a></span> <span class="inlinecode">=</span> <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#Some"><span class="id" type="constructor">Some</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#b"><span class="id" type="variable">b</span></a></span>, and remember that
+  <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#a"><span class="id" type="variable">a</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#b"><span class="id" type="variable">b</span></a></span>. This is the role of the <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#transport"><span class="id" type="projection">transport</span></a></span> tactic. 
+<div class="paragraph"> </div>
+
+<a name="lab10"></a><h3 class="section">Transportable hypotheses</h3>
+
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+<span class="id" type="keyword">Class</span> <a name="Transport"><span class="id" type="record">Transport</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Transport.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Transport.html#B"><span class="id" type="variable">B</span></a>) (<span class="id" type="var">a</span>: <a class="idref" href="coqrel.Transport.html#A"><span class="id" type="variable">A</span></a>) (<span class="id" type="var">b</span>: <a class="idref" href="coqrel.Transport.html#B"><span class="id" type="variable">B</span></a>) (<span class="id" type="var">PA</span>: <span class="id" type="keyword">Prop</span>) (<span class="id" type="var">PB</span>: <span class="id" type="keyword">Prop</span>) :=<br/>
+&nbsp;&nbsp;<a name="transport"><span class="id" type="projection">transport</span></a>: <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Transport.html#a"><span class="id" type="variable">a</span></a> <a class="idref" href="coqrel.Transport.html#b"><span class="id" type="variable">b</span></a> → <a class="idref" href="coqrel.Transport.html#PA"><span class="id" type="variable">PA</span></a> → <a class="idref" href="coqrel.Transport.html#PB"><span class="id" type="variable">PB</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The stereotypical example is <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#option_rel"><span class="id" type="inductive">option_rel</span></a></span>, which we can use to
+  transport hypotheses as per the following instances. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="option_rel_transport_eq_some"><span class="id" type="instance">option_rel_transport_eq_some</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Transport.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Transport.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">x</span> <span class="id" type="var">y</span> <span class="id" type="var">a</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> (<a class="idref" href="coqrel.Relators.html#option_rel"><span class="id" type="inductive">option_rel</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a>) <a class="idref" href="coqrel.Transport.html#x"><span class="id" type="variable">x</span></a> <a class="idref" href="coqrel.Transport.html#y"><span class="id" type="variable">y</span></a> (<a class="idref" href="coqrel.Transport.html#x"><span class="id" type="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'='_x"><span class="id" type="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#Some"><span class="id" type="constructor">Some</span></a> <a class="idref" href="coqrel.Transport.html#a"><span class="id" type="variable">a</span></a>) (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">∃</span></a> <span class="id" type="var">b</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#y"><span class="id" type="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'='_x"><span class="id" type="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#Some"><span class="id" type="constructor">Some</span></a> <a class="idref" href="coqrel.Transport.html#b"><span class="id" type="variable">b</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Transport.html#a"><span class="id" type="variable">a</span></a> <a class="idref" href="coqrel.Transport.html#b"><span class="id" type="variable">b</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">Hxy</span> <span class="id" type="var">Hx</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">subst</span>; <span class="id" type="tactic">inversion</span> <span class="id" type="var">Hxy</span>; <span class="id" type="tactic">eauto</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="option_rel_transport_eq_none"><span class="id" type="instance">option_rel_transport_eq_none</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Transport.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Transport.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">x</span> <span class="id" type="var">y</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> (<a class="idref" href="coqrel.Relators.html#option_rel"><span class="id" type="inductive">option_rel</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a>) <a class="idref" href="coqrel.Transport.html#x"><span class="id" type="variable">x</span></a> <a class="idref" href="coqrel.Transport.html#y"><span class="id" type="variable">y</span></a> (<a class="idref" href="coqrel.Transport.html#x"><span class="id" type="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'='_x"><span class="id" type="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#None"><span class="id" type="constructor">None</span></a>) (<a class="idref" href="coqrel.Transport.html#y"><span class="id" type="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'='_x"><span class="id" type="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#None"><span class="id" type="constructor">None</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">Hxy</span> <span class="id" type="var">Hx</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">subst</span>; <span class="id" type="tactic">inversion</span> <span class="id" type="var">Hxy</span>; <span class="id" type="tactic">eauto</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+A similar approach can be used to transport hypotheses which assert
+  a element of a product type is equal to a specific pair. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="prod_rel_transport_eq_pair"><span class="id" type="instance">prod_rel_transport_eq_pair</span></a> {<span class="id" type="var">A1</span> <span class="id" type="var">B1</span> <span class="id" type="var">A2</span> <span class="id" type="var">B2</span>} (<span class="id" type="var">R1</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Transport.html#A1"><span class="id" type="variable">A1</span></a> <a class="idref" href="coqrel.Transport.html#B1"><span class="id" type="variable">B1</span></a>) (<span class="id" type="var">R2</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Transport.html#A2"><span class="id" type="variable">A2</span></a> <a class="idref" href="coqrel.Transport.html#B2"><span class="id" type="variable">B2</span></a>) <span class="id" type="var">x</span> <span class="id" type="var">y</span> <span class="id" type="var">a1</span> <span class="id" type="var">a2</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> (<a class="idref" href="coqrel.Relators.html#prod_rel"><span class="id" type="definition">prod_rel</span></a> <a class="idref" href="coqrel.Transport.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.Transport.html#R2"><span class="id" type="variable">R2</span></a>) <a class="idref" href="coqrel.Transport.html#x"><span class="id" type="variable">x</span></a> <a class="idref" href="coqrel.Transport.html#y"><span class="id" type="variable">y</span></a> (<a class="idref" href="coqrel.Transport.html#x"><span class="id" type="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'='_x"><span class="id" type="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(</span></a><a class="idref" href="coqrel.Transport.html#a1"><span class="id" type="variable">a1</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#a2"><span class="id" type="variable">a2</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a>) (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">∃</span></a> <span class="id" type="var">b1</span> <span class="id" type="var">b2</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#y"><span class="id" type="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'='_x"><span class="id" type="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(</span></a><a class="idref" href="coqrel.Transport.html#b1"><span class="id" type="variable">b1</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#b2"><span class="id" type="variable">b2</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.Transport.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.Transport.html#a1"><span class="id" type="variable">a1</span></a> <a class="idref" href="coqrel.Transport.html#b1"><span class="id" type="variable">b1</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.Transport.html#R2"><span class="id" type="variable">R2</span></a> <a class="idref" href="coqrel.Transport.html#a2"><span class="id" type="variable">a2</span></a> <a class="idref" href="coqrel.Transport.html#b2"><span class="id" type="variable">b2</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> [<span class="id" type="var">Hxy1</span> <span class="id" type="var">Hxy2</span>] <span class="id" type="var">Hx</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">destruct</span> <span class="id" type="var">y</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">subst</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">simpl</span> <span class="id" type="keyword">in</span> ×.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">eauto</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+For <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#set_rel"><span class="id" type="definition">set_rel</span></a></span> the situation is slightly more involved, for two
+  reasons. First, a regular <span class="inlinecode"><span class="id" type="tactic">eapply</span></span> <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#set_rel_transport"><span class="id" type="lemma">set_rel_transport</span></a></span> fails to unify
+  the parameter <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#B"><span class="id" type="variable">B</span></a></span> of <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="record">Transport</span></a></span> against the <span class="inlinecode"><span class="id" type="var">_</span></span> <span class="inlinecode">→</span> <span class="inlinecode"><span class="id" type="keyword">Prop</span></span> provied by
+  the instance below. This can be worked around by pre-unifying that
+  specific parameter. Second, because <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#set_rel_transport"><span class="id" type="lemma">set_rel_transport</span></a></span> is
+  potentially applicable to virtually any hypothesis (since there is
+  no strongly distinguishing syntactic format in our target
+  hypotheses), it makes <span class="inlinecode"><span class="id" type="var">transport_hyps</span></span> very slow.
+
+<div class="paragraph"> </div>
+
+  To address this, we explicitely register hints based on the
+  <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#set_rel_transport"><span class="id" type="lemma">set_rel_transport</span></a></span> tactic, which looks for "keywords" before doing
+  anything, then applies the lemma with the required unification
+  preparation. For example, <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#set_rel_transport"><span class="id" type="lemma">set_rel_transport</span></a></span> is used in the
+  following way in the <span class="inlinecode"><span class="id" type="var">SimClight</span></span> library:
+  <tt>&lt;
+  Hint Extern 1 (Transport _ _ _ _ _) =&gt;
+    set_rel_transport @assign_loc : typeclass_instances.
+  </tt>&gt;
+  Note that it's necessary to use <span class="inlinecode">@</span> because <span class="inlinecode"><span class="id" type="var">assign_loc</span></span> is
+  parametrized by typeclasses, and we want to avoid undue
+  specialization at hint registration time. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Lemma</span> <a name="set_rel_transport"><span class="id" type="lemma">set_rel_transport</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Transport.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Transport.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">sA</span> <span class="id" type="var">sB</span> <span class="id" type="var">a</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> (<a class="idref" href="coqrel.Relators.html#set_rel"><span class="id" type="definition">set_rel</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a>) <a class="idref" href="coqrel.Transport.html#sA"><span class="id" type="variable">sA</span></a> <a class="idref" href="coqrel.Transport.html#sB"><span class="id" type="variable">sB</span></a> (<a class="idref" href="coqrel.Transport.html#sA"><span class="id" type="variable">sA</span></a> <a class="idref" href="coqrel.Transport.html#a"><span class="id" type="variable">a</span></a>) (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">∃</span></a> <span class="id" type="var">b</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#sB"><span class="id" type="variable">sB</span></a> <a class="idref" href="coqrel.Transport.html#b"><span class="id" type="variable">b</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Transport.html#a"><span class="id" type="variable">a</span></a> <a class="idref" href="coqrel.Transport.html#b"><span class="id" type="variable">b</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">HsAB</span> <span class="id" type="var">Ha</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="var">edestruct</span> <span class="id" type="var">HsAB</span>; <span class="id" type="tactic">eauto</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">set_rel_transport</span> <span class="id" type="var">keyword</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| |- @<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> ?<span class="id" type="var">A</span> ?<span class="id" type="var">B</span> ?<span class="id" type="var">R</span> ?<span class="id" type="var">a</span> ?<span class="id" type="var">b</span> ?<span class="id" type="var">PA</span> ?<span class="id" type="var">PB</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">PA</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">appcontext</span> [<span class="id" type="var">keyword</span>] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Xv</span> := <span class="id" type="tactic">fresh</span> "X" <span class="id" type="keyword">in</span> <span class="id" type="tactic">evar</span> (<span class="id" type="var">Xv</span>: <span class="id" type="keyword">Type</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">X</span> := <span class="id" type="tactic">eval</span> <span class="id" type="tactic">red</span> <span class="id" type="keyword">in</span> <span class="id" type="var">Xv</span> <span class="id" type="keyword">in</span> <span class="id" type="tactic">clear</span> <span class="id" type="var">Xv</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">unify</span> <span class="id" type="var">B</span> (<span class="id" type="var">X</span> → <span class="id" type="keyword">Prop</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.Transport.html#set_rel_transport"><span class="id" type="lemma">set_rel_transport</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+We defined a few more relation patterns based on <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#set_rel"><span class="id" type="definition">set_rel</span></a></span> and
+  <span class="inlinecode"><a class="idref" href="coqrel.RelOperators.html#rel_curry"><span class="id" type="definition">rel_curry</span></a></span>, with a similar strategy. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Lemma</span> <a name="rel_curry_set_rel_transport"><span class="id" type="lemma">rel_curry_set_rel_transport</span></a> {<span class="id" type="var">A1</span> <span class="id" type="var">A2</span> <span class="id" type="var">B1</span> <span class="id" type="var">B2</span>} <span class="id" type="var">R</span> <span class="id" type="var">sA</span> <span class="id" type="var">sB</span> (<span class="id" type="var">a1</span>: <a class="idref" href="coqrel.Transport.html#A1"><span class="id" type="variable">A1</span></a>) (<span class="id" type="var">a2</span>: <a class="idref" href="coqrel.Transport.html#A2"><span class="id" type="variable">A2</span></a>):<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> (<a class="idref" href="coqrel.RelOperators.html#rel_curry"><span class="id" type="definition">rel_curry</span></a> (<a class="idref" href="coqrel.Relators.html#set_rel"><span class="id" type="definition">set_rel</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a>)) <a class="idref" href="coqrel.Transport.html#sA"><span class="id" type="variable">sA</span></a> <a class="idref" href="coqrel.Transport.html#sB"><span class="id" type="variable">sB</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="coqrel.Transport.html#sA"><span class="id" type="variable">sA</span></a> <a class="idref" href="coqrel.Transport.html#a1"><span class="id" type="variable">a1</span></a> <a class="idref" href="coqrel.Transport.html#a2"><span class="id" type="variable">a2</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">∃</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">(</span></a><span class="id" type="var">b1</span>: <a class="idref" href="coqrel.Transport.html#B1"><span class="id" type="variable">B1</span></a>) (<span class="id" type="var">b2</span>: <a class="idref" href="coqrel.Transport.html#B2"><span class="id" type="variable">B2</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">),</span></a> <a class="idref" href="coqrel.Transport.html#sB"><span class="id" type="variable">sB</span></a> <a class="idref" href="coqrel.Transport.html#b1"><span class="id" type="variable">b1</span></a> <a class="idref" href="coqrel.Transport.html#b2"><span class="id" type="variable">b2</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(</span></a><a class="idref" href="coqrel.Transport.html#a1"><span class="id" type="variable">a1</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#a2"><span class="id" type="variable">a2</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(</span></a><a class="idref" href="coqrel.Transport.html#b1"><span class="id" type="variable">b1</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#b2"><span class="id" type="variable">b2</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">HsAB</span> <span class="id" type="var">Ha</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">destruct</span> (<span class="id" type="var">HsAB</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(</span></a><span class="id" type="var">a1</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <span class="id" type="var">a2</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a>) <span class="id" type="keyword">as</span> ([<span class="id" type="var">b1</span> <span class="id" type="var">b2</span>] &amp; <span class="id" type="var">Hb</span> &amp; <span class="id" type="var">Hab</span>); <span class="id" type="tactic">eauto</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">rel_curry_set_rel_transport</span> <span class="id" type="var">keyword</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| |- @<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> ?<span class="id" type="var">A</span> ?<span class="id" type="var">B</span> ?<span class="id" type="var">R</span> ?<span class="id" type="var">a</span> ?<span class="id" type="var">b</span> ?<span class="id" type="var">PA</span> ?<span class="id" type="var">PB</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">PA</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">appcontext</span> [<span class="id" type="var">keyword</span>] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Xv</span> := <span class="id" type="tactic">fresh</span> "X" <span class="id" type="keyword">in</span> <span class="id" type="tactic">evar</span> (<span class="id" type="var">Xv</span>: <span class="id" type="keyword">Type</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">X</span> := <span class="id" type="tactic">eval</span> <span class="id" type="tactic">red</span> <span class="id" type="keyword">in</span> <span class="id" type="var">Xv</span> <span class="id" type="keyword">in</span> <span class="id" type="tactic">clear</span> <span class="id" type="var">Xv</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Yv</span> := <span class="id" type="tactic">fresh</span> "Y" <span class="id" type="keyword">in</span> <span class="id" type="tactic">evar</span> (<span class="id" type="var">Yv</span>: <span class="id" type="keyword">Type</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Y</span> := <span class="id" type="tactic">eval</span> <span class="id" type="tactic">red</span> <span class="id" type="keyword">in</span> <span class="id" type="var">Yv</span> <span class="id" type="keyword">in</span> <span class="id" type="tactic">clear</span> <span class="id" type="var">Yv</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">unify</span> <span class="id" type="var">B</span> (<span class="id" type="var">X</span> → <span class="id" type="var">Y</span> → <span class="id" type="keyword">Prop</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.Transport.html#rel_curry_set_rel_transport"><span class="id" type="lemma">rel_curry_set_rel_transport</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Lemma</span> <a name="rel_curry2_set_rel_transport"><span class="id" type="lemma">rel_curry2_set_rel_transport</span></a> {<span class="id" type="var">A1</span> <span class="id" type="var">A2</span> <span class="id" type="var">A3</span> <span class="id" type="var">B1</span> <span class="id" type="var">B2</span> <span class="id" type="var">B3</span>} <span class="id" type="var">R</span> <span class="id" type="var">sA</span> <span class="id" type="var">sB</span> (<span class="id" type="var">a1</span>: <a class="idref" href="coqrel.Transport.html#A1"><span class="id" type="variable">A1</span></a>) (<span class="id" type="var">a2</span>: <a class="idref" href="coqrel.Transport.html#A2"><span class="id" type="variable">A2</span></a>) (<span class="id" type="var">a3</span>: <a class="idref" href="coqrel.Transport.html#A3"><span class="id" type="variable">A3</span></a>):<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> (<a class="idref" href="coqrel.RelOperators.html#rel_curry"><span class="id" type="definition">rel_curry</span></a> (<a class="idref" href="coqrel.RelOperators.html#rel_curry"><span class="id" type="definition">rel_curry</span></a> (<a class="idref" href="coqrel.Relators.html#set_rel"><span class="id" type="definition">set_rel</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a>))) <a class="idref" href="coqrel.Transport.html#sA"><span class="id" type="variable">sA</span></a> <a class="idref" href="coqrel.Transport.html#sB"><span class="id" type="variable">sB</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="coqrel.Transport.html#sA"><span class="id" type="variable">sA</span></a> <a class="idref" href="coqrel.Transport.html#a1"><span class="id" type="variable">a1</span></a> <a class="idref" href="coqrel.Transport.html#a2"><span class="id" type="variable">a2</span></a> <a class="idref" href="coqrel.Transport.html#a3"><span class="id" type="variable">a3</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">∃</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">(</span></a><span class="id" type="var">b1</span>: <a class="idref" href="coqrel.Transport.html#B1"><span class="id" type="variable">B1</span></a>) (<span class="id" type="var">b2</span>: <a class="idref" href="coqrel.Transport.html#B2"><span class="id" type="variable">B2</span></a>) (<span class="id" type="var">b3</span>: <a class="idref" href="coqrel.Transport.html#B3"><span class="id" type="variable">B3</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:'exists'_x_'..'_x_','_x"><span class="id" type="notation">),</span></a> <a class="idref" href="coqrel.Transport.html#sB"><span class="id" type="variable">sB</span></a> <a class="idref" href="coqrel.Transport.html#b1"><span class="id" type="variable">b1</span></a> <a class="idref" href="coqrel.Transport.html#b2"><span class="id" type="variable">b2</span></a> <a class="idref" href="coqrel.Transport.html#b3"><span class="id" type="variable">b3</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(</span></a><a class="idref" href="coqrel.Transport.html#a1"><span class="id" type="variable">a1</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#a2"><span class="id" type="variable">a2</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#a3"><span class="id" type="variable">a3</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(</span></a><a class="idref" href="coqrel.Transport.html#b1"><span class="id" type="variable">b1</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#b2"><span class="id" type="variable">b2</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="coqrel.Transport.html#b3"><span class="id" type="variable">b3</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">HsAB</span> <span class="id" type="var">Ha</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">destruct</span> (<span class="id" type="var">HsAB</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(</span></a><span class="id" type="var">a1</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <span class="id" type="var">a2</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <span class="id" type="var">a3</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a>) <span class="id" type="keyword">as</span> ([[<span class="id" type="var">b1</span> <span class="id" type="var">b2</span>] <span class="id" type="var">b3</span>] &amp; <span class="id" type="var">Hb</span> &amp; <span class="id" type="var">Hab</span>); <span class="id" type="tactic">eauto</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">rel_curry2_set_rel_transport</span> <span class="id" type="var">keyword</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| |- @<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> ?<span class="id" type="var">A</span> ?<span class="id" type="var">B</span> ?<span class="id" type="var">R</span> ?<span class="id" type="var">a</span> ?<span class="id" type="var">b</span> ?<span class="id" type="var">PA</span> ?<span class="id" type="var">PB</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">PA</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">appcontext</span> [<span class="id" type="var">keyword</span>] ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Xv</span> := <span class="id" type="tactic">fresh</span> "X" <span class="id" type="keyword">in</span> <span class="id" type="tactic">evar</span> (<span class="id" type="var">Xv</span>: <span class="id" type="keyword">Type</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">X</span> := <span class="id" type="tactic">eval</span> <span class="id" type="tactic">red</span> <span class="id" type="keyword">in</span> <span class="id" type="var">Xv</span> <span class="id" type="keyword">in</span> <span class="id" type="tactic">clear</span> <span class="id" type="var">Xv</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Yv</span> := <span class="id" type="tactic">fresh</span> "Y" <span class="id" type="keyword">in</span> <span class="id" type="tactic">evar</span> (<span class="id" type="var">Yv</span>: <span class="id" type="keyword">Type</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Y</span> := <span class="id" type="tactic">eval</span> <span class="id" type="tactic">red</span> <span class="id" type="keyword">in</span> <span class="id" type="var">Yv</span> <span class="id" type="keyword">in</span> <span class="id" type="tactic">clear</span> <span class="id" type="var">Yv</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Zv</span> := <span class="id" type="tactic">fresh</span> "Y" <span class="id" type="keyword">in</span> <span class="id" type="tactic">evar</span> (<span class="id" type="var">Yv</span>: <span class="id" type="keyword">Type</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Z</span> := <span class="id" type="tactic">eval</span> <span class="id" type="tactic">red</span> <span class="id" type="keyword">in</span> <span class="id" type="var">Yv</span> <span class="id" type="keyword">in</span> <span class="id" type="tactic">clear</span> <span class="id" type="var">Yv</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">unify</span> <span class="id" type="var">B</span> (<span class="id" type="var">X</span> → <span class="id" type="var">Y</span> → <span class="id" type="var">Z</span> → <span class="id" type="keyword">Prop</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.Transport.html#rel_curry2_set_rel_transport"><span class="id" type="lemma">rel_curry2_set_rel_transport</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The situation for <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Program.Basics.html#impl"><span class="id" type="definition">impl</span></a></span> is similar: since this transport instance
+  can apply to pretty much anything, we need to register it on a
+  case-by-case basis. Here is an example used in the CertiKOS proof
+  for hypotheses of the form <span class="inlinecode"><span class="id" type="var">writable_block</span></span> <span class="inlinecode"><span class="id" type="var">ge</span></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#b"><span class="id" type="variable">b</span></a></span>:
+  <tt>&lt;
+  Hint Extern 10 (Transport _ _ _ (writable_block _ _) _) =&gt;
+    eapply impl_transport : typeclass_instances.
+  </tt>&gt; 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Lemma</span> <a name="impl_transport"><span class="id" type="lemma">impl_transport</span></a> <span class="id" type="var">P</span> <span class="id" type="var">Q</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Program.Basics.html#impl"><span class="id" type="definition">impl</span></a> <a class="idref" href="coqrel.Transport.html#P"><span class="id" type="variable">P</span></a> <a class="idref" href="coqrel.Transport.html#Q"><span class="id" type="variable">Q</span></a> <a class="idref" href="coqrel.Transport.html#P"><span class="id" type="variable">P</span></a> <a class="idref" href="coqrel.Transport.html#Q"><span class="id" type="variable">Q</span></a>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Often, the target hypotheses declared using the <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="record">Transport</span></a></span> class
+  have existential quantifiers, and need to be broken up to get to the
+  actual relational hypotheses we're interested in. The <span class="inlinecode"><span class="id" type="var">split_hyp</span></span>
+  tactic does that. We also use that opportunity to split up
+  <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#prod_rel"><span class="id" type="definition">prod_rel</span></a></span> and <span class="inlinecode"><a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a></span> when appropriate. For <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#prod_rel"><span class="id" type="definition">prod_rel</span></a></span> this is
+  especially useful when <span class="inlinecode"><a class="idref" href="coqrel.RelOperators.html#rel_curry"><span class="id" type="definition">rel_curry</span></a></span> is involved. Likewise we
+  generally want to split up <span class="inlinecode"><a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a></span> as soon as possible, so that
+  the existentially quantified world therein can be used to
+  instantiate evars that have been spawned from that point on.
+
+<div class="paragraph"> </div>
+
+  As a generally useful complement, the <span class="inlinecode"><span class="id" type="var">split_hyps</span></span> tactic applies
+  the same process to all hypotheses. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">split_hyp</span> <span class="id" type="var">H</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">type</span> <span class="id" type="var">of</span> <span class="id" type="var">H</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#ex"><span class="id" type="inductive">ex</span></a> <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">destruct</span> <span class="id" type="var">H</span> <span class="id" type="keyword">as</span> [? <span class="id" type="var">H</span>];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">split_hyp</span> <span class="id" type="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">_</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">H1</span> := <span class="id" type="tactic">fresh</span> <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">H2</span> := <span class="id" type="tactic">fresh</span> <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">destruct</span> <span class="id" type="var">H</span> <span class="id" type="keyword">as</span> [<span class="id" type="var">H1</span> <span class="id" type="var">H2</span>];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">split_hyp</span> <span class="id" type="var">H1</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">split_hyp</span> <span class="id" type="var">H2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="coqrel.Relators.html#prod_rel"><span class="id" type="definition">prod_rel</span></a> ?<span class="id" type="var">Rx</span> ?<span class="id" type="var">Ry</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(?</span></a><span class="id" type="var">x1</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">?</span></a><span class="id" type="var">y1</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(?</span></a><span class="id" type="var">x2</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">?</span></a><span class="id" type="var">y2</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">change</span> (<span class="id" type="var">Rx</span> <span class="id" type="var">x1</span> <span class="id" type="var">x2</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">Ry</span> <span class="id" type="var">y1</span> <span class="id" type="var">y2</span>) <span class="id" type="keyword">in</span> <span class="id" type="var">H</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">split_hyp</span> <span class="id" type="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a> ?<span class="id" type="var">acc</span> ?<span class="id" type="var">R</span> ?<span class="id" type="var">w</span> ?<span class="id" type="var">x</span> ?<span class="id" type="var">y</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">w'</span> := <span class="id" type="tactic">fresh</span> <span class="id" type="var">w</span> "'" <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">Hw'</span> := <span class="id" type="tactic">fresh</span> "H" <span class="id" type="var">w'</span> <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">destruct</span> <span class="id" type="var">H</span> <span class="id" type="keyword">as</span> (<span class="id" type="var">w'</span> &amp; <span class="id" type="var">Hw'</span> &amp; <span class="id" type="var">H</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">split_hyp</span> <span class="id" type="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">idtac</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">split_hyps</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">repeat</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">H</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#ex"><span class="id" type="inductive">ex</span></a> <span class="id" type="var">_</span> |- <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">destruct</span> <span class="id" type="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">H</span>: <span class="id" type="var">_</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">_</span> |- <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">destruct</span> <span class="id" type="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">H</span>: <a class="idref" href="coqrel.Relators.html#prod_rel"><span class="id" type="definition">prod_rel</span></a> ?<span class="id" type="var">Rx</span> ?<span class="id" type="var">Ry</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(?</span></a><span class="id" type="var">x1</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">?</span></a><span class="id" type="var">y1</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">(?</span></a><span class="id" type="var">x2</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">,</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">?</span></a><span class="id" type="var">y2</span><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#:core_scope:'('_x_','_x_','_'..'_','_x_')'"><span class="id" type="notation">)</span></a> |- <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">change</span> (<span class="id" type="var">Rx</span> <span class="id" type="var">x1</span> <span class="id" type="var">x2</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">Ry</span> <span class="id" type="var">y1</span> <span class="id" type="var">y2</span>) <span class="id" type="keyword">in</span> <span class="id" type="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+We're now ready to defined the <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#transport"><span class="id" type="projection">transport</span></a></span> tactic, which
+  essentially looks up a <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="record">Transport</span></a></span> instance and applies it the the
+  hypothesis to be transported, using <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RAuto"><span class="id" type="record">RAuto</span></a></span> to solve the relational
+  subgoal. Note that the relation and right-hand side will usually
+  contain existential variables, but the proof search can hopefully
+  proceed by following the structure of the left-hand side. Once the
+  <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="record">Transport</span></a></span> instance has been applied, we use <span class="inlinecode"><span class="id" type="var">split_hyp</span></span> on the
+  modified hypothesis as post-processing.
+
+<div class="paragraph"> </div>
+
+  Because we have many open-ended evars involved, it is easy for
+  trivial relations such as <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#eq"><span class="id" type="inductive">eq</span></a></span> to kick in and sabotage us,
+  overriding the more interesting properties that we actually want to
+  use and preventing any progress from actually being made. In order
+  to attenuate this issue, we require that <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RAuto"><span class="id" type="record">RAuto</span></a></span> yield unconvertible
+  related elements.
+
+<div class="paragraph"> </div>
+
+  Another pitfall we want to avoid is illustrated by the <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#option_rel"><span class="id" type="inductive">option_rel</span></a></span>
+  case. When we have a hypothesis of the form <span class="inlinecode"><span class="id" type="var">H</span>:</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> <span class="inlinecode">=</span> <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#Some"><span class="id" type="constructor">Some</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#a"><span class="id" type="variable">a</span></a></span>, but no
+  interesting way to relate <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> to something else, then the search for
+  <span class="inlinecode">(<a class="idref" href="coqrel.Relators.html#option_rel"><span class="id" type="inductive">option_rel</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a>)</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#n"><span class="id" type="variable">n</span></a></span> can end up using <span class="inlinecode"><span class="id" type="var">H</span></span> itself (because
+  <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#option_rel"><span class="id" type="inductive">option_rel</span></a></span> <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#eq"><span class="id" type="inductive">eq</span></a></span> is reflexive, hence <span class="inlinecode"><span class="id" type="var">subrel_eq</span></span> applies). To prevent
+  such cases we need to make sure that the hypothesis being
+  transported is not used to discharge the relational premise, and so
+  we revert it into the conclusing before we proceed, and use the
+  following lemma to work on a goal of that form directly. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Lemma</span> <a name="transport_in_goal"><span class="id" type="lemma">transport_in_goal</span></a> `{<a class="idref" href="coqrel.Transport.html#Transport"><span class="id" type="class">Transport</span></a>} `{!<a class="idref" href="coqrel.RelDefinitions.html#RAuto"><span class="id" type="class">RAuto</span></a> (<a class="idref" href="coqrel.Transport.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Transport.html#a"><span class="id" type="variable">a</span></a> <a class="idref" href="coqrel.Transport.html#b"><span class="id" type="variable">b</span></a>)} `{!<a class="idref" href="coqrel.RelDefinitions.html#Unconvertible"><span class="id" type="class">Unconvertible</span></a> <a class="idref" href="coqrel.Transport.html#a"><span class="id" type="variable">a</span></a> <a class="idref" href="coqrel.Transport.html#b"><span class="id" type="variable">b</span></a>}:<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">∀</span> (<span class="id" type="var">Q</span>: <span class="id" type="keyword">Prop</span>), (<a class="idref" href="coqrel.Transport.html#PB"><span class="id" type="variable">PB</span></a> → <a class="idref" href="coqrel.Transport.html#Q"><span class="id" type="variable">Q</span></a>) → (<a class="idref" href="coqrel.Transport.html#PA"><span class="id" type="variable">PA</span></a> → <a class="idref" href="coqrel.Transport.html#Q"><span class="id" type="variable">Q</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">transport</span> <span class="id" type="var">H</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">revert</span> <span class="id" type="var">H</span>;<br/>
+&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| |- ?<span class="id" type="var">PA</span> → ?<span class="id" type="var">Q</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">apply</span> (<a class="idref" href="coqrel.Transport.html#transport_in_goal"><span class="id" type="lemma">transport_in_goal</span></a> (<span class="id" type="var">PA</span>:=<span class="id" type="var">PA</span>) <span class="id" type="var">Q</span>)<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>;<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intro</span> <span class="id" type="var">H</span>;<br/>
+&nbsp;&nbsp;<span class="id" type="var">split_hyp</span> <span class="id" type="var">H</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Again we provide a tactic which attempts to transport all
+  hypotheses. Notice that earlier transportations may provide new
+  hypotheses making later transportations possible. Hence it would be
+  hard to provide a much more effective tactic, even though this one
+  may retry failing transportations many times. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">transport_hyps</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">repeat</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">H</span>: <span class="id" type="var">_</span> |- <span class="id" type="var">_</span> ⇒ <span class="id" type="var">transport</span> <span class="id" type="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link href="coqdoc.css" rel="stylesheet" type="text/css"/>
+<title>coqrel.PreOrderTactic</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library coqrel.PreOrderTactic</h1>
+
+<div class="code">
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <a class="idref" href="coqrel.RelDefinitions.html#"><span class="id" type="library">RelDefinitions</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The following tactic attempts to prove a relational goal by
+  combining the <span class="inlinecode"><span class="id" type="tactic">reflexivity</span></span> and <span class="inlinecode"><span class="id" type="tactic">transitivity</span></span> properties of
+  preorders with hypotheses available in the context. This is
+  implemented through a simple depth-first search as follows.
+  Assuming the goal is <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#n"><span class="id" type="variable">n</span></a></span>, we use <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> as the starting node.
+  We maintain a stack of terms with proofs that they are related
+  to <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span>, initialized with <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a>,</span> <span class="inlinecode"><span class="id" type="tactic">reflexivity</span>)::<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#nil"><span class="id" type="constructor">nil</span></a></span>. Then as long
+  as the stack is non-empty:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> Pop the first element <span class="inlinecode">(<span class="id" type="var">t</span>,</span> <span class="inlinecode"><span class="id" type="var">Ht</span>)</span>.
+
+</li>
+<li> If <span class="inlinecode"><span class="id" type="var">t</span></span> is <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#n"><span class="id" type="variable">n</span></a></span>, success! Use <span class="inlinecode"><span class="id" type="var">Ht</span></span>.
+
+</li>
+<li> Otherwise, for every hypothesis of the form <span class="inlinecode"><span class="id" type="var">Ht'</span>:</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> <span class="inlinecode"><span class="id" type="var">t</span></span> <span class="inlinecode"><span class="id" type="var">t'</span></span>,
+      push (t', transitivity m t t' Ht Ht') on the stack.
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+  If the search terminates without encountering <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#n"><span class="id" type="variable">n</span></a></span>, fail. Once a
+  hypothesis has been used, it is "deactivated" so as not to be used
+  again, using the following marker. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <a name="preorder_tactic_done"><span class="id" type="definition">preorder_tactic_done</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.PreOrderTactic.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.PreOrderTactic.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">a</span> <span class="id" type="var">b</span> := <a class="idref" href="coqrel.PreOrderTactic.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.PreOrderTactic.html#a"><span class="id" type="variable">a</span></a> <a class="idref" href="coqrel.PreOrderTactic.html#b"><span class="id" type="variable">b</span></a>.<br/>
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">preorder</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| |- ?<span class="id" type="var">R</span> ?<span class="id" type="var">m</span> ?<span class="id" type="var">n</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">not_evar</span> <span class="id" type="var">R</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">not_evar</span> <span class="id" type="var">m</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">not_evar</span> <span class="id" type="var">n</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">HR</span> := <span class="id" type="tactic">fresh</span> "HR" <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">first</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" type="tactic">assert</span> (<span class="id" type="var">HR</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.RelationClasses.html#PreOrder"><span class="id" type="class">PreOrder</span></a> <span class="id" type="var">R</span>) <span class="id" type="tactic">by</span> <span class="id" type="var">typeclasses</span> <span class="id" type="tactic">eauto</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="tactic">fail</span> 1 <span class="id" type="var">R</span> "is not a declared preorder" ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">rec</span> <span class="id" type="var">step</span> <span class="id" type="var">q</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">q</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#cons"><span class="id" type="constructor">cons</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Specif.html#exist"><span class="id" type="constructor">exist</span></a> <span class="id" type="var">_</span> <span class="id" type="var">n</span> ?<span class="id" type="var">Hn</span>) <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">exact</span> <span class="id" type="var">Hn</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#cons"><span class="id" type="constructor">cons</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Specif.html#exist"><span class="id" type="constructor">exist</span></a> <span class="id" type="var">_</span> ?<span class="id" type="var">t</span> ?<span class="id" type="var">Ht</span>) ?<span class="id" type="var">tail</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">gather</span> <span class="id" type="var">tail</span> <span class="id" type="var">t</span> <span class="id" type="var">Ht</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">with</span> <span class="id" type="var">gather</span> <span class="id" type="var">q</span> <span class="id" type="var">t</span> <span class="id" type="var">Ht</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">Ht'</span>: <span class="id" type="var">R</span> <span class="id" type="var">t</span> ?<span class="id" type="var">t'</span> |- <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">change</span> (<a class="idref" href="coqrel.PreOrderTactic.html#preorder_tactic_done"><span class="id" type="definition">preorder_tactic_done</span></a> <span class="id" type="var">R</span> <span class="id" type="var">t</span> <span class="id" type="var">t'</span>) <span class="id" type="keyword">in</span> <span class="id" type="var">Ht'</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">gather</span> (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#cons"><span class="id" type="constructor">cons</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Specif.html#exist"><span class="id" type="constructor">exist</span></a> (<span class="id" type="var">R</span> <span class="id" type="var">m</span>) <span class="id" type="var">t'</span> (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.RelationClasses.html#transitivity"><span class="id" type="definition">transitivity</span></a> <span class="id" type="var">Ht</span> <span class="id" type="var">Ht'</span>)) <span class="id" type="var">q</span>) <span class="id" type="var">t</span> <span class="id" type="var">Ht</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">step</span> <span class="id" type="var">q</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span> <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">first</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" type="var">step</span> (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#cons"><span class="id" type="constructor">cons</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Specif.html#exist"><span class="id" type="constructor">exist</span></a> (<span class="id" type="var">R</span> <span class="id" type="var">m</span>) <span class="id" type="var">m</span> (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.RelationClasses.html#reflexivity"><span class="id" type="definition">reflexivity</span></a> <span class="id" type="var">m</span>)) <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#nil"><span class="id" type="constructor">nil</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="tactic">fail</span> 1 <span class="id" type="var">n</span> "not reachable from" <span class="id" type="var">m</span> "using hypotheses from the context" ]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">fail</span> "the goal is not an applied relation"<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Hook <span class="inlinecode"><span class="id" type="var">preorder</span></span> for providing <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" type="record">RStep</span></a></span>s 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Hint Extern</span> 30 (<a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" type="class">RStep</span></a> ?<span class="id" type="var">P</span> (<span class="id" type="var">_</span> <span class="id" type="var">_</span> <span class="id" type="var">_</span>)) ⇒<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">solve</span> [ <span class="id" type="tactic">try</span> <span class="id" type="var">unify</span> <span class="id" type="var">P</span> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#True"><span class="id" type="inductive">True</span></a>; <span class="id" type="tactic">intro</span>; <span class="id" type="var">preorder</span> ] : <span class="id" type="var">typeclass_instances</span>.<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

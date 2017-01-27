@@ -1,0 +1,526 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link href="coqdoc.css" rel="stylesheet" type="text/css"/>
+<title>coqrel.Monotonicity</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library coqrel.Monotonicity</h1>
+
+<div class="code">
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Export</span> <a class="idref" href="coqrel.RelDefinitions.html#"><span class="id" type="library">RelDefinitions</span></a>.<br/>
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Export</span> <a class="idref" href="coqrel.RelOperators.html#"><span class="id" type="library">RelOperators</span></a>.<br/>
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Export</span> <a class="idref" href="coqrel.Relators.html#"><span class="id" type="library">Relators</span></a>.<br/>
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <a class="idref" href="coqrel.Delay.html#"><span class="id" type="library">Delay</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab11"></a><h2 class="section">The <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#monotonicity"><span class="id" type="projection">monotonicity</span></a></span> tactic</h2>
+
+<div class="paragraph"> </div>
+
+ The purpose of the <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#monotonicity"><span class="id" type="projection">monotonicity</span></a></span> tactic is to automatically
+  select and apply a theorem of the form <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> in order to
+  make progress when the goal is an applied relation. Compared with
+  setoid rewriting, <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#monotonicity"><span class="id" type="projection">monotonicity</span></a></span> is less powerful, but more direct
+  and simple. This means it is easier to debug, and it can seamlessly
+  handle dependent types and heterogenous relations. 
+<div class="paragraph"> </div>
+
+<a name="lab12"></a><h3 class="section">Truncating applications</h3>
+
+<div class="paragraph"> </div>
+
+ The search is at first guided by the left-hand side term, so that
+  if the goal has the form <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> <span class="inlinecode">(?<a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#x1"><span class="id" type="variable">x1</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#x2"><span class="id" type="variable">x2</span></a></span> <span class="inlinecode">?<span class="id" type="var">x3</span></span> <span class="inlinecode">...</span> <span class="inlinecode">?<span class="id" type="var">xn</span>)</span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a></span>, we will
+  seek a <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="record">Related</span></a></span> instance for some prefix <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x1"><span class="id" type="variable">x1</span></a></span> <span class="inlinecode">...</span> <span class="inlinecode"><span class="id" type="var">xk</span></span>. This allows
+  both <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> and <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a></span> to be existential variables, which is required in
+  particular by the <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#transport"><span class="id" type="projection">transport</span></a></span> tactic.
+
+<div class="paragraph"> </div>
+
+  However, peeling off the <span class="inlinecode"><span class="id" type="var">xi</span></span>s one by one and conducting a
+  full-blown search at every step is very time-consuming. To deal with
+  this issue we narrow down the search to (in this order):
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> the whole application <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x1"><span class="id" type="variable">x1</span></a></span> <span class="inlinecode">...</span> <span class="inlinecode"><span class="id" type="var">xk</span></span>;
+
+</li>
+<li> prefixes constructed from user-declared <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a></span> instances;
+
+</li>
+<li> the head term <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> alone.
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+  In the following we define some tactics and classes to implement
+  this search process. 
+<div class="paragraph"> </div>
+
+ <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#ApplicationHead"><span class="id" type="record">ApplicationHead</span></a></span> finds the head term <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> for an application <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">application_head</span> <span class="id" type="var">m</span> <span class="id" type="var">f</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">m</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" type="var">m'</span> <span class="id" type="var">_</span> ⇒ <span class="id" type="var">application_head</span> <span class="id" type="var">m'</span> <span class="id" type="var">f</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">_</span> ⇒ <span class="id" type="var">unify</span> <span class="id" type="var">m</span> <span class="id" type="var">f</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Class</span> <a name="ApplicationHead"><span class="id" type="record">ApplicationHead</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">m</span>: <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a>) (<span class="id" type="var">f</span>: <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>).<br/>
+
+<br/>
+<span class="id" type="keyword">Hint Extern</span> 1 (<a class="idref" href="coqrel.Monotonicity.html#ApplicationHead"><span class="id" type="class">ApplicationHead</span></a> ?<span class="id" type="var">m</span> ?<span class="id" type="var">f</span>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" type="var">application_head</span> <span class="id" type="var">m</span> <span class="id" type="var">f</span>; <span class="id" type="tactic">constructor</span> : <span class="id" type="var">typeclass_instances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#RemoveParams"><span class="id" type="record">RemoveParams</span></a></span> drops some arguments from the application <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> so
+  that the result <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> expects <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#n"><span class="id" type="variable">n</span></a></span> parameters. We are careful to skip
+  an appropriate number of parameters when the type of term indicates
+  that it is already a partial application. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">remove_params</span> <span class="id" type="var">m</span> <span class="id" type="var">n</span> <span class="id" type="var">f</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">rec</span> <span class="id" type="var">remove</span> <span class="id" type="var">m</span> <span class="id" type="var">n</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">n</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#S"><span class="id" type="constructor">S</span></a> ?<span class="id" type="var">n'</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">m</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" type="var">m'</span> <span class="id" type="var">_</span> ⇒ <span class="id" type="var">remove</span> <span class="id" type="var">m'</span> <span class="id" type="var">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#O"><span class="id" type="constructor">O</span></a> ⇒ <span class="id" type="var">unify</span> <span class="id" type="var">m</span> <span class="id" type="var">f</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span> <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">rec</span> <span class="id" type="var">remove_from_partial</span> <span class="id" type="var">m</span> <span class="id" type="var">t</span> <span class="id" type="var">n</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">t</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="keyword">∀</span> <span class="id" type="var">x</span>, ?<span class="id" type="var">t'</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="var">n</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#S"><span class="id" type="constructor">S</span></a> ?<span class="id" type="var">n'</span> ⇒ <span class="id" type="var">remove_from_partial</span> <span class="id" type="var">m</span> <span class="id" type="var">t'</span> <span class="id" type="var">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">remove</span> <span class="id" type="var">m</span> <span class="id" type="var">n</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span> <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">t</span> := <span class="id" type="var">type</span> <span class="id" type="var">of</span> <span class="id" type="var">m</span> <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" type="var">remove_from_partial</span> <span class="id" type="var">m</span> <span class="id" type="var">t</span> <span class="id" type="var">n</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Class</span> <a name="RemoveParams"><span class="id" type="record">RemoveParams</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">m</span>: <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a>) (<span class="id" type="var">n</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" type="inductive">nat</span></a>) (<span class="id" type="var">f</span>: <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>).<br/>
+
+<br/>
+<span class="id" type="keyword">Hint Extern</span> 1 (<a class="idref" href="coqrel.Monotonicity.html#RemoveParams"><span class="id" type="class">RemoveParams</span></a> ?<span class="id" type="var">m</span> ?<span class="id" type="var">n</span> ?<span class="id" type="var">f</span>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" type="var">remove_params</span> <span class="id" type="var">m</span> <span class="id" type="var">n</span> <span class="id" type="var">f</span>; <span class="id" type="tactic">constructor</span> : <span class="id" type="var">typeclass_instances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+With these, we can define <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#CandidatePrefix"><span class="id" type="record">CandidatePrefix</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span>, which serves as
+  the source of possible prefixes <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> of the application <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Class</span> <a name="CandidatePrefix"><span class="id" type="record">CandidatePrefix</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">m</span>: <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a>) (<span class="id" type="var">f</span>: <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>).<br/>
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="candidate_prefix_self"><span class="id" type="instance">candidate_prefix_self</span></a> {<span class="id" type="var">A</span>} (<span class="id" type="var">m</span>: <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a>):<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#CandidatePrefix"><span class="id" type="class">CandidatePrefix</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> | 10.<br/>
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="candidate_prefix_params"><span class="id" type="instance">candidate_prefix_params</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span> <span class="id" type="var">C</span>} (<span class="id" type="var">m</span>: <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a>) (<span class="id" type="var">h</span>: <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>) (<span class="id" type="var">n</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" type="inductive">nat</span></a>) (<span class="id" type="var">f</span>: <a class="idref" href="coqrel.Monotonicity.html#C"><span class="id" type="variable">C</span></a>):<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#ApplicationHead"><span class="id" type="class">ApplicationHead</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#h"><span class="id" type="variable">h</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> <a class="idref" href="coqrel.Monotonicity.html#h"><span class="id" type="variable">h</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#RemoveParams"><span class="id" type="class">RemoveParams</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a> <a class="idref" href="coqrel.Monotonicity.html#f"><span class="id" type="variable">f</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#CandidatePrefix"><span class="id" type="class">CandidatePrefix</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#f"><span class="id" type="variable">f</span></a> | 20.<br/>
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="candidate_prefix_head"><span class="id" type="instance">candidate_prefix_head</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">m</span>: <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a>) (<span class="id" type="var">h</span>: <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>):<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#ApplicationHead"><span class="id" type="class">ApplicationHead</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#h"><span class="id" type="variable">h</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#CandidatePrefix"><span class="id" type="class">CandidatePrefix</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#h"><span class="id" type="variable">h</span></a> | 30.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab13"></a><h3 class="section">Selecting a relational property</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Class</span> <a name="CandidateProperty"><span class="id" type="record">CandidateProperty</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">m</span> <span class="id" type="var">n</span> (<span class="id" type="var">Q</span>: <span class="id" type="keyword">Prop</span>) :=<br/>
+&nbsp;&nbsp;<a name="candidate_related"><span class="id" type="projection">candidate_related</span></a>: <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+We first attempt to use any matching hypothesis. This takes
+  priority and bypasses any <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a></span> declaration. We assume that we
+  will always want such hypotheses to be used, at least when the left-
+  or right-hand side matches exactly. There is a possibility that this
+  ends up being too broad for some applications, for which we'll want
+  to restrict ourselves to <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="record">Related</span></a></span> instances explicitely defined by
+  the user. If this turns out to be the case, we can introduce an
+  intermediate class with more parameters to control the sources of
+  the relational properties we use, and perhaps have some kind of
+  normalization process akin to what is done in <span class="inlinecode"><span class="id" type="library">Coq.Classes.Morphisms</span></span>.
+
+<div class="paragraph"> </div>
+
+  We don't hesitate to instantiate evars in the goal or hypothesis; if
+  the types or skeletons are compatible this is likely what we want.
+  In one practical case where this is needed, my hypothesis is
+  something like <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#x1"><span class="id" type="variable">x1</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#y1"><span class="id" type="variable">y1</span></a></span> <span class="inlinecode">42)</span> <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#x2"><span class="id" type="variable">x2</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#y2"><span class="id" type="variable">y2</span></a></span> <span class="inlinecode">24)</span>, and I want
+  <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#x1"><span class="id" type="variable">x1</span></a></span>, <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#x2"><span class="id" type="variable">x2</span></a></span>, <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#y1"><span class="id" type="variable">y1</span></a></span>, <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#y2"><span class="id" type="variable">y2</span></a></span> to be matched against the goal. In case
+  the use of <span class="inlinecode"><span class="id" type="var">unify</span></span> below is too broad, we could develop a strategy
+  whereby at least one of the head terms <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span>, <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#g"><span class="id" type="variable">g</span></a></span> should match exactly.
+
+<div class="paragraph"> </div>
+
+  Note that it is important that we reduce the goal to <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#n"><span class="id" type="variable">n</span></a></span>
+  before we use <span class="inlinecode"><span class="id" type="tactic">eexact</span></span>: if the relation in the hypothesis is an
+  existential variable, we don't want unified against
+  <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#CandidateProperty"><span class="id" type="record">CandidateProperty</span></a></span> <span class="inlinecode"><span class="id" type="var">_</span></span> <span class="inlinecode"><span class="id" type="var">_</span></span> <span class="inlinecode"><span class="id" type="var">_</span></span> <span class="inlinecode">(<span class="id" type="var">_</span></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#m"><span class="id" type="variable">m</span></a></span> <span class="inlinecode">?<a class="idref" href="coqrel.LogicalRelationsTests.html#n"><span class="id" type="variable">n</span></a>)</span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">context_candidate</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">rec</span> <span class="id" type="var">is_prefix</span> <span class="id" type="var">f</span> <span class="id" type="var">m</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">first</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" type="var">unify</span> <span class="id" type="var">f</span> <span class="id" type="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">lazymatch</span> <span class="id" type="var">m</span> <span class="id" type="keyword">with</span> ?<span class="id" type="var">n</span> <span class="id" type="var">_</span> ⇒ <span class="id" type="var">is_prefix</span> <span class="id" type="var">f</span> <span class="id" type="var">n</span> <span class="id" type="keyword">end</span> ] <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">let</span> <span class="id" type="var">rec</span> <span class="id" type="var">is_prefixable</span> <span class="id" type="var">f</span> <span class="id" type="var">m</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">first</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" type="var">is_evar</span> <span class="id" type="var">f</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">is_evar</span> <span class="id" type="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">unify</span> <span class="id" type="var">f</span> <span class="id" type="var">m</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">lazymatch</span> <span class="id" type="var">m</span> <span class="id" type="keyword">with</span> ?<span class="id" type="var">n</span> <span class="id" type="var">_</span> ⇒ <span class="id" type="var">is_prefixable</span> <span class="id" type="var">f</span> <span class="id" type="var">n</span> <span class="id" type="keyword">end</span> ] <span class="id" type="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">H</span>: <span class="id" type="var">_</span> ?<span class="id" type="var">f</span> ?<span class="id" type="var">g</span> |- <a class="idref" href="coqrel.Monotonicity.html#CandidateProperty"><span class="id" type="class">CandidateProperty</span></a> <span class="id" type="var">_</span> <span class="id" type="var">_</span> <span class="id" type="var">_</span> (<span class="id" type="var">_</span> ?<span class="id" type="var">m</span> ?<span class="id" type="var">n</span>) ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">red</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">first</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ <span class="id" type="var">is_prefix</span> <span class="id" type="var">f</span> <span class="id" type="var">m</span>; <span class="id" type="var">is_prefixable</span> <span class="id" type="var">g</span> <span class="id" type="var">n</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">is_prefix</span> <span class="id" type="var">g</span> <span class="id" type="var">n</span>; <span class="id" type="var">is_prefixable</span> <span class="id" type="var">f</span> <span class="id" type="var">m</span> ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="tactic">eexact</span> <span class="id" type="var">H</span><br/>
+&nbsp;&nbsp;<span class="id" type="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Hint Extern</span> 1 (<a class="idref" href="coqrel.Monotonicity.html#CandidateProperty"><span class="id" type="class">CandidateProperty</span></a> <span class="id" type="var">_</span> <span class="id" type="var">_</span> <span class="id" type="var">_</span> <span class="id" type="var">_</span>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" type="var">context_candidate</span> : <span class="id" type="var">typeclass_instances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+After we've tried the relevant hypotheses, we use <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="record">Related</span></a></span>
+  instances as described above. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Lemma</span> <a name="candidate_l"><span class="id" type="lemma">candidate_l</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span> <span class="id" type="var">GA</span> <span class="id" type="var">GB</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">f</span> <span class="id" type="var">g</span> (<span class="id" type="var">QR</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#GA"><span class="id" type="variable">GA</span></a> <a class="idref" href="coqrel.Monotonicity.html#GB"><span class="id" type="variable">GB</span></a>) <span class="id" type="var">m</span> <span class="id" type="var">n</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#CandidatePrefix"><span class="id" type="class">CandidatePrefix</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#f"><span class="id" type="variable">f</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> <a class="idref" href="coqrel.Monotonicity.html#f"><span class="id" type="variable">f</span></a> <a class="idref" href="coqrel.Monotonicity.html#g"><span class="id" type="variable">g</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#CandidateProperty"><span class="id" type="class">CandidateProperty</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#f"><span class="id" type="variable">f</span></a> <a class="idref" href="coqrel.Monotonicity.html#g"><span class="id" type="variable">g</span></a> (<a class="idref" href="coqrel.Monotonicity.html#QR"><span class="id" type="variable">QR</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Hint Extern</span> 2 (<a class="idref" href="coqrel.Monotonicity.html#CandidateProperty"><span class="id" type="class">CandidateProperty</span></a> <span class="id" type="var">_</span> <span class="id" type="var">_</span> <span class="id" type="var">_</span> (?<span class="id" type="var">QR</span> ?<span class="id" type="var">m</span> ?<span class="id" type="var">n</span>)) ⇒<br/>
+&nbsp;&nbsp;<span class="id" type="var">not_evar</span> <span class="id" type="var">m</span>; <span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.Monotonicity.html#candidate_l"><span class="id" type="lemma">candidate_l</span></a> : <span class="id" type="var">typeclass_instances</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Lemma</span> <a name="candidate_r"><span class="id" type="lemma">candidate_r</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span> <span class="id" type="var">QA</span> <span class="id" type="var">QB</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">f</span> <span class="id" type="var">g</span> (<span class="id" type="var">QR</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#QA"><span class="id" type="variable">QA</span></a> <a class="idref" href="coqrel.Monotonicity.html#QB"><span class="id" type="variable">QB</span></a>) <span class="id" type="var">m</span> <span class="id" type="var">n</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#CandidatePrefix"><span class="id" type="class">CandidatePrefix</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a> <a class="idref" href="coqrel.Monotonicity.html#g"><span class="id" type="variable">g</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> <a class="idref" href="coqrel.Monotonicity.html#f"><span class="id" type="variable">f</span></a> <a class="idref" href="coqrel.Monotonicity.html#g"><span class="id" type="variable">g</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#CandidateProperty"><span class="id" type="class">CandidateProperty</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#f"><span class="id" type="variable">f</span></a> <a class="idref" href="coqrel.Monotonicity.html#g"><span class="id" type="variable">g</span></a> (<a class="idref" href="coqrel.Monotonicity.html#QR"><span class="id" type="variable">QR</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Hint Extern</span> 3 (<a class="idref" href="coqrel.Monotonicity.html#CandidateProperty"><span class="id" type="class">CandidateProperty</span></a> <span class="id" type="var">_</span> <span class="id" type="var">_</span> <span class="id" type="var">_</span> (?<span class="id" type="var">QR</span> ?<span class="id" type="var">m</span> ?<span class="id" type="var">n</span>)) ⇒<br/>
+&nbsp;&nbsp;<span class="id" type="var">not_evar</span> <span class="id" type="var">n</span>; <span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.Monotonicity.html#candidate_r"><span class="id" type="lemma">candidate_r</span></a> : <span class="id" type="var">typeclass_instances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab14"></a><h3 class="section">Using <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span></h3>
+
+<div class="paragraph"> </div>
+
+ It is not obvious at what point in the process <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> should be
+  hooked in. One thing we crucially want to avoid is an open-ended
+  <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> search enumerating all possibilities to be filtered later,
+  with a high potential for exponential blow-up should the user be a
+  little too liberal with the <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> instances they declare.
+
+<div class="paragraph"> </div>
+
+  Here I choose to have it kick in after a candidate property has been
+  selected, and we know how to apply it to a goal. Then we use
+  <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> to bridge any gap between that goal and the actual one,
+  through the <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#RImpl"><span class="id" type="record">RImpl</span></a></span> class below.
+
+<div class="paragraph"> </div>
+
+  This is a conservative solution which precludes many interesting
+  usages of <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span>. For instance, suppose we have a relational
+  property alogn the lines of <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a></span> <span class="inlinecode">((<a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a>)</span> <span class="inlinecode">∩</span> <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span> <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a>))</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span>.
+  We would want to be able to use it to show that <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#f"><span class="id" type="variable">f</span></a></span> preserve <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> or
+  <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span> individually (because <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a>)</span> <span class="inlinecode">((<a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a>)</span> <span class="inlinecode">∩</span> <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span>
+  <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a>))</span>, but also together (because <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode">∩</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span> <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode">∩</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a>)</span>
+  <span class="inlinecode">((<a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a>)</span> <span class="inlinecode">∩</span> <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span> <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a>))</span>). This cannot be done using this
+  approach, which does not act on the relational property itself but
+  only the goal we're attempting to prove.
+
+<div class="paragraph"> </div>
+
+  Perhaps in the future we can extend this by acting at the level of
+  <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RElim"><span class="id" type="record">RElim</span></a></span>. In any case, we should provide explicit guidelines for when
+  to declare <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> instances, and how. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Class</span> <a name="RImpl"><span class="id" type="record">RImpl</span></a> (<span class="id" type="var">P</span> <span class="id" type="var">Q</span>: <span class="id" type="keyword">Prop</span>): <span class="id" type="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<a name="rimpl"><span class="id" type="projection">rimpl</span></a>: <a class="idref" href="coqrel.Monotonicity.html#P"><span class="id" type="variable">P</span></a> → <a class="idref" href="coqrel.Monotonicity.html#Q"><span class="id" type="variable">Q</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+While we give priority to <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#rimpl_refl"><span class="id" type="instance">rimpl_refl</span></a></span> below, when it doesn't work
+  we use <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RAuto"><span class="id" type="record">RAuto</span></a></span> to establish a <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> property. The <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a></span>
+  instances we declared alongside relators can be used conjunction
+  with <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#Monotonicity"><span class="id" type="record">Monotonicity</span></a></span> to break up <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> goals along the structure
+  of the relations being considered. This may end up causing loops
+  (especially in failure cases), so it may be necessary to add some
+  flag in the context to prevent <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel_related"><span class="id" type="instance">subrel_related</span></a></span> from being used when
+  discharging the <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> goals themselves. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="rimpl_refl"><span class="id" type="instance">rimpl_refl</span></a> <span class="id" type="var">P</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#RImpl"><span class="id" type="class">RImpl</span></a> <a class="idref" href="coqrel.Monotonicity.html#P"><span class="id" type="variable">P</span></a> <a class="idref" href="coqrel.Monotonicity.html#P"><span class="id" type="variable">P</span></a>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="rimpl_subrel"><span class="id" type="instance">rimpl_subrel</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span> <span class="id" type="var">R'</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">m</span> <span class="id" type="var">n</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Delay.html#NonDelayed"><span class="id" type="class">NonDelayed</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#RAuto"><span class="id" type="class">RAuto</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#R'"><span class="id" type="variable">R'</span></a>)) →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Unconvertible"><span class="id" type="class">Unconvertible</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#R'"><span class="id" type="variable">R'</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#RImpl"><span class="id" type="class">RImpl</span></a> (<a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a>) (<a class="idref" href="coqrel.Monotonicity.html#R'"><span class="id" type="variable">R'</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+As an aside, the following instance of <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> enables the use of
+  <span class="inlinecode"><span class="id" type="var">foo_subrel</span></span> instances for rewriting along within applied relations.
+  So that for instance, a hypothesis <span class="inlinecode"><span class="id" type="var">H</span>:</span> <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="record">subrel</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span> can be used for
+  rewriting in a goal of the form <span class="inlinecode">(<a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode">×</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1'"><span class="id" type="variable">R1'</span></a></span> <span class="inlinecode">++&gt;</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R"><span class="id" type="variable">R</span></a>)</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x"><span class="id" type="variable">x</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Instance</span> <a name="subrel_pointwise_subrel"><span class="id" type="instance">subrel_pointwise_subrel</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>}:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> (@<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>) (<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#eq"><span class="id" type="inductive">eq</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'==>'_x"><span class="id" type="notation">==&gt;</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#eq"><span class="id" type="inductive">eq</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'==>'_x"><span class="id" type="notation">==&gt;</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Program.Basics.html#impl"><span class="id" type="definition">impl</span></a>).<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">R1</span> <span class="id" type="var">R2</span> <span class="id" type="var">HR</span> <span class="id" type="var">x1</span> <span class="id" type="var">x2</span> <span class="id" type="var">Hx</span> <span class="id" type="var">y1</span> <span class="id" type="var">y2</span> <span class="id" type="var">Hy</span> <span class="id" type="var">H</span>; <span class="id" type="tactic">subst</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">eauto</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab15"></a><h3 class="section">Main tactic</h3>
+
+<div class="paragraph"> </div>
+
+ With these components, defining the <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#monotonicity"><span class="id" type="projection">monotonicity</span></a></span> tactic is
+  straightforward: identify a candidate property, then figure out a
+  way to apply it to the goal <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#Q"><span class="id" type="variable">Q</span></a></span> using the <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RElim"><span class="id" type="record">RElim</span></a></span> class. We first
+  define a <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#Monotonicity"><span class="id" type="record">Monotonicity</span></a></span> typeclass that captures this behavior with
+  full backtracking ability. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Class</span> <a name="Monotonicity"><span class="id" type="record">Monotonicity</span></a> (<span class="id" type="var">P</span> <span class="id" type="var">Q</span>: <span class="id" type="keyword">Prop</span>): <span class="id" type="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<a name="monotonicity"><span class="id" type="projection">monotonicity</span></a>: <a class="idref" href="coqrel.Monotonicity.html#P"><span class="id" type="variable">P</span></a> → <a class="idref" href="coqrel.Monotonicity.html#Q"><span class="id" type="variable">Q</span></a>.<br/>
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="apply_candidate"><span class="id" type="instance">apply_candidate</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">m</span> <span class="id" type="var">n</span> <span class="id" type="var">P</span> <span class="id" type="var">Q</span> <span class="id" type="var">Q'</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#CandidateProperty"><span class="id" type="class">CandidateProperty</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a> <a class="idref" href="coqrel.Monotonicity.html#Q"><span class="id" type="variable">Q</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RElim"><span class="id" type="class">RElim</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a> <a class="idref" href="coqrel.Monotonicity.html#P"><span class="id" type="variable">P</span></a> <a class="idref" href="coqrel.Monotonicity.html#Q'"><span class="id" type="variable">Q'</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#RImpl"><span class="id" type="class">RImpl</span></a> <a class="idref" href="coqrel.Monotonicity.html#Q'"><span class="id" type="variable">Q'</span></a> <a class="idref" href="coqrel.Monotonicity.html#Q"><span class="id" type="variable">Q</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#Monotonicity"><span class="id" type="class">Monotonicity</span></a> <a class="idref" href="coqrel.Monotonicity.html#P"><span class="id" type="variable">P</span></a> <a class="idref" href="coqrel.Monotonicity.html#Q"><span class="id" type="variable">Q</span></a>.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+We also exploit <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.RelationClasses.html#Reflexive"><span class="id" type="class">Reflexive</span></a></span> instances. A reflexive relation is one
+  for which all elements are proper elements. Then reflexivity is a
+  kind of general, nullary monotonicity property. In fact, in
+  principle we should use <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.RelationClasses.html#Reflexive"><span class="id" type="class">Reflexive</span></a></span> to declare a generic
+  <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="record">Related</span></a></span> instance, and the instance below would follow. However,
+  such instances end up polluting the resolution process and causing
+  premature instanciations of existential variables.
+
+<div class="paragraph"> </div>
+
+  Instead, we only use the following instance as a last resort, and
+  only to satisfy the goal directly (not in the search for relational
+  properties). This allows us to insist the related terms be exactly
+  identical, not just unifiable. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="reflexive_monotonicity"><span class="id" type="instance">reflexive_monotonicity</span></a> {<span class="id" type="var">A</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a>) (<span class="id" type="var">m</span>: <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a>):<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#NotEvar"><span class="id" type="class">NotEvar</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.RelationClasses.html#Reflexive"><span class="id" type="class">Reflexive</span></a> <a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#Monotonicity"><span class="id" type="class">Monotonicity</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#True"><span class="id" type="inductive">True</span></a> (<a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a>) | 10.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The Ltac tactic simply applies <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#monotonicity"><span class="id" type="projection">monotonicity</span></a></span>; typeclass
+  resolution will do the rest. Note that using <span class="inlinecode"><span class="id" type="tactic">apply</span></span> naively is too
+  lenient because in a goal of type <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#A"><span class="id" type="variable">A</span></a></span> <span class="inlinecode">→</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#B"><span class="id" type="variable">B</span></a></span>, it will end up unifying
+  <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#A"><span class="id" type="variable">A</span></a></span> with <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#P"><span class="id" type="variable">P</span></a></span> and <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#B"><span class="id" type="variable">B</span></a></span> with <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#Q"><span class="id" type="variable">Q</span></a></span> instead of setting <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#Q"><span class="id" type="variable">Q</span></a></span> <span class="inlinecode">:=</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#A"><span class="id" type="variable">A</span></a></span> <span class="inlinecode">→</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#B"><span class="id" type="variable">B</span></a></span> and
+  generating a new subgoal for <span class="inlinecode"><a class="idref" href="coqrel.Transport.html#P"><span class="id" type="variable">P</span></a></span> as expected. On the other hand,
+  using <span class="inlinecode"><span class="id" type="tactic">refine</span></span> directly is too restrictive because it will not unify
+  the type of <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#monotonicity"><span class="id" type="projection">monotonicity</span></a></span> against the goal if existential variables
+  are present in one or the other. Hence we constrain apply just
+  enough, so as to handle both of these cases. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">monotonicity</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">lazymatch</span> <span class="id" type="keyword">goal</span> <span class="id" type="keyword">with</span> |- ?<span class="id" type="var">Q</span> ⇒ <span class="id" type="tactic">apply</span> (<a class="idref" href="coqrel.Monotonicity.html#monotonicity"><span class="id" type="definition">monotonicity</span></a> (<span class="id" type="var">Q</span>:=<span class="id" type="var">Q</span>)) <span class="id" type="keyword">end</span>;<br/>
+&nbsp;&nbsp;<span class="id" type="var">Delay.split_conjunction</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Another way to use <span class="inlinecode"><a class="idref" href="coqrel.Monotonicity.html#Monotonicity"><span class="id" type="record">Monotonicity</span></a></span> is to hook it as an <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" type="record">RStep</span></a></span>
+  instance. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="monotonicity_rstep"><span class="id" type="instance">monotonicity_rstep</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">P</span>: <span class="id" type="keyword">Prop</span>) (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.Monotonicity.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.Monotonicity.html#B"><span class="id" type="variable">B</span></a>) <span class="id" type="var">m</span> <span class="id" type="var">n</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.Monotonicity.html#Monotonicity"><span class="id" type="class">Monotonicity</span></a> <a class="idref" href="coqrel.Monotonicity.html#P"><span class="id" type="variable">P</span></a> (<a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a>) →<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" type="class">RStep</span></a> <a class="idref" href="coqrel.Monotonicity.html#P"><span class="id" type="variable">P</span></a> (<a class="idref" href="coqrel.Monotonicity.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.Monotonicity.html#m"><span class="id" type="variable">m</span></a> <a class="idref" href="coqrel.Monotonicity.html#n"><span class="id" type="variable">n</span></a>) | 50.<br/>
+<span class="id" type="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Our version of <span class="inlinecode"><span class="id" type="var">Morphisms.f_equiv</span></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">f_equiv</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">repeat</span> <span class="id" type="var">monotonicity</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Our version of <span class="inlinecode"><span class="id" type="var">Morphisms.solve_proper</span></span>. Note that we are somewhat
+  parcimonious with introductions because we don't want to cause undue
+  unfoldings. For instance, if we define the relation <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> from <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span>
+  as <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x"><span class="id" type="variable">x</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a></span> <span class="inlinecode">:=</span> <span class="inlinecode"><span class="id" type="keyword">∀</span></span> <span class="inlinecode"><span class="id" type="var">i</span>,</span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span> <span class="inlinecode">(<span class="id" type="var">get</span></span> <span class="inlinecode"><span class="id" type="var">i</span></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x"><span class="id" type="variable">x</span></a>)</span> <span class="inlinecode">(<span class="id" type="var">get</span></span> <span class="inlinecode"><span class="id" type="var">i</span></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a>)</span>, we may create a
+  situation where applying the monotonicity theorem for <span class="inlinecode"><span class="id" type="var">get</span></span> on a
+  goal of the form <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R2"><span class="id" type="variable">R2</span></a></span> <span class="inlinecode">(<span class="id" type="var">get</span></span> <span class="inlinecode"><span class="id" type="var">i</span></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x"><span class="id" type="variable">x</span></a>)</span> <span class="inlinecode">(<span class="id" type="var">get</span></span> <span class="inlinecode"><span class="id" type="var">i</span></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a>)</span> produces a subgoal of the
+  form <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#R1"><span class="id" type="variable">R1</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#x"><span class="id" type="variable">x</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.LogicalRelationsTests.html#y"><span class="id" type="variable">y</span></a></span>, but then an introduction would get us back to where
+  we started. So we limit them to well-defined cases.
+
+<div class="paragraph"> </div>
+
+  Most cases are straightforward. In the <span class="inlinecode"><span class="id" type="keyword">match</span></span>/<span class="inlinecode"><span class="id" type="keyword">if</span></span> case, we need to
+  first show that the terms being destructed are related. Then if the
+  relation has been defined in a typical way (akin to <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#sum_rel"><span class="id" type="inductive">sum_rel</span></a></span> or
+  <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#list_rel"><span class="id" type="inductive">list_rel</span></a></span> below), destructing that hypothesis will cause the goal
+  to reduce and we can go on with the process. Note that for <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Datatypes.html#prod"><span class="id" type="inductive">prod</span></a></span>,
+  and for record types, we usually prefer to define associated
+  relations as conjunctions of statements that the projections are
+  related, in which case the terms would need to be destructed on
+  their own as well. At the moment we only have a special case for
+  <span class="inlinecode"><a class="idref" href="coqrel.Relators.html#prod_rel"><span class="id" type="definition">prod_rel</span></a></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" type="keyword">Ltac</span> <span class="id" type="var">solve_monotonic_tac</span> <span class="id" type="var">t</span> :=<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">first</span> [ <span class="id" type="var">rstep</span>; <span class="id" type="var">solve_monotonic_tac</span> <span class="id" type="var">t</span> | <span class="id" type="var">t</span> ].<br/>
+
+<br/>
+<span class="id" type="keyword">Tactic Notation</span> "solve_monotonic" :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">solve_monotonic_tac</span> <span class="id" type="keyword">ltac</span>:(<span class="id" type="var">eassumption</span> || <span class="id" type="tactic">congruence</span> || (<span class="id" type="var">now</span> <span class="id" type="tactic">econstructor</span>)).<br/>
+
+<br/>
+<span class="id" type="keyword">Tactic Notation</span> "solve_monotonic" <span class="id" type="var">tactic</span>(<span class="id" type="var">t</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" type="var">solve_monotonic_tac</span> <span class="id" type="keyword">ltac</span>:(<span class="id" type="var">eassumption</span> || <span class="id" type="tactic">congruence</span> || (<span class="id" type="var">now</span> <span class="id" type="tactic">econstructor</span>)|| <span class="id" type="var">t</span>).<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
