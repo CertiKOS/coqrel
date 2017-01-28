@@ -21,32 +21,30 @@ Global Instance rel_union_subrel_params:
   Params (@rel_union) 4.
 
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
-  subrel R1 (R1 \/ R2).
+  Related R1 (R1 \/ R2)%rel subrel.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (subrel _ (_ \/ _)) =>
+Hint Extern 0 (Related _ (_ \/ _)%rel subrel) =>
   eapply rel_union_introl : typeclass_instances.
 
 Lemma rel_union_intror {A B} (R1 R2: rel A B):
-  subrel R2 (R1 \/ R2).
+  Related R2 (R1 \/ R2)%rel subrel.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (subrel _ (_ \/ _)) =>
+Hint Extern 0 (Related _ (_ \/ _)%rel subrel) =>
   eapply rel_union_introl : typeclass_instances.
 
 Lemma rel_union_lub {A B} (R1 R2 R: rel A B):
-  subrel R1 R ->
-  subrel R2 R ->
-  subrel (R1 \/ R2)%rel R.
+  RIntro (subrel R1 R /\ subrel R2 R) subrel (R1 \/ R2)%rel R.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 2 (subrel (_ \/ _) _) =>
+Hint Extern 2 (RIntro _ subrel (_ \/ _)%rel _) =>
   eapply rel_union_lub : typeclass_instances.
 
 (** ** Intersection of relations *)
@@ -69,32 +67,30 @@ Global Instance rel_inter_subrel_params:
   Params (@rel_inter) 4.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
-  subrel (R1 /\ R2) R1.
+  Related (R1 /\ R2)%rel R1 subrel.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (subrel (_ /\ _) _) =>
+Hint Extern 0 (Related (_ /\ _)%rel _ subrel) =>
   eapply rel_inter_eliml : typeclass_instances.
 
 Lemma rel_inter_elimr {A B} (R1 R2: rel A B):
-  subrel (R1 /\ R2) R2.
+  Related (R1 /\ R2)%rel R2 subrel.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (subrel (_ /\ _) _) =>
+Hint Extern 0 (Related (_ /\ _)%rel _ subrel) =>
   eapply rel_inter_elimr : typeclass_instances.
 
 Lemma rel_inter_glb {A B} (R R1 R2: rel A B):
-  subrel R R1 ->
-  subrel R R2 ->
-  subrel R (R1 /\ R2).
+  RIntro (subrel R R1 /\ subrel R R2) subrel R (R1 /\ R2)%rel.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 2 (subrel _ (_ /\ _)) =>
+Hint Extern 2 (RIntro _ subrel _ (_ /\ _)%rel) =>
   eapply rel_inter_glb : typeclass_instances.
 
 Lemma rel_inter_refl {A} (R1 R2: rel A A):
@@ -186,7 +182,7 @@ Proof.
 Qed.
 
 Global Instance rel_compose_params:
-  Params (@rel_compose) 2.
+  Params (@rel_compose) 4.
 
 Lemma rel_compose_id_left {A B} (R: rel A B):
   eqrel (rel_compose R eq) R.
@@ -495,8 +491,8 @@ Proof.
     assumption.
 Qed.
 
-Global Instance rel_incr_params:
-  Params (@rel_incr) 2.
+Global Instance rel_incr_subrel_params:
+  Params (@rel_incr) 4.
 
 (** Note the order of the premises in our intro rule. We want to first
   determine what [w'] should be, then prove [acc w w']. *)
