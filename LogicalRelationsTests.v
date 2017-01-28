@@ -124,6 +124,22 @@ Proof.
   rauto.
 Qed.
 
+(** *** [impl] vs. [subrel] *)
+
+(** This checks that a relational property written in terms of
+  [subrel] can be used to solve a goal stated in terms of [impl].
+  This is made possible by [subrel_impl_relim]. *)
+
+Goal
+  forall A B C (R: rel A A) (f: A -> rel B C) a1 a2 b c,
+    Monotonic f (R ++> subrel) ->
+    R a1 a2 ->
+    impl (f a1 b c) (f a2 b c).
+Proof.
+  intros A B C R f a1 a2 b c Hf Ha.
+  monotonicity; rauto.
+Qed.
+
 (** ** Using [foo_subrel] instances *)
 
 (** Still broken because of the interaction between [subrel] and

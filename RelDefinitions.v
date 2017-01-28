@@ -465,6 +465,16 @@ Proof.
   reflexivity.
 Qed.
 
+Instance subrel_impl_relim {A B} (R1 R2 : rel A B) x1 x2 y1 y2 P Q:
+  RElim impl (R1 x1 y1) (R2 x2 y2) P Q ->
+  RElim subrel R1 R2 (x1 = x2 /\ y1 = y2 /\ P) Q.
+Proof.
+  cbv.
+  firstorder.
+  subst.
+  eauto.
+Qed.
+
 
 (** * Core relators *)
 
