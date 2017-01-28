@@ -3,32 +3,9 @@ Require Import Coq.Lists.List.
 
 (** * Tests *)
 
-(** ** Partial applications *)
-
-Goal forall A (a1 a2: A) B (b1 b2: B) (RA: rel A A), True.
-Proof.
-  intros.
-
-  evar (T: Type); evar (R: rel T T); subst T;
-  assert (H1: ProperQuery (proper_partial_app::nil) R (@pair A A a1)); subst R.
-  typeclasses eauto.
-  instantiate (1 := RA) in H1.
-
-  evar (T: Type); evar (R: rel T T); subst T;
-  assert (H2: ProperQuery (proper_partial_app::nil) R (@pair A)); subst R.
-  typeclasses eauto.
-  instantiate (1 := RA) in H2.
-
-  evar (T: Type); evar (R: rel T T); subst T;
-  assert (H3: ProperQuery (proper_partial_app::nil) R (@inl A B a2)); subst R.
-  typeclasses eauto.
-  instantiate (1 := eq) in H3.
-
-  exact I.
-Qed.
-
 (** ** Setoid rewriting *)
 
+(*
 Goal
   forall A (a b: A) `(HR: Equivalence A) (H: R a b),
     sum_rel R R (inl a) (inl b).
@@ -38,6 +15,7 @@ Proof.
   rewrite <- H.
   reflexivity.
 Qed.
+*)
 
 (** ** Monotonicity tactics *)
 
@@ -135,6 +113,7 @@ Qed.
 
 (** ** Using [foo_subrel] instances *)
 
+(*
 Goal
   forall A1 A2 B1 B2 C1 C2 (R1 R2: rel A1 A2) (R1': rel B1 B2) (R: rel C1 C2),
     subrel R1 R2 ->
@@ -146,6 +125,7 @@ Proof.
   rewrite HR12.
   assumption.
 Qed.
+*)
 
 Goal
   forall A B (xa1 xa2 ya1 ya2 : A) (xb1 xb2 yb1 yb2 : B)

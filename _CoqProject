@@ -4,7 +4,6 @@ Delay.v
 RelDefinitions.v
 RelOperators.v
 Relators.v
-MorphismsCompat.v
 Monotonicity.v
 Transport.v
 PreOrderTactic.v
