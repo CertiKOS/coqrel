@@ -228,7 +228,7 @@ Qed.
   rewriting in a goal of the form [(R1 * R1' ++> R) x y]. *)
 
 Instance subrel_pointwise_subrel {A B}:
-  subrel (@subrel A B) (eq ==> eq ==> impl).
+  Related (@subrel A B) (eq ==> eq ==> impl) subrel.
 Proof.
   intros R1 R2 HR x1 x2 Hx y1 y2 Hy H; subst.
   eauto.

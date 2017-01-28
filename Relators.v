@@ -77,8 +77,8 @@ Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
   pattern). *)
 
 Global Instance arrow_pointwise_eq_subrel {A B1 B2} (RB1 RB2: rel B1 B2):
-  subrel RB1 RB2 ->
-  subrel (- ==> RB1) (@eq A ==> RB2).
+  Related RB1 RB2 subrel ->
+  Related (- ==> RB1) (@eq A ==> RB2) subrel.
 Proof.
   intros HRB f g Hfg x y Hxy.
   subst.
