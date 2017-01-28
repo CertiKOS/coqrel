@@ -140,12 +140,22 @@ Proof.
   monotonicity; rauto.
 Qed.
 
+Goal
+  forall A1 A2 B1 B2 (R1 R2: rel A1 A2) (R: rel B1 B2),
+    subrel R1 R2 ->
+    forall x y,
+      (R2 ++> R) x y ->
+      (R1 ++> R) x y.
+Proof.
+  intros A1 A2 B1 B2 R1 R2 R HR12 x y.
+  rauto.
+Qed.
+
 (** ** Using [foo_subrel] instances *)
 
 (** Still broken because of the interaction between [subrel] and
   [- ==> - ==> impl] (or lack thereof) *)
 
-(*
 Goal
   forall A1 A2 B1 B2 C1 C2 (R1 R2: rel A1 A2) (R1': rel B1 B2) (R: rel C1 C2),
     subrel R1 R2 ->
@@ -157,7 +167,6 @@ Proof.
   rewrite HR12.
   assumption.
 Qed.
-*)
 
 Goal
   forall A B (xa1 xa2 ya1 ya2 : A) (xb1 xb2 yb1 yb2 : B)

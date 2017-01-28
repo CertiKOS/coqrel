@@ -46,7 +46,9 @@ Hint Extern 1 (ApplicationHead ?m ?f) =>
 (** [RemoveParams] drops some arguments from the application [m] so
   that the result [f] expects [n] parameters. We are careful to skip
   an appropriate number of parameters when the type of term indicates
-  that it is already a partial application. *)
+  that it is already a partial application. Note that we need to make
+  sure we "open up" types such as [subrel] to expose the product,
+  accomplished here by using [eval cbv]. *)
 
 Ltac remove_params m n f :=
   let rec remove m n :=
@@ -58,6 +60,7 @@ Ltac remove_params m n f :=
       | O => unify m f
     end in
   let rec remove_from_partial m t n :=
+    let t := eval cbv in t in
     lazymatch t with
       | forall x, ?t' =>
         lazymatch n with

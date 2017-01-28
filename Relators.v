@@ -41,7 +41,7 @@ Proof.
 Qed.
 
 Global Instance arrow_pointwise_subrel_params:
-  Params (@arrow_pointwise_rel) 1.
+  Params (@arrow_pointwise_rel) 3.
 
 Global Instance arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
   RIntro (forall x: A, R (f x) (g x)) (- ==> R) f g.

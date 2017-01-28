@@ -18,7 +18,7 @@ Proof.
 Qed.
 
 Global Instance rel_union_subrel_params:
-  Params (@rel_union) 2.
+  Params (@rel_union) 4.
 
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
   subrel R1 (R1 \/ R2).
@@ -66,7 +66,7 @@ Proof.
 Qed.
 
 Global Instance rel_inter_subrel_params:
-  Params (@rel_inter) 2.
+  Params (@rel_inter) 4.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
   subrel (R1 /\ R2) R1.
@@ -232,7 +232,7 @@ Proof.
 Qed.
 
 Global Instance rel_pull_subrel_params:
-  Params (@rel_pull) 1.
+  Params (@rel_pull) 3.
 
 (** In the restricted case where [f = g], [rel_pull] preserves many
   properties of the underlying relation. *)
