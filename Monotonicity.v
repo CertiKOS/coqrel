@@ -246,18 +246,6 @@ Proof.
   firstorder.
 Qed.
 
-(** As an aside, the following instance of [subrel] enables the use of
-  [foo_subrel] instances for rewriting along within applied relations.
-  So that for instance, a hypothesis [H: subrel R1 R2] can be used for
-  rewriting in a goal of the form [(R1 * R1' ++> R) x y]. *)
-
-Instance subrel_pointwise_subrel {A B}:
-  Related (@subrel A B) (eq ==> eq ==> impl) subrel.
-Proof.
-  intros R1 R2 HR x1 x2 Hx y1 y2 Hy H; subst.
-  eauto.
-Qed.
-
 (** *** Main tactic *)
 
 (** With these components, defining the [monotonicity] tactic is
