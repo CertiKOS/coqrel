@@ -41,7 +41,7 @@ Proof.
 Qed.
 
 Global Instance arrow_pointwise_subrel_params:
-  Params (@arrow_pointwise_rel) 1.
+  Params (@arrow_pointwise_rel) 3.
 
 Global Instance arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
   RIntro (forall x: A, R (f x) (g x)) (- ==> R) f g.
@@ -77,8 +77,8 @@ Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
   pattern). *)
 
 Global Instance arrow_pointwise_eq_subrel {A B1 B2} (RB1 RB2: rel B1 B2):
-  subrel RB1 RB2 ->
-  subrel (- ==> RB1) (@eq A ==> RB2).
+  Related RB1 RB2 subrel ->
+  Related (- ==> RB1) (@eq A ==> RB2) subrel.
 Proof.
   intros HRB f g Hfg x y Hxy.
   subst.

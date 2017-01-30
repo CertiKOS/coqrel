@@ -368,38 +368,6 @@ Ltac destruct_rstep m :=
 Hint Extern 39 (RStep _ (_ (match ?m with _=>_ end) (match ?m with _=>_ end))) =>
   destruct_rstep m : typeclass_instances.
 
-(** ** Order on relations *)
-
-(** This is our generalization of [subrelation]. Like the original it
-  constitutes a preorder, and the union and intersection of relations
-  are the corresponding join and meet. *)
-
-Class subrel {A B} (R1 R2: rel A B) :=
-  subrel_at x y: R1 x y -> R2 x y.
-
-Arguments subrel {A%type B%type} R1%rel R2%rel.
-
-Global Instance subrel_preorder A B:
-  @PreOrder (rel A B) subrel.
-Proof.
-  split; firstorder.
-Qed.
-
-Instance subrel_refl {A B} (R: rel A B):
-  subrel R R.
-Proof.
-  firstorder.
-Qed.
-
-Global Instance eq_subrel {A} (R: rel A A):
-  Reflexive R ->
-  subrel eq R.
-Proof.
-  intros HR x y H.
-  subst.
-  reflexivity.
-Qed.
-
 (** ** Monotonicity properties *)
 
 (** We use the class [Related] for the user to declare monotonicity
@@ -465,15 +433,46 @@ Qed.
 Hint Extern 1 (RStep _ (Related _ _ _)) =>
   eapply unfold_monotonic_rstep : typeclass_instances.
 
-(** TODO: perhaps [subrel] doesn't need to be a class: we should drop
-  the following instance and just use [Related subrel] for declaring
-  subrelations. *)
+(** ** Order on relations *)
 
-Global Instance subrel_related {A B} (R R': rel A B):
-  subrel R R' ->
-  Related R R' subrel.
+(** This is our generalization of [subrelation]. Like the original it
+  constitutes a preorder, and the union and intersection of relations
+  are the corresponding join and meet. *)
+
+Definition subrel {A B} (R1 R2: rel A B) :=
+  forall x y, R1 x y -> R2 x y.
+
+Arguments subrel {A%type B%type} R1%rel R2%rel.
+
+Global Instance subrel_preorder A B:
+  @PreOrder (rel A B) subrel.
+Proof.
+  split; firstorder.
+Qed.
+
+Instance subrel_refl {A B} (R: rel A B):
+  Related R R subrel.
 Proof.
   firstorder.
+Qed.
+
+Global Instance eq_subrel {A} (R: rel A A):
+  Reflexive R ->
+  Related eq R subrel.
+Proof.
+  intros HR x y H.
+  subst.
+  reflexivity.
+Qed.
+
+Instance subrel_impl_relim {A B} (R1 R2 : rel A B) x1 x2 y1 y2 P Q:
+  RElim impl (R1 x1 y1) (R2 x2 y2) P Q ->
+  RElim subrel R1 R2 (x1 = x2 /\ y1 = y2 /\ P) Q.
+Proof.
+  cbv.
+  firstorder.
+  subst.
+  eauto.
 Qed.
 
 
@@ -511,7 +510,7 @@ Proof.
 Qed.
 
 Global Instance arrow_subrel_params:
-  Params (@arrow_rel) 2.
+  Params (@arrow_rel) 4.
 
 Global Instance arrow_rintro {A1 A2 B1 B2} (RA: rel A1 A2) (RB: rel B1 B2) f g:
   RIntro (forall x y, RA x y -> RB (f x) (g y)) (RA ++> RB) f g.
@@ -618,7 +617,7 @@ Proof.
 Qed.
 
 Global Instance flip_subrel_params:
-  Params (@flip) 1.
+  Params (@flip) 3.
 
 Lemma flip_rintro {A B} (R: rel A B) m n:
   RIntro (R n m) (flip R) m n.
