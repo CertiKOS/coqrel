@@ -414,14 +414,6 @@ Notation Monotonic m R := (Related m m R).
 Hint Extern 50 (Related _ _ _) =>
   progress cbv beta : typeclass_instances.
 
-(** For the sake of backwards compatibility, we override
-  [Morphisms.Proper] with the following notation. *)
-
-Notation "'@' 'Proper' T R m" := (@Monotonic T m R)
-  (at level 10, T at next level, R at next level, m at next level, only parsing).
-
-Notation Proper R m := (Monotonic m R) (only parsing).
-
 (** We provide a [RStep] instance for unfolding [Related]. *)
 
 Lemma unfold_monotonic_rstep {A B} (R: rel A B) m n:
@@ -504,7 +496,7 @@ Notation "RA --> RB" := (arrow_rel (flip RA) RB)
   (at level 55, right associativity) : rel_scope.
 
 Global Instance arrow_subrel {A1 A2 B1 B2}:
-  Proper (subrel --> subrel ++> subrel) (@arrow_rel A1 A2 B1 B2).
+  Monotonic (@arrow_rel A1 A2 B1 B2) (subrel --> subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
@@ -538,15 +530,15 @@ Hint Extern 1 (RElim (_ ++> _) _ _ _ _) =>
   relations. Then, [forall_rel FE f g] states that given an edge
   [(e : E v1 v2)], the images [f v1] and [g v2] are related by the
   corresponding relation [FE v1 v2 e]. We will write [forall_rel FE f g]
-  as [(∀ e : E v1 v2, FE[v1,v2,e]) f g]. Notice that this notation
+  as [(forallr e @ v1 v2 : E, FE[v1,v2,e]) f g]. Notice that this notation
   binds [v1] and [v2] as well as [e].
 
   If that makes no sense, you can think of specific source quivers. So
   for instance, oftentimes we will want to use ([Type], [rel]) as the
   source quiver too. This corresponds to parametric polymorphism. The
-  type of [Some] is [∀ A : Type, A -> option A]; the corresponding
-  logical relation is [∀ R : rel A1 A2, R ++> option_rel R]. Stating
-  that [Proper (∀ R : rel A1 A2, R ++> option_rel R) Some] means that,
+  type of [Some] is [forall A : Type, A -> option A]; the corresponding
+  logical relation is [forallr R @ A1 A2 : rel, R ++> option_rel R]. Stating
+  that [Monotonic Some (foralr R @ A1 A2 : rel, R ++> option_rel R)] means that,
   given any relation [R] and elements [x1] and [x2], if [R] relates
   [x1] and [x2], then [option_rel R] will relate [Some x1] and [Some x2].
 
@@ -559,7 +551,7 @@ Hint Extern 1 (RElim (_ ++> _) _ _ _ _) =>
   Then, the monotonicity of a data-indexed function —
   say, [foo: forall D : layerdata, layer D -> primsem D] —
   can be expressed as
-  [Proper (∀ R : simrel D1 D2, siml D1 D2 R ++> simp D1 D2 R) foo].
+  [Monotonic foo (forall R @ D1 D2 : simrel, siml D1 D2 R ++> simp D1 D2 R) foo].
 
   This definition is the same as [respectful_hetero]. *)
 
@@ -611,7 +603,7 @@ Hint Extern 1 (RElim (forall_rel _) _ _ _ _) =>
   characterize its variance and introduce an [RElim] rule. *)
 
 Global Instance flip_subrel {A B}:
-  Proper (subrel ++> subrel) (@flip A B Prop).
+  Monotonic (@flip A B Prop) (subrel ++> subrel).
 Proof.
   firstorder.
 Qed.

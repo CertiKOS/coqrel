@@ -35,7 +35,7 @@ Notation "- ==> R" := (arrow_pointwise_rel _ R)
   (at level 55, right associativity) : rel_scope.
 
 Global Instance arrow_pointwise_subrel {A B1 B2}:
-  Proper (subrel ++> subrel) (@arrow_pointwise_rel A B1 B2).
+  Monotonic (@arrow_pointwise_rel A B1 B2) (subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
@@ -193,7 +193,7 @@ Definition set_rel {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
   fun sA sB => forall a, sA a -> exists b, sB b /\ R a b.
 
 Global Instance set_subrel:
-  Proper (forallr -, forallr -, subrel ++> subrel) (@set_rel).
+  Monotonic (@set_rel) (forallr -, forallr -, subrel ++> subrel).
 Proof.
   intros A B R1 R2 HR sA sB Hs.
   intros x Hx.
@@ -247,21 +247,21 @@ Infix "+" := sum_rel : rel_scope.
   a corresponding, full-blown [Proper] instance. *)
 
 Global Instance inl_rel:
-  Proper (forallr RA, forallr RB, RA ++> RA + RB) (@inl).
+  Monotonic (@inl) (forallr RA, forallr RB, RA ++> RA + RB).
 Proof.
   exact @inl_rel_def.
 Qed.
 
 Global Instance inr_rel:
-  Proper (forallr RA, forallr RB, RB ++> RA + RB) (@inr).
+  Monotonic (@inr) (forallr RA, forallr RB, RB ++> RA + RB).
 Proof.
   exact @inr_rel_def.
 Qed.
 
 Global Instance sum_subrel:
-  Proper
-    (forallr -, forallr -, subrel ++> forallr -, forallr -, subrel ++> subrel)
-    (@sum_rel).
+  Monotonic
+    (@sum_rel)
+    (forallr -, forallr -, subrel ++> forallr -, forallr -, subrel ++> subrel).
 Proof.
   intros A1 A2 RA1 RA2 HRA B1 B2 RB1 RB2 HRB.
   intros x1 x2 Hx.
@@ -305,7 +305,7 @@ Definition prod_rel {A1 A2} RA {B1 B2} RB: rel (A1 * B1)%type (A2 * B2)%type :=
 Infix "*" := prod_rel : rel_scope.
 
 Global Instance pair_rel:
-  Proper (forallr RA, forallr RB, RA ++> RB ++> RA * RB) (@pair).
+  Monotonic (@pair) (forallr RA, forallr RB, RA ++> RB ++> RA * RB).
 Proof.
   intros A1 A2 RA B1 B2 RB a1 a2 Ha b1 b2 Hb.
   red.
@@ -313,7 +313,7 @@ Proof.
 Qed.
 
 Global Instance fst_rel:
-  Proper (forallr RA, forallr RB, RA * RB ==> RA) (@fst).
+  Monotonic (@fst) (forallr RA, forallr RB, RA * RB ==> RA).
 Proof.
   intros A1 A2 RA B1 B2 RB.
   intros x1 x2 [Ha Hb].
@@ -321,7 +321,7 @@ Proof.
 Qed.
 
 Global Instance snd_rel:
-  Proper (forallr RA, forallr RB, RA * RB ==> RB) (@snd).
+  Monotonic (@snd) (forallr RA, forallr RB, RA * RB ==> RB).
 Proof.
   intros A1 A2 RA B1 B2 RB.
   intros x1 x2 [Ha Hb].
@@ -329,9 +329,9 @@ Proof.
 Qed.
 
 Global Instance prod_subrel:
-  Proper
-    (forallr -, forallr -, subrel ++> forallr -, forallr -, subrel ++> subrel)
-    (@prod_rel).
+  Monotonic
+    (@prod_rel)
+    (forallr -, forallr -, subrel ++> forallr -, forallr -, subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
@@ -379,19 +379,19 @@ Inductive option_rel {A1 A2} (RA: rel A1 A2): rel (option A1) (option A2) :=
   | None_rel_def: option_rel RA (@None A1) (@None A2).
 
 Global Instance Some_rel:
-  Proper (forallr R @ A1 A2 : rel, R ++> option_rel R) (@Some).
+  Monotonic (@Some) (forallr R @ A1 A2 : rel, R ++> option_rel R).
 Proof.
   exact @Some_rel_def.
 Qed.
 
 Global Instance None_rel:
-  Proper (forallr R, option_rel R) (@None).
+  Monotonic (@None) (forallr R, option_rel R).
 Proof.
   exact @None_rel_def.
 Qed.
 
 Global Instance option_subrel:
-  Proper (forallr -, forallr -, subrel ++> subrel) (@option_rel).
+  Monotonic (@option_rel) (forallr -, forallr -, subrel ++> subrel).
 Proof.
   intros A1 A2 RA1 RA2 HRA.
   intros x1 x2 Hx.
@@ -415,19 +415,19 @@ Inductive list_rel {A1 A2} (R: rel A1 A2): rel (list A1) (list A2) :=
   | cons_rel_def: (R ++> list_rel R ++> list_rel R) (@cons A1) (@cons A2).
 
 Global Instance nil_rel:
-  Proper (forallr R, list_rel R) (@nil).
+  Monotonic (@nil) (forallr R, list_rel R).
 Proof.
   exact @nil_rel_def.
 Qed.
 
 Global Instance cons_rel:
-  Proper (forallr R, R ++> list_rel R ++> list_rel R) (@cons).
+  Monotonic (@cons) (forallr R, R ++> list_rel R ++> list_rel R).
 Proof.
   exact @cons_rel_def.
 Qed.
 
 Global Instance list_subrel:
-  Proper (forallr -, forallr -, subrel ++> subrel) (@list_rel).
+  Monotonic (@list_rel) (forallr -, forallr -, subrel ++> subrel).
 Proof.
   intros A B R S HRS x y.
   red in HRS.
@@ -457,7 +457,9 @@ Proof.
 Qed.
 
 Global Instance app_rel:
-  Proper (forallr R : rel, list_rel R ++> list_rel R ++> list_rel R) (@app).
+  Monotonic
+    (@app)
+    (forallr R : rel, list_rel R ++> list_rel R ++> list_rel R).
 Proof.
   intros A1 A2 R l1 l2 Hl.
   induction Hl as [ | x1 x2 Hx l1 l2 Hl IHl]; simpl.
@@ -466,18 +468,18 @@ Proof.
 Qed.
 
 Global Instance map_rel:
-  Proper
-    (forallr RA, forallr RB, (RA ++> RB) ++> list_rel RA ++> list_rel RB)
-    map.
+  Monotonic
+    (@map)
+    (forallr RA, forallr RB, (RA ++> RB) ++> list_rel RA ++> list_rel RB).
 Proof.
   intros A1 A2 RA B1 B2 RB f g Hfg l1 l2 Hl.
   induction Hl; constructor; eauto.
 Qed.
 
 Global Instance fold_right_rel:
-  Proper
-    (forallr RA, forallr RB, (RB ++> RA ++> RA) ++> RA ++> list_rel RB ++> RA)
-    fold_right.
+  Monotonic
+    (@fold_right)
+    (forallr RA, forallr RB, (RB ++> RA ++> RA) ++> RA ++> list_rel RB ++> RA).
 Proof.
   intros A1 A2 RA B1 B2 RB f g Hfg a1 a2 Ha l1 l2 Hl.
   induction Hl; simpl; eauto.
@@ -485,9 +487,9 @@ Proof.
 Qed.
 
 Global Instance fold_left_rel:
-  Proper
-    (forallr RA, forallr RB, (RA ++> RB ++> RA) ++> list_rel RB ++> RA ++> RA)
-    fold_left.
+  Monotonic
+    (@fold_left)
+    (forallr RA, forallr RB, (RA ++> RB ++> RA) ++> list_rel RB ++> RA ++> RA).
 Proof.
   intros A1 A2 RA B1 B2 RB f g Hfg l1 l2 Hl.
   induction Hl; simpl.
@@ -508,38 +510,32 @@ Qed.
 Hint Extern 1 (RStep _ (_ -> _)) =>
   eapply fold_impl_rstep : typeclass_instances.
 
-Global Instance all_monotonic A:
-  Proper ((- ==> impl) ++> impl) (@all A).
+Global Instance all_monotonic:
+  Monotonic (@all) (forallr -, (- ==> impl) ++> impl).
 Proof.
-  intros P Q HPQ H x.
+  intros A P Q HPQ H x.
   apply HPQ.
   apply H.
 Qed.
 
-Global Instance all_monotonic_param:
-  Params (@all) 1.
-
-Global Instance ex_monotonic A:
-  Proper ((- ==> impl) ++> impl) (@ex A).
+Global Instance ex_monotonic:
+  Monotonic (@ex) (forallr -, (- ==> impl) ++> impl).
 Proof.
-  intros P Q HPQ [x Hx].
+  intros A P Q HPQ [x Hx].
   exists x.
   apply HPQ.
   assumption.
 Qed.
 
-Global Instance ex_monotonic_params:
-  Params (@ex) 1.
-
 Global Instance and_monotonic:
-  Proper (impl ++> impl ++> impl) and.
+  Monotonic (@and) (impl ++> impl ++> impl).
 Proof.
   intros P1 P2 HP Q1 Q2 HQ [HP1 HQ1].
   eauto.
 Qed.
 
 Global Instance or_monotonic:
-  Proper (impl ++> impl ++> impl) or.
+  Monotonic (@or) (impl ++> impl ++> impl).
 Proof.
   intros P1 P2 HP Q1 Q2 HQ [HP1|HQ1];
   eauto.

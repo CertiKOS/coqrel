@@ -6,7 +6,7 @@ Require Import Delay.
 (** ** The [monotonicity] tactic *)
 
 (** The purpose of the [monotonicity] tactic is to automatically
-  select and apply a theorem of the form [Proper ?R ?m] in order to
+  select and apply a theorem of the form [Monotonic ?m ?R] in order to
   make progress when the goal is an applied relation. Compared with
   setoid rewriting, [monotonicity] is less powerful, but more direct
   and simple. This means it is easier to debug, and it can seamlessly
@@ -208,7 +208,7 @@ Hint Extern 3 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
 
   This is a conservative solution which precludes many interesting
   usages of [subrel]. For instance, suppose we have a relational
-  property alogn the lines of [Proper ((R1 ++> R1) ∩ (R2 ++> R2)) f].
+  property alogn the lines of [Monotonic f ((R1 ++> R1) ∩ (R2 ++> R2))].
   We would want to be able to use it to show that [f] preserve [R1] or
   [R2] individually (because [subrel (R1 ++> R1) ((R1 ++> R1) ∩ (R2
   ++> R2))], but also together (because [subrel (R1 ∩ R2 ++> R1 ∩ R2)
@@ -224,7 +224,7 @@ Class RImpl (P Q: Prop): Prop :=
   rimpl: P -> Q.
 
 (** While we give priority to [rimpl_refl] below, when it doesn't work
-  we use [RAuto] to establish a [subrel] property. The [Proper]
+  we use [RAuto] to establish a [subrel] property. The [Monotonic]
   instances we declared alongside relators can be used conjunction
   with [Monotonicity] to break up [subrel] goals along the structure
   of the relations being considered. This may end up causing loops
