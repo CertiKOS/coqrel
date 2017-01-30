@@ -26,7 +26,7 @@
 </div>
 
 <div class="doc">
-<a name="lab34"></a><h2 class="section">Union of relations</h2>
+<a name="lab36"></a><h2 class="section">Union of relations</h2>
 
 </div>
 <div class="code">
@@ -43,7 +43,7 @@
 
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_union_subrel"><span class="id" type="instance">rel_union_subrel</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>}:<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a>) (@<a class="idref" href="coqrel.RelOperators.html#rel_union"><span class="id" type="definition">rel_union</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>).<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) (@<a class="idref" href="coqrel.RelOperators.html#rel_union"><span class="id" type="definition">rel_union</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>).<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">clear</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
@@ -51,48 +51,46 @@
 
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_union_subrel_params"><span class="id" type="instance">rel_union_subrel_params</span></a>:<br/>
-&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_union"><span class="id" type="definition">rel_union</span></a>) 2.<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_union"><span class="id" type="definition">rel_union</span></a>) 4.<br/>
 
 <br/>
 <span class="id" type="keyword">Lemma</span> <a name="rel_union_introl"><span class="id" type="lemma">rel_union_introl</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R1</span> <span class="id" type="var">R2</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>):<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>).<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> <a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>)%<span class="id" type="var">rel</span> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>.<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
 <span class="id" type="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" type="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <span class="id" type="var">_</span> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <span class="id" type="var">_</span>)) ⇒<br/>
+<span class="id" type="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> <span class="id" type="var">_</span> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <span class="id" type="var">_</span>)%<span class="id" type="var">rel</span> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) ⇒<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.RelOperators.html#rel_union_introl"><span class="id" type="lemma">rel_union_introl</span></a> : <span class="id" type="var">typeclass_instances</span>.<br/>
 
 <br/>
 <span class="id" type="keyword">Lemma</span> <a name="rel_union_intror"><span class="id" type="lemma">rel_union_intror</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R1</span> <span class="id" type="var">R2</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>):<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>).<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>)%<span class="id" type="var">rel</span> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>.<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
 <span class="id" type="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" type="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <span class="id" type="var">_</span> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <span class="id" type="var">_</span>)) ⇒<br/>
+<span class="id" type="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> <span class="id" type="var">_</span> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <span class="id" type="var">_</span>)%<span class="id" type="var">rel</span> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) ⇒<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.RelOperators.html#rel_union_introl"><span class="id" type="lemma">rel_union_introl</span></a> : <span class="id" type="var">typeclass_instances</span>.<br/>
 
 <br/>
 <span class="id" type="keyword">Lemma</span> <a name="rel_union_lub"><span class="id" type="lemma">rel_union_lub</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R1</span> <span class="id" type="var">R2</span> <span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>):<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> →<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> →<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>)%<span class="id" type="var">rel</span> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a>.<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" type="class">RIntro</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a>) <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>)%<span class="id" type="var">rel</span> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a>.<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
 <span class="id" type="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" type="keyword">Hint Extern</span> 2 (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <span class="id" type="var">_</span>) <span class="id" type="var">_</span>) ⇒<br/>
+<span class="id" type="keyword">Hint Extern</span> 2 (<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" type="class">RIntro</span></a> <span class="id" type="var">_</span> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'\/'_x"><span class="id" type="notation">∨</span></a> <span class="id" type="var">_</span>)%<span class="id" type="var">rel</span> <span class="id" type="var">_</span>) ⇒<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.RelOperators.html#rel_union_lub"><span class="id" type="lemma">rel_union_lub</span></a> : <span class="id" type="var">typeclass_instances</span>.<br/>
 
 <br/>
 </div>
 
 <div class="doc">
-<a name="lab35"></a><h2 class="section">Intersection of relations</h2>
+<a name="lab37"></a><h2 class="section">Intersection of relations</h2>
 
 </div>
 <div class="code">
@@ -109,7 +107,7 @@
 
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_inter_subrel"><span class="id" type="instance">rel_inter_subrel</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>}:<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a>) (@<a class="idref" href="coqrel.RelOperators.html#rel_inter"><span class="id" type="definition">rel_inter</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>).<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) (@<a class="idref" href="coqrel.RelOperators.html#rel_inter"><span class="id" type="definition">rel_inter</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>).<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">clear</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
@@ -117,41 +115,39 @@
 
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_inter_subrel_params"><span class="id" type="instance">rel_inter_subrel_params</span></a>:<br/>
-&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_inter"><span class="id" type="definition">rel_inter</span></a>) 2.<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_inter"><span class="id" type="definition">rel_inter</span></a>) 4.<br/>
 
 <br/>
 <span class="id" type="keyword">Lemma</span> <a name="rel_inter_eliml"><span class="id" type="lemma">rel_inter_eliml</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R1</span> <span class="id" type="var">R2</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>):<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>) <a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a>.<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>)%<span class="id" type="var">rel</span> <a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>.<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
 <span class="id" type="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" type="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">_</span>) <span class="id" type="var">_</span>) ⇒<br/>
+<span class="id" type="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">_</span>)%<span class="id" type="var">rel</span> <span class="id" type="var">_</span> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) ⇒<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.RelOperators.html#rel_inter_eliml"><span class="id" type="lemma">rel_inter_eliml</span></a> : <span class="id" type="var">typeclass_instances</span>.<br/>
 
 <br/>
 <span class="id" type="keyword">Lemma</span> <a name="rel_inter_elimr"><span class="id" type="lemma">rel_inter_elimr</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R1</span> <span class="id" type="var">R2</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>):<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>) <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>.<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>)%<span class="id" type="var">rel</span> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>.<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
 <span class="id" type="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" type="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">_</span>) <span class="id" type="var">_</span>) ⇒<br/>
+<span class="id" type="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#Related"><span class="id" type="class">Related</span></a> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">_</span>)%<span class="id" type="var">rel</span> <span class="id" type="var">_</span> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) ⇒<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.RelOperators.html#rel_inter_elimr"><span class="id" type="lemma">rel_inter_elimr</span></a> : <span class="id" type="var">typeclass_instances</span>.<br/>
 
 <br/>
 <span class="id" type="keyword">Lemma</span> <a name="rel_inter_glb"><span class="id" type="lemma">rel_inter_glb</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span> <span class="id" type="var">R1</span> <span class="id" type="var">R2</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>):<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> →<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a> →<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>).<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" type="class">RIntro</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#:type_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>) <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#R"><span class="id" type="variable">R</span></a> (<a class="idref" href="coqrel.RelOperators.html#R1"><span class="id" type="variable">R1</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="coqrel.RelOperators.html#R2"><span class="id" type="variable">R2</span></a>)%<span class="id" type="var">rel</span>.<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
 <span class="id" type="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" type="keyword">Hint Extern</span> 2 (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <span class="id" type="var">_</span> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">_</span>)) ⇒<br/>
+<span class="id" type="keyword">Hint Extern</span> 2 (<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" type="class">RIntro</span></a> <span class="id" type="var">_</span> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <span class="id" type="var">_</span> (<span class="id" type="var">_</span> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <span class="id" type="var">_</span>)%<span class="id" type="var">rel</span>) ⇒<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">eapply</span> <a class="idref" href="coqrel.RelOperators.html#rel_inter_glb"><span class="id" type="lemma">rel_inter_glb</span></a> : <span class="id" type="var">typeclass_instances</span>.<br/>
 
 <br/>
@@ -208,7 +204,7 @@
 </div>
 
 <div class="doc">
-<a name="lab36"></a><h2 class="section">The bottom and top relations</h2>
+<a name="lab38"></a><h2 class="section">The bottom and top relations</h2>
 
 </div>
 <div class="code">
@@ -234,14 +230,14 @@
 </div>
 
 <div class="doc">
-<a name="lab37"></a><h2 class="section">Relation equivalence</h2>
+<a name="lab39"></a><h2 class="section">Relation equivalence</h2>
 
 </div>
 <div class="code">
 
 <br/>
 <span class="id" type="keyword">Definition</span> <a name="eqrel"><span class="id" type="definition">eqrel</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>}: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>) (<a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>) :=<br/>
-&nbsp;&nbsp;(<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Program.Basics.html#flip"><span class="id" type="definition">flip</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a>)%<span class="id" type="var">rel</span>.<br/>
+&nbsp;&nbsp;(<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelOperators.html#:rel_scope:x_'/\'_x"><span class="id" type="notation">∧</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Program.Basics.html#flip"><span class="id" type="definition">flip</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>)%<span class="id" type="var">rel</span>.<br/>
 
 <br/>
 <span class="id" type="var">Arguments</span> <a class="idref" href="coqrel.RelOperators.html#eqrel"><span class="id" type="definition">eqrel</span></a> {<span class="id" type="var">_</span> <span class="id" type="var">_</span>} <span class="id" type="var">RA</span>%<span class="id" type="var">rel</span> <span class="id" type="var">RB</span>%<span class="id" type="var">rel</span>.<br/>
@@ -258,7 +254,7 @@
 </div>
 
 <div class="doc">
-<a name="lab38"></a><h2 class="section">Relation composition</h2>
+<a name="lab40"></a><h2 class="section">Relation composition</h2>
 
 </div>
 <div class="code">
@@ -269,7 +265,7 @@
 
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_compose_subrel"><span class="id" type="instance">rel_compose_subrel</span></a> <span class="id" type="var">A</span> <span class="id" type="var">B</span> <span class="id" type="var">C</span>:<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a>) (@<a class="idref" href="coqrel.RelOperators.html#rel_compose"><span class="id" type="definition">rel_compose</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a> <a class="idref" href="coqrel.RelOperators.html#C"><span class="id" type="variable">C</span></a>).<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) (@<a class="idref" href="coqrel.RelOperators.html#rel_compose"><span class="id" type="definition">rel_compose</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a> <a class="idref" href="coqrel.RelOperators.html#C"><span class="id" type="variable">C</span></a>).<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
 <span class="id" type="keyword">Qed</span>.<br/>
@@ -283,7 +279,7 @@
 
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_compose_params"><span class="id" type="instance">rel_compose_params</span></a>:<br/>
-&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_compose"><span class="id" type="definition">rel_compose</span></a>) 2.<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_compose"><span class="id" type="definition">rel_compose</span></a>) 4.<br/>
 
 <br/>
 <span class="id" type="keyword">Lemma</span> <a name="rel_compose_id_left"><span class="id" type="lemma">rel_compose_id_left</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span>} (<span class="id" type="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" type="abbreviation">rel</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a>):<br/>
@@ -315,7 +311,7 @@
 </div>
 
 <div class="doc">
-<a name="lab39"></a><h2 class="section">Pulling a relation along functions</h2>
+<a name="lab41"></a><h2 class="section">Pulling a relation along functions</h2>
 
 </div>
 <div class="code">
@@ -338,14 +334,14 @@
 
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_pull_subrel"><span class="id" type="instance">rel_pull_subrel</span></a> {<span class="id" type="var">A</span> <span class="id" type="var">B</span> <span class="id" type="var">A'</span> <span class="id" type="var">B'</span>} (<span class="id" type="var">f</span>: <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> → <a class="idref" href="coqrel.RelOperators.html#A'"><span class="id" type="variable">A'</span></a>) (<span class="id" type="var">g</span>: <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a> → <a class="idref" href="coqrel.RelOperators.html#B'"><span class="id" type="variable">B'</span></a>):<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a>) (<a class="idref" href="coqrel.RelOperators.html#rel_pull"><span class="id" type="definition">rel_pull</span></a> <a class="idref" href="coqrel.RelOperators.html#f"><span class="id" type="variable">f</span></a> <a class="idref" href="coqrel.RelOperators.html#g"><span class="id" type="variable">g</span></a>).<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) (<a class="idref" href="coqrel.RelOperators.html#rel_pull"><span class="id" type="definition">rel_pull</span></a> <a class="idref" href="coqrel.RelOperators.html#f"><span class="id" type="variable">f</span></a> <a class="idref" href="coqrel.RelOperators.html#g"><span class="id" type="variable">g</span></a>).<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">firstorder</span>.<br/>
 <span class="id" type="keyword">Qed</span>.<br/>
 
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_pull_subrel_params"><span class="id" type="instance">rel_pull_subrel_params</span></a>:<br/>
-&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_pull"><span class="id" type="definition">rel_pull</span></a>) 1.<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_pull"><span class="id" type="definition">rel_pull</span></a>) 3.<br/>
 
 <br/>
 </div>
@@ -430,7 +426,7 @@ We can also reuse instances of <span class="inlinecode"><a class="idref" href="c
 </div>
 
 <div class="doc">
-<a name="lab40"></a><h2 class="section">Relation currying</h2>
+<a name="lab42"></a><h2 class="section">Relation currying</h2>
 
 </div>
 <div class="code">
@@ -558,7 +554,7 @@ Now we can provide a somewhat general <span class="inlinecode"><a class="idref" 
 </div>
 
 <div class="doc">
-<a name="lab41"></a><h2 class="section">The <span class="inlinecode"><a class="idref" href="coqrel.RelOperators.html#req"><span class="id" type="inductive">req</span></a></span> relation</h2>
+<a name="lab43"></a><h2 class="section">The <span class="inlinecode"><a class="idref" href="coqrel.RelOperators.html#req"><span class="id" type="inductive">req</span></a></span> relation</h2>
 
 <div class="paragraph"> </div>
 
@@ -580,7 +576,7 @@ Now we can provide a somewhat general <span class="inlinecode"><a class="idref" 
 </div>
 
 <div class="doc">
-<a name="lab42"></a><h2 class="section">Checking predicates on the left and right elements</h2>
+<a name="lab44"></a><h2 class="section">Checking predicates on the left and right elements</h2>
 
 </div>
 <div class="code">
@@ -597,7 +593,7 @@ Now we can provide a somewhat general <span class="inlinecode"><a class="idref" 
 </div>
 
 <div class="doc">
-<a name="lab43"></a><h2 class="section">Relation versions of <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#"><span class="id" type="library">ex</span></a></span> and <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#all"><span class="id" type="definition">all</span></a></span></h2>
+<a name="lab45"></a><h2 class="section">Relation versions of <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#"><span class="id" type="library">ex</span></a></span> and <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Init.Logic.html#all"><span class="id" type="definition">all</span></a></span></h2>
 
 <div class="paragraph"> </div>
 
@@ -679,7 +675,7 @@ Now we can provide a somewhat general <span class="inlinecode"><a class="idref" 
 </div>
 
 <div class="doc">
-<a name="lab44"></a><h2 class="section">The <span class="inlinecode"><a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a></span> construction</h2>
+<a name="lab46"></a><h2 class="section">The <span class="inlinecode"><a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a></span> construction</h2>
 
 <div class="paragraph"> </div>
 
@@ -708,7 +704,7 @@ While it's possible to define a more general monotonicity property
 <br/>
 <span class="id" type="keyword">Global Instance</span> <a name="rel_incr_subrel"><span class="id" type="instance">rel_incr_subrel</span></a> {<span class="id" type="var">W</span> <span class="id" type="var">A</span> <span class="id" type="var">B</span>} <span class="id" type="var">acc</span>:<br/>
 &nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.RelationClasses.html#Transitive"><span class="id" type="class">Transitive</span></a> <a class="idref" href="coqrel.RelOperators.html#acc"><span class="id" type="variable">acc</span></a> →<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">(</span></a><a class="idref" href="coqrel.Relators.html#:rel_scope:'-'_'==>'_x"><span class="id" type="notation">-</span></a> <a class="idref" href="coqrel.Relators.html#:rel_scope:'-'_'==>'_x"><span class="id" type="notation">==&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a><a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">)</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelOperators.html#acc"><span class="id" type="variable">acc</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'-->'_x"><span class="id" type="notation">--&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="class">subrel</span></a>) (@<a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a> <a class="idref" href="coqrel.RelOperators.html#W"><span class="id" type="variable">W</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a> <a class="idref" href="coqrel.RelOperators.html#acc"><span class="id" type="variable">acc</span></a>).<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Proper"><span class="id" type="abbreviation">Proper</span></a> (<a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">(</span></a><a class="idref" href="coqrel.Relators.html#:rel_scope:'-'_'==>'_x"><span class="id" type="notation">-</span></a> <a class="idref" href="coqrel.Relators.html#:rel_scope:'-'_'==>'_x"><span class="id" type="notation">==&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a><a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">)</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'++>'_x"><span class="id" type="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelOperators.html#acc"><span class="id" type="variable">acc</span></a> <a class="idref" href="coqrel.RelDefinitions.html#:rel_scope:x_'-->'_x"><span class="id" type="notation">--&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" type="definition">subrel</span></a>) (@<a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a> <a class="idref" href="coqrel.RelOperators.html#W"><span class="id" type="variable">W</span></a> <a class="idref" href="coqrel.RelOperators.html#A"><span class="id" type="variable">A</span></a> <a class="idref" href="coqrel.RelOperators.html#B"><span class="id" type="variable">B</span></a> <a class="idref" href="coqrel.RelOperators.html#acc"><span class="id" type="variable">acc</span></a>).<br/>
 <span class="id" type="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">intros</span> <span class="id" type="var">Hacc</span> <span class="id" type="var">R1</span> <span class="id" type="var">R2</span> <span class="id" type="var">HR</span> <span class="id" type="var">w1</span> <span class="id" type="var">w2</span> <span class="id" type="var">Hw</span> <span class="id" type="var">a</span> <span class="id" type="var">b</span> (<span class="id" type="var">w1'</span> &amp; <span class="id" type="var">Hw1'</span> &amp; <span class="id" type="var">Hab</span>).<br/>
 &nbsp;&nbsp;<span class="id" type="tactic">eexists</span>; <span class="id" type="tactic">split</span>.<br/>
@@ -719,8 +715,8 @@ While it's possible to define a more general monotonicity property
 <span class="id" type="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" type="keyword">Global Instance</span> <a name="rel_incr_params"><span class="id" type="instance">rel_incr_params</span></a>:<br/>
-&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a>) 2.<br/>
+<span class="id" type="keyword">Global Instance</span> <a name="rel_incr_subrel_params"><span class="id" type="instance">rel_incr_subrel_params</span></a>:<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.4pl4/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" type="class">Params</span></a> (@<a class="idref" href="coqrel.RelOperators.html#rel_incr"><span class="id" type="definition">rel_incr</span></a>) 4.<br/>
 
 <br/>
 </div>
