@@ -462,7 +462,7 @@ Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
 (** ** The [rel_incr] construction *)
 
 (** When dealing with Kripke logical relations, we have a family of
-  relations indexed by a type of world, as well as an accessibility
+  relations indexed by a type of worlds, as well as an accessibility
   relation over this type of worlds. We often want to state that there
   exists a world accessible from a base one in which the relation
   holds. The following construction expresses this. *)
