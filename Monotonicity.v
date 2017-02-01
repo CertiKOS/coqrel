@@ -155,13 +155,15 @@ Ltac context_candidate :=
       | unify f m
       | lazymatch m with ?n _ => is_prefixable f n end ] in
   match goal with
-    | H: _ ?f ?g |- CandidateProperty _ _ _ (_ ?m ?n) =>
+    | H: _ ?f ?g |- @CandidateProperty ?A ?B ?R ?x ?y (_ ?m ?n) =>
       red;
       first
         [ is_prefix f m; is_prefixable g n
         | is_prefix g n; is_prefixable f m
-        | is_prefix g m; is_prefixable f n; apply unflip_context_candidate
-        | is_prefix f n; is_prefixable g m; apply unflip_context_candidate ];
+        | is_prefix g m; is_prefixable f n;
+          apply (@unflip_context_candidate A B R x y)
+        | is_prefix f n; is_prefixable g m;
+          apply (@unflip_context_candidate A B R x y)];
       eexact H
   end.
 

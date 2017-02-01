@@ -17,6 +17,21 @@ Qed.
 
 (** ** Monotonicity tactics *)
 
+(** Basic sanity check. This has actually failed in the past due to
+  [context_candidate] being too liberal and selecting the [RB]
+  property instead of [RA], then going nowhere with that with no
+  backtracking implemented yet. *)
+
+Goal
+  forall A B (RA: rel A A) (x y: A) (RB: rel B B) (z t: B),
+    RA x y ->
+    RB z t ->
+    RA x y.
+Proof.
+  intros.
+  rauto.
+Qed.
+
 Goal
   forall A (a b: A) (R: rel A A) (H: R a b),
     let f (x y: A * A) := (@pair (A+A) (A+A) (inr (fst x)) (inl (snd y))) in
