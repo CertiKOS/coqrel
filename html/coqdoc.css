@@ -75,7 +75,7 @@ h4.section {
                    padding-top: 0px; 
                    padding-bottom: 0px; 
                    font-size : 100%;
-                   font-style : bold;
+                   font-weight : bold;
                    text-decoration : underline;
  }
 
@@ -86,8 +86,7 @@ h4.section {
              max-width: 40em;
              color: black;
 	     padding: 10px;
-             background-color: #90bdff;
-             border-style: plain}
+             background-color: #90bdff }
 
 .inlinecode { 
     display: inline;
@@ -160,7 +159,64 @@ tr.infrulemiddle hr {
 #footer { font-size: 65%;
           font-family: sans-serif; }
 
+/* Identifiers: <span class="id" title="...">) */
+
 .id { display: inline; }
+
+.id[title="constructor"] {
+    color: rgb(60%,0%,0%);
+}
+
+.id[title="var"] {
+    color: rgb(40%,0%,40%);
+}
+
+.id[title="variable"] {
+    color: rgb(40%,0%,40%);
+}
+
+.id[title="definition"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="abbreviation"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="lemma"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="instance"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="projection"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="method"] {
+    color: rgb(0%,40%,0%);
+}
+
+.id[title="inductive"] {
+    color: rgb(0%,0%,80%);
+}
+
+.id[title="record"] {
+    color: rgb(0%,0%,80%);
+}
+
+.id[title="class"] {
+    color: rgb(0%,0%,80%);
+}
+
+.id[title="keyword"] {
+ color : #cf1d1d;
+/*     color: black; */
+}
+
+/* Deprecated rules using the 'type' attribute of <span> (not xhtml valid) */
 
 .id[type="constructor"] { 
     color: rgb(60%,0%,0%);
@@ -261,7 +317,6 @@ tr.infrulemiddle hr {
 #index #footer {
     position: absolute;
     bottom: 0;
-    text-align: bottom;
 }
 
 .paragraph {
