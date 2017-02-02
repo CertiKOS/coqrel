@@ -10,15 +10,12 @@ Arguments rel_union {_ _} R1%rel R2%rel _ _.
 
 Infix "\/" := rel_union : rel_scope.
 
-Global Instance rel_union_subrel {A B}:
-  Proper (subrel ++> subrel ++> subrel) (@rel_union A B).
+Global Instance rel_union_subrel:
+  Monotonic (@rel_union) (forallr -, forallr -, subrel ++> subrel ++> subrel).
 Proof.
   clear.
   firstorder.
 Qed.
-
-Global Instance rel_union_subrel_params:
-  Params (@rel_union) 4.
 
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
   Related R1 (R1 \/ R2)%rel subrel.
@@ -56,15 +53,12 @@ Arguments rel_inter {_ _} R1%rel R2%rel _ _.
 
 Infix "/\" := rel_inter : rel_scope.
 
-Global Instance rel_inter_subrel {A B}:
-  Proper (subrel ++> subrel ++> subrel) (@rel_inter A B).
+Global Instance rel_inter_subrel:
+  Monotonic (@rel_inter) (forallr -, forallr -, subrel ++> subrel ++> subrel).
 Proof.
   clear.
   firstorder.
 Qed.
-
-Global Instance rel_inter_subrel_params:
-  Params (@rel_inter) 4.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
   Related (R1 /\ R2)%rel R1 subrel.
@@ -169,20 +163,21 @@ Qed.
 Definition rel_compose {A B C} (RAB: rel A B) (RBC: rel B C): rel A C :=
   fun x z => exists y, RAB x y /\ RBC y z.
 
-Global Instance rel_compose_subrel A B C:
-  Proper (subrel ++> subrel ++> subrel) (@rel_compose A B C).
+Global Instance rel_compose_subrel:
+  Monotonic
+    (@rel_compose)
+    (forallr -, forallr -, forallr -, subrel ++> subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
 
-Global Instance rel_compose_eqrel A B C:
-  Proper (eqrel ==> eqrel ==> eqrel) (@rel_compose A B C).
+Global Instance rel_compose_eqrel:
+  Monotonic
+    (@rel_compose)
+    (forallr -, forallr -, forallr -, eqrel ==> eqrel ==> eqrel).
 Proof.
   firstorder.
 Qed.
-
-Global Instance rel_compose_params:
-  Params (@rel_compose) 4.
 
 Lemma rel_compose_id_left {A B} (R: rel A B):
   eqrel (rel_compose R eq) R.
@@ -222,7 +217,7 @@ Notation "R @@ ( f )" := (rel_pull f f R)
   (at level 30, right associativity) : rel_scope.
 
 Global Instance rel_pull_subrel {A B A' B'} (f: A -> A') (g: B -> B'):
-  Proper (subrel ++> subrel) (rel_pull f g).
+  Monotonic (rel_pull f g) (subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
@@ -467,7 +462,7 @@ Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
 (** ** The [rel_incr] construction *)
 
 (** When dealing with Kripke logical relations, we have a family of
-  relations indexed by a type of world, as well as an accessibility
+  relations indexed by a type of worlds, as well as an accessibility
   relation over this type of worlds. We often want to state that there
   exists a world accessible from a base one in which the relation
   holds. The following construction expresses this. *)
@@ -481,7 +476,7 @@ Definition rel_incr {W A B} (acc: rel W W) (R: W -> rel A B): W -> rel A B :=
 
 Global Instance rel_incr_subrel {W A B} acc:
   Transitive acc ->
-  Proper ((- ==> subrel) ++> acc --> subrel) (@rel_incr W A B acc).
+  Monotonic (@rel_incr W A B acc) ((- ==> subrel) ++> acc --> subrel).
 Proof.
   intros Hacc R1 R2 HR w1 w2 Hw a b (w1' & Hw1' & Hab).
   eexists; split.

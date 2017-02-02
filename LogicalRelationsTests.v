@@ -17,10 +17,25 @@ Qed.
 
 (** ** Monotonicity tactics *)
 
+(** Basic sanity check. This has actually failed in the past due to
+  [context_candidate] being too liberal and selecting the [RB]
+  property instead of [RA], then going nowhere with that with no
+  backtracking implemented yet. *)
+
+Goal
+  forall A B (RA: rel A A) (x y: A) (RB: rel B B) (z t: B),
+    RA x y ->
+    RB z t ->
+    RA x y.
+Proof.
+  intros.
+  rauto.
+Qed.
+
 Goal
   forall A (a b: A) (R: rel A A) (H: R a b),
     let f (x y: A * A) := (@pair (A+A) (A+A) (inr (fst x)) (inl (snd y))) in
-    Proper (R * ⊤ ++> ⊤ * R ++> (⊥ + R) * (R + ⊥))%rel f.
+    Monotonic f (R * ⊤ ++> ⊤ * R ++> (⊥ + R) * (R + ⊥))%rel.
 Proof.
   intros; unfold f.
   solve_monotonic.
@@ -37,7 +52,7 @@ Proof.
 Qed.
 
 (** Check that we can use relational hypotheses from the context as
-  well as [Proper] and [Related] instances. *)
+  well as [Monotonic]/[Related] instances. *)
 
 Goal
   forall
@@ -91,7 +106,7 @@ Qed.
 
 Goal
   forall {A B C} R R' S (f: A -> B -> B -> C) (x1 y1: A) (x2 y2: B),
-    Proper (rel_curry (R ++> R' ++> S)) f ->
+    Monotonic f (rel_curry (R ++> R' ++> S)) ->
     S (f x1 x2 x2) (f y1 y2 y2).
 Proof.
   intros A B C R R' S f x1 y1 x2 y2 Hf.
@@ -172,8 +187,8 @@ Goal
   forall A B (xa1 xa2 ya1 ya2 : A) (xb1 xb2 yb1 yb2 : B)
          (opA: A -> A -> A) (opB: B -> B -> B)
          (RA: rel A A) (RB: rel B B)
-         (HopA: Proper (RA ++> RA ++> RA) opA)
-         (HopB: Proper (RB ++> RB ++> RB) opB)
+         (HopA: Monotonic opA (RA ++> RA ++> RA))
+         (HopB: Monotonic opB (RB ++> RB ++> RB))
          (Hxa: RA xa1 xa2)
          (Hxb: RB xb1 xb2)
          (Hya: RA ya1 ya2)
@@ -219,8 +234,8 @@ Qed.
 
 Goal
   forall W acc A B C (R1: W -> rel A A) (R2: W -> rel B B) (R3: W -> rel C C) f g a b x w,
-    Proper (rforall w, R1 w ++> R2 w) f ->
-    Proper (rforall w, R2 w ++> option_rel (rel_incr acc R3 w)) g ->
+    Monotonic f (rforall w, R1 w ++> R2 w) ->
+    Monotonic g (rforall w, R2 w ++> option_rel (rel_incr acc R3 w)) ->
     R1 w a b ->
     g (f a) = Some x ->
     exists y, rel_incr acc R3 w x y.
