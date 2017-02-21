@@ -38,7 +38,7 @@ Goal
     Monotonic f (R * ⊤ ++> ⊤ * R ++> (⊥ + R) * (R + ⊥))%rel.
 Proof.
   intros; unfold f.
-  solve_monotonic.
+  rauto.
 Qed.
 
 Goal
@@ -48,7 +48,7 @@ Goal
     subrel (R1 ++> R2) (R1' ++> R2').
 Proof.
   do 10 intro.
-  solve_monotonic.
+  rauto.
 Qed.
 
 (** Check that we can use relational hypotheses from the context as
@@ -62,7 +62,7 @@ Goal
     op x = op y.
 Proof.
   intros.
-  solve_monotonic.
+  rauto.
 Qed.
 
 (** Bug with relational parametricity: you can't [RElim] a relation
@@ -75,7 +75,7 @@ Goal
 Proof.
   intros A B RA RB m n x y Hmn.
   try monotonicity.
-  try solve_monotonic.
+  try rauto.
 Abort.
 
 (** Pattern matching *)
@@ -88,7 +88,7 @@ Goal
        (match f y with inl a => a | inr b => y end).
 Proof.
   intros.
-  solve_monotonic.
+  rauto.
 Qed.
 
 Goal
@@ -99,7 +99,7 @@ Goal
        (let (a, b) := y in z).
 Proof.
   intros.
-  solve_monotonic.
+  rauto.
 Qed.
 
 (** [rel_curry] *)
@@ -198,7 +198,7 @@ Goal
       (opA xa2 ya2, opB xb2 yb2).
 Proof.
   intros.
-  solve_monotonic.
+  rauto.
 Qed.
 
 (** FIXME: this should work as well. *)
@@ -243,7 +243,7 @@ Proof.
   intros.
   transport H2.
   eexists.
-  solve_monotonic.
+  rauto.
 Qed.
 
 (** ** Tests for specific relators *)

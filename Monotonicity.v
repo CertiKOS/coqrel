@@ -312,37 +312,3 @@ Global Instance monotonicity_rstep {A B} (P: Prop) (R: rel A B) m n:
 Proof.
   firstorder.
 Qed.
-
-(** Our version of [Morphisms.f_equiv]. *)
-
-Ltac f_equiv :=
-  repeat monotonicity.
-
-(** Our version of [Morphisms.solve_proper]. Note that we are somewhat
-  parcimonious with introductions because we don't want to cause undue
-  unfoldings. For instance, if we define the relation [R1] from [R2]
-  as [R1 x y := forall i, R2 (get i x) (get i y)], we may create a
-  situation where applying the monotonicity theorem for [get] on a
-  goal of the form [R2 (get i x) (get i y)] produces a subgoal of the
-  form [R1 x y], but then an introduction would get us back to where
-  we started. So we limit them to well-defined cases.
-
-  Most cases are straightforward. In the [match]/[if] case, we need to
-  first show that the terms being destructed are related. Then if the
-  relation has been defined in a typical way (akin to [sum_rel] or
-  [list_rel] below), destructing that hypothesis will cause the goal
-  to reduce and we can go on with the process. Note that for [prod],
-  and for record types, we usually prefer to define associated
-  relations as conjunctions of statements that the projections are
-  related, in which case the terms would need to be destructed on
-  their own as well. At the moment we only have a special case for
-  [prod_rel]. *)
-
-Ltac solve_monotonic_tac t :=
-  first [ rstep; solve_monotonic_tac t | t ].
-
-Tactic Notation "solve_monotonic" :=
-  solve_monotonic_tac ltac:(eassumption || congruence || (now econstructor)).
-
-Tactic Notation "solve_monotonic" tactic(t) :=
-  solve_monotonic_tac ltac:(eassumption || congruence || (now econstructor)|| t).

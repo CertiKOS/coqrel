@@ -150,7 +150,7 @@ Ltac solve_morphisms_proper :=
     | H : apply_subrelation |- _ =>
       clear H;
       red;
-      solve_monotonic
+      rauto
   end.
 
 Hint Extern 10 (Morphisms.Proper _ _) =>
