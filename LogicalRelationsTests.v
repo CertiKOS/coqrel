@@ -202,8 +202,6 @@ Proof.
   rauto.
 Qed.
 
-(** FIXME: this should work as well. *)
-
 Goal
   forall A1 A2 B1 B2 C1 C2 (R1 R2: rel A1 A2) (R1': rel B1 B2) (R: rel C1 C2),
     subrel R1 R2 ->
@@ -212,8 +210,9 @@ Goal
       (R1 * R1' ++> R) x y.
 Proof.
   intros A1 A2 B1 B2 C1 C2 R1 R2 R1' R HR12 x y H.
-  try rewrite HR12.
-Abort.
+  rewrite HR12.
+  assumption.
+Qed.
 
 (** ** The [preorder] tactic *)
 

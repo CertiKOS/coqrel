@@ -107,6 +107,17 @@ Qed.
 Hint Extern 1 (RElim (pointwise_relation _ _) _ _ _ _) =>
   eapply pointwise_relation_relim : typeclass_instances.
 
+(** The rewriting system sometimes generates arguments constraints of
+  the following form (when rewriting an argument of [arrow_rel] for
+  instance), which need to be matched against our relational
+  properties stated in terms of [subrel]. *)
+
+Global Instance pointwise_relation_subrel_subrel A B:
+  Related (pointwise_relation A (pointwise_relation B impl)) subrel subrel.
+Proof.
+  firstorder.
+Qed.
+
 (** *** [Morphisms.Proper] instances *)
 
 (** Now that we can interpret the relators used in [Morphisms]-style
