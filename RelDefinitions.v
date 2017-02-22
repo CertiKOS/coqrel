@@ -431,8 +431,8 @@ Hint Extern 1 (RStep _ (Related _ _ _)) =>
   constitutes a preorder, and the union and intersection of relations
   are the corresponding join and meet. *)
 
-Definition subrel {A B} (R1 R2: rel A B) :=
-  forall x y, R1 x y -> R2 x y.
+Definition subrel {A B}: rel (rel A B) (rel A B) :=
+  fun R1 R2 => forall x y, R1 x y -> R2 x y.
 
 Arguments subrel {A%type B%type} R1%rel R2%rel.
 
