@@ -10,12 +10,15 @@ Arguments rel_union {_ _} R1%rel R2%rel _ _.
 
 Infix "\/" := rel_union : rel_scope.
 
-Global Instance rel_union_subrel:
-  Monotonic (@rel_union) (forallr -, forallr -, subrel ++> subrel ++> subrel).
+Global Instance rel_union_subrel {A B}:
+  Monotonic (@rel_union A B) (subrel ++> subrel ++> subrel).
 Proof.
   clear.
   firstorder.
 Qed.
+
+Global Instance rel_union_subrel_params:
+  Params (@rel_union) 4.
 
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
   Related R1 (R1 \/ R2)%rel subrel.
@@ -53,12 +56,15 @@ Arguments rel_inter {_ _} R1%rel R2%rel _ _.
 
 Infix "/\" := rel_inter : rel_scope.
 
-Global Instance rel_inter_subrel:
-  Monotonic (@rel_inter) (forallr -, forallr -, subrel ++> subrel ++> subrel).
+Global Instance rel_inter_subrel {A B}:
+  Monotonic (@rel_inter A B) (subrel ++> subrel ++> subrel).
 Proof.
   clear.
   firstorder.
 Qed.
+
+Global Instance rel_inter_params:
+  Params (@rel_inter) 4.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
   Related (R1 /\ R2)%rel R1 subrel.
@@ -163,21 +169,20 @@ Qed.
 Definition rel_compose {A B C} (RAB: rel A B) (RBC: rel B C): rel A C :=
   fun x z => exists y, RAB x y /\ RBC y z.
 
-Global Instance rel_compose_subrel:
-  Monotonic
-    (@rel_compose)
-    (forallr -, forallr -, forallr -, subrel ++> subrel ++> subrel).
+Global Instance rel_compose_subrel {A B C}:
+  Monotonic (@rel_compose A B C) (subrel ++> subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
 
-Global Instance rel_compose_eqrel:
-  Monotonic
-    (@rel_compose)
-    (forallr -, forallr -, forallr -, eqrel ==> eqrel ==> eqrel).
+Global Instance rel_compose_eqrel {A B C}:
+  Monotonic (@rel_compose A B C) (eqrel ==> eqrel ==> eqrel).
 Proof.
   firstorder.
 Qed.
+
+Global Instance rel_compose_params:
+  Params (@rel_compose) 4.
 
 Lemma rel_compose_id_left {A B} (R: rel A B):
   eqrel (rel_compose R eq) R.
@@ -305,10 +310,10 @@ Definition uncurry {A B C} (f: A -> B -> C): A * B -> C :=
   fun ab => match ab with (a, b) => f a b end.
 
 Definition rel_curry {A1 B1 C1 A2 B2 C2} (R: rel (A1*B1->C1) (A2*B2->C2)) :=
-  R @@ uncurry.
+  (R @@ uncurry)%rel.
 
 Definition rel_uncurry {A1 B1 C1 A2 B2 C2} (R: rel (A1->B1->C1) (A2->B2->C2)) :=
-  R @@ curry.
+  (R @@ curry)%rel.
 
 (** In order to provide an [RElim] instance for [rel_curry], we will
   rely on the fact that:

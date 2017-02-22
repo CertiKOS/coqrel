@@ -5,8 +5,8 @@ Require Export Monotonicity.
 (** Often, we know that a number of terms are related, and need to
   transport hypotheses built out the the left-hand sides into ones
   with similar shapes, but built out of the right-hand sides. For
-  instance, in cirumstances where [solve_monotonic] can establish
-  [option_le R x y], we will want to turn a hypothesis of the form
+  instance, in cirumstances where [rauto] can establish
+  [option_rel R x y], we will want to turn a hypothesis of the form
   [x = Some a] into one of the form [y = Some b], and remember that
   [R a b]. This is the role of the [transport] tactic. *)
 

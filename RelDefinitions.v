@@ -45,37 +45,15 @@ Hint Extern 1 (Convertible ?x ?y) =>
   is defined as [A -> A -> Prop]. We will need more general
   relations, and so I define [rel A B] as [A -> B -> Prop]. *)
 
-(** When we move to a version of Coq with universe polymorphism, we
-  can make this a [Polymorphic Definition]. In the meantime, we need
-  to use a notation so that universes levels are instantiated at every
-  use site. *)
-
-Notation rel := (fun A1 A2 => A1 -> A2 -> Prop).
-
-(** Note that the status of [rel] as a notation, rather than an actual
-  definition, also prevents us from binding it to a [rel]
-  scope. As a workaround, we open it as a global scope; in most places
-  the [type] scope will override it as required. However this is an
-  imperfect solutions, and means we must scope type explicitely here
-  and there. *)
+Definition rel (A1 A2: Type) := A1 -> A2 -> Prop.
 
 Delimit Scope rel_scope with rel.
-Open Scope rel_scope.
-Open Scope type_scope.
+Bind Scope rel_scope with rel.
 
 (** Make sure that the existing definitions based on
   [Relation_Definitions.relation] use our [rel_scope] as well. *)
 
 Bind Scope rel_scope with Relation_Definitions.relation.
-
-(** For Coq 8.4 we need to rescope the arguments for common
-  definitions; in 8.5 it seems it is done automatically. *)
-
-Arguments Reflexive {A%type} R%rel.
-Arguments Transitive {A%type} R%rel.
-Arguments Symmetric {A%type} R%rel.
-Arguments PreOrder {A%type} R%rel.
-Arguments Equivalence {A%type} R%rel.
 
 (** ** Proof step *)
 
@@ -398,10 +376,10 @@ Class Related {A B} (f: A) (g: B) (R: rel A B) :=
 
 Arguments Related {A%type B%type} _ _ R%rel.
 
-Notation "'@' 'Monotonic' T m R" := (@Related T T m m R)
+Notation "'@' 'Monotonic' T m R" := (@Related T T m m R%rel)
   (at level 10, T at next level, R at next level, m at next level).
 
-Notation Monotonic m R := (Related m m R).
+Notation Monotonic m R := (Related m m R%rel).
 
 (** Another issue related to unification of type arguments: because
   [rel] is not a proper definition, sometimes Coq beta-reduces
@@ -431,8 +409,8 @@ Hint Extern 1 (RStep _ (Related _ _ _)) =>
   constitutes a preorder, and the union and intersection of relations
   are the corresponding join and meet. *)
 
-Definition subrel {A B} (R1 R2: rel A B) :=
-  forall x y, R1 x y -> R2 x y.
+Definition subrel {A B}: rel (rel A B) (rel A B) :=
+  fun R1 R2 => forall x y, R1 x y -> R2 x y.
 
 Arguments subrel {A%type B%type} R1%rel R2%rel.
 

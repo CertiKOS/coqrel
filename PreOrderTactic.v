@@ -20,6 +20,17 @@ Require Import RelDefinitions.
 
 Definition preorder_tactic_done {A B} (R: rel A B) a b := R a b.
 
+(** In addition, we roll our own data structure to make sure we avoid
+  any problems related to universe inconsistencies. *)
+
+Inductive preorder_queue {A} (R: rel A A) (x: A) :=
+  | preorder_nil:
+      preorder_queue R x
+  | preorder_cons y:
+      R x y ->
+      preorder_queue R x ->
+      preorder_queue R x.
+
 Ltac preorder :=
   lazymatch goal with
     | |- ?R ?m ?n =>
@@ -32,21 +43,21 @@ Ltac preorder :=
         | fail 1 R "is not a declared preorder" ];
       let rec step q :=
         lazymatch q with
-          | cons (exist _ n ?Hn) _ =>
+          | preorder_cons _ _ n ?Hn _ =>
             exact Hn
-          | cons (exist _ ?t ?Ht) ?tail =>
+          | preorder_cons _ _ ?t ?Ht ?tail =>
             gather tail t Ht
         end
       with gather q t Ht :=
         lazymatch goal with
           | Ht': R t ?t' |- _ =>
             change (preorder_tactic_done R t t') in Ht';
-            gather (cons (exist (R m) t' (transitivity Ht Ht')) q) t Ht
+            gather (preorder_cons R m t' (transitivity Ht Ht') q) t Ht
           | _ =>
             step q
         end in
       first
-        [ step (cons (exist (R m) m (reflexivity m)) nil)
+        [ step (preorder_cons R m m (reflexivity m) (preorder_nil R m))
         | fail 1 n "not reachable from" m "using hypotheses from the context" ]
     | _ =>
       fail "the goal is not an applied relation"
