@@ -45,21 +45,11 @@ Hint Extern 1 (Convertible ?x ?y) =>
   is defined as [A -> A -> Prop]. We will need more general
   relations, and so I define [rel A B] as [A -> B -> Prop]. *)
 
-(** When we move to a version of Coq with universe polymorphism, we
-  can make this a [Polymorphic Definition]. In the meantime, we need
-  to use a notation so that universes levels are instantiated at every
-  use site. *)
-
-Notation rel := (fun A1 A2 => A1 -> A2 -> Prop).
-
-(** Note that the status of [rel] as a notation, rather than an actual
-  definition, also prevents us from binding it to a [rel]
-  scope. As a workaround, we open it as a global scope; in most places
-  the [type] scope will override it as required. However this is an
-  imperfect solutions, and means we must scope type explicitely here
-  and there. *)
+Definition rel (A1 A2: Type) := A1 -> A2 -> Prop.
 
 Delimit Scope rel_scope with rel.
+Bind Scope rel_scope with rel.
+
 Open Scope rel_scope.
 Open Scope type_scope.
 
