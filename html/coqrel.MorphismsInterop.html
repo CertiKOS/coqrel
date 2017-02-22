@@ -30,7 +30,7 @@
 </div>
 
 <div class="doc">
-<a name="lab46"></a><h1 class="section">Interoperation with <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#"><span class="id" title="library">Coq.Classes.Morphisms</span></a></span></h1>
+<a name="lab47"></a><h1 class="section">Interoperation with <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#"><span class="id" title="library">Coq.Classes.Morphisms</span></a></span></h1>
 
 <div class="paragraph"> </div>
 
@@ -60,11 +60,11 @@
   <span class="inlinecode"><span class="id" title="var">Morphisms.Proper</span></span> queries. 
 <div class="paragraph"> </div>
 
-<a name="lab47"></a><h2 class="section">Using <span class="inlinecode"><span class="id" title="library">Morphisms</span></span>-style relational properties</h2>
+<a name="lab48"></a><h2 class="section">Using <span class="inlinecode"><span class="id" title="library">Morphisms</span></span>-style relational properties</h2>
 
 <div class="paragraph"> </div>
 
-<a name="lab48"></a><h3 class="section">Relators</h3>
+<a name="lab49"></a><h3 class="section">Relators</h3>
 
 <div class="paragraph"> </div>
 
@@ -77,11 +77,15 @@
 <div class="code">
 
 <br/>
-<span class="id" title="keyword">Global Instance</span> <a name="respectful_subrel"><span class="id" title="instance">respectful_subrel</span></a>:<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Monotonic"><span class="id" title="abbreviation">Monotonic</span></a> (@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#respectful"><span class="id" title="definition">respectful</span></a>) (<a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">forallr</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">-,</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">forallr</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">-,</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#28fb2fb3952fac7e01eb907871e1ea99"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a>).<br/>
+<span class="id" title="keyword">Global Instance</span> <a name="respectful_subrel"><span class="id" title="instance">respectful_subrel</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Monotonic"><span class="id" title="abbreviation">Monotonic</span></a> (@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#respectful"><span class="id" title="definition">respectful</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#B"><span class="id" title="variable">B</span></a>) (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#28fb2fb3952fac7e01eb907871e1ea99"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a>).<br/>
 <span class="id" title="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">firstorder</span>.<br/>
 <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Global Instance</span> <a name="respectful_params"><span class="id" title="instance">respectful_params</span></a>:<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" title="class">Params</span></a> (@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#respectful"><span class="id" title="definition">respectful</span></a>) 4.<br/>
 
 <br/>
 <span class="id" title="keyword">Global Instance</span> <a name="respectful_rintro"><span class="id" title="instance">respectful_rintro</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} (<span class="id" title="var">RA</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Relations.Relation_Definitions.html#relation"><span class="id" title="definition">relation</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#A"><span class="id" title="variable">A</span></a>) (<span class="id" title="var">RB</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Relations.Relation_Definitions.html#relation"><span class="id" title="definition">relation</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#B"><span class="id" title="variable">B</span></a>) <span class="id" title="var">f</span> <span class="id" title="var">g</span>:<br/>
@@ -103,13 +107,15 @@
 &nbsp;&nbsp;<span class="id" title="tactic">eapply</span> <a class="idref" href="coqrel.MorphismsInterop.html#respectful_relim"><span class="id" title="lemma">respectful_relim</span></a> : <span class="id" title="var">typeclass_instances</span>.<br/>
 
 <br/>
-<span class="id" title="keyword">Global Instance</span> <a name="forall_relation_subrel"><span class="id" title="instance">forall_relation_subrel</span></a>:<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Monotonic"><span class="id" title="abbreviation">Monotonic</span></a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#forall_relation"><span class="id" title="definition">forall_relation</span></a>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">forallr</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">-,</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">forallr</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">-,</span></a> <a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">(</span></a><a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">forallr</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">-,</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a><a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">)</span></a> <a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a>).<br/>
+<span class="id" title="keyword">Global Instance</span> <a name="forall_relation_subrel"><span class="id" title="instance">forall_relation_subrel</span></a> <span class="id" title="var">A</span> <span class="id" title="var">P</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Monotonic"><span class="id" title="abbreviation">Monotonic</span></a> (@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#forall_relation"><span class="id" title="definition">forall_relation</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#P"><span class="id" title="variable">P</span></a>) (<a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">(</span></a><a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">forallr</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">-,</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a><a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">)</span></a> <a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a>).<br/>
 <span class="id" title="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">firstorder</span>.<br/>
 <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Global Instance</span> <a name="forall_relation_params"><span class="id" title="instance">forall_relation_params</span></a>:<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" title="class">Params</span></a> (@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#forall_relation"><span class="id" title="definition">forall_relation</span></a>) 3.<br/>
 
 <br/>
 <span class="id" title="keyword">Global Instance</span> <a name="forall_relation_rintro"><span class="id" title="instance">forall_relation_rintro</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} (<span class="id" title="var">R</span>: <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>:<a class="idref" href="coqrel.MorphismsInterop.html#A"><span class="id" title="variable">A</span></a>, <a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Relations.Relation_Definitions.html#relation"><span class="id" title="definition">relation</span></a> (<a class="idref" href="coqrel.MorphismsInterop.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#a"><span class="id" title="variable">a</span></a>)) <span class="id" title="var">f</span> <span class="id" title="var">g</span>:<br/>
@@ -131,13 +137,15 @@
 &nbsp;&nbsp;<span class="id" title="tactic">eapply</span> <a class="idref" href="coqrel.MorphismsInterop.html#forall_relation_relim"><span class="id" title="lemma">forall_relation_relim</span></a> : <span class="id" title="var">typeclass_instances</span>.<br/>
 
 <br/>
-<span class="id" title="keyword">Global Instance</span> <a name="pointwise_relation_subrel"><span class="id" title="instance">pointwise_relation_subrel</span></a>:<br/>
-&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Monotonic"><span class="id" title="abbreviation">Monotonic</span></a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#pointwise_relation"><span class="id" title="definition">pointwise_relation</span></a>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">forallr</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">-,</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">forallr</span></a> <a class="idref" href="coqrel.Relators.html#121f19e13d350c3a792fb7c67ae4a001"><span class="id" title="notation">-,</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a>).<br/>
+<span class="id" title="keyword">Global Instance</span> <a name="pointwise_relation_subrel"><span class="id" title="instance">pointwise_relation_subrel</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#Monotonic"><span class="id" title="abbreviation">Monotonic</span></a> (@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#pointwise_relation"><span class="id" title="definition">pointwise_relation</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#B"><span class="id" title="variable">B</span></a>) (<a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a> <a class="idref" href="coqrel.RelDefinitions.html#d5d0ad6beccd25d5224442d64ed307d5"><span class="id" title="notation">++&gt;</span></a> <a class="idref" href="coqrel.RelDefinitions.html#subrel"><span class="id" title="definition">subrel</span></a>).<br/>
 <span class="id" title="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">firstorder</span>.<br/>
 <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Global Instance</span> <a name="pointwise_relation_params"><span class="id" title="instance">pointwise_relation_params</span></a>:<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#Params"><span class="id" title="class">Params</span></a> (@<a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#pointwise_relation"><span class="id" title="definition">pointwise_relation</span></a>) 3.<br/>
 
 <br/>
 <span class="id" title="keyword">Global Instance</span> <a name="pointwise_relation_rintro"><span class="id" title="instance">pointwise_relation_rintro</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} (<span class="id" title="var">R</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Relations.Relation_Definitions.html#relation"><span class="id" title="definition">relation</span></a> <a class="idref" href="coqrel.MorphismsInterop.html#B"><span class="id" title="variable">B</span></a>) <span class="id" title="var">f</span> <span class="id" title="var">g</span>:<br/>
@@ -162,7 +170,7 @@
 </div>
 
 <div class="doc">
-<a name="lab49"></a><h3 class="section"><span class="inlinecode"><span class="id" title="var">Morphisms.Proper</span></span> instances</h3>
+<a name="lab50"></a><h3 class="section"><span class="inlinecode"><span class="id" title="var">Morphisms.Proper</span></span> instances</h3>
 
 <div class="paragraph"> </div>
 
@@ -190,7 +198,7 @@
 </div>
 
 <div class="doc">
-<a name="lab50"></a><h3 class="section"><span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.RelationClasses.html#subrelation"><span class="id" title="class">subrelation</span></a></span> instances</h3>
+<a name="lab51"></a><h3 class="section"><span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.RelationClasses.html#subrelation"><span class="id" title="class">subrelation</span></a></span> instances</h3>
 
 <div class="paragraph"> </div>
 
@@ -214,7 +222,7 @@
 </div>
 
 <div class="doc">
-<a name="lab51"></a><h2 class="section">Satisfying <span class="inlinecode"><span class="id" title="var">Morphisms.Proper</span></span> queries</h2>
+<a name="lab52"></a><h2 class="section">Satisfying <span class="inlinecode"><span class="id" title="var">Morphisms.Proper</span></span> queries</h2>
 
 <div class="paragraph"> </div>
 
@@ -235,7 +243,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">H</span> : <a class="idref" href="http://coq.inria.fr/distrib/8.5pl3/stdlib/Coq.Classes.Morphisms.html#apply_subrelation"><span class="id" title="inductive">apply_subrelation</span></a> |- <span class="id" title="var">_</span> ⇒<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">clear</span> <span class="id" title="var">H</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">red</span>;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">solve_monotonic</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">rauto</span><br/>
 &nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
 
 <br/>
