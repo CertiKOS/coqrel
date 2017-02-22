@@ -16,6 +16,61 @@ Require Import Coq.Lists.List.
   corresponding relators with respect to [subrel], and the suffix
   [_relim] for an associated instance of [RElim]. *)
 
+(** ** A note about universes *)
+
+(** Our use of [subrel] illustrates the fact that we consider
+  relations over relations, and use relators to build up relations
+  over the types of our relators to characterize their variance.
+  In other words: we relate all kind of higher-order things as a
+  matter of course and make sure our library eats its own dog
+  food. This makes it relatively easy to run into universe
+  inconsistency issues. This note is to explain why those happen, fix
+  the terminology, and formulate best practices to avoid such
+  problems.
+
+  The critical universe level in Coqrel is the universe [U] from which
+  the arguments and return type of [rel] are taken (so that
+  conceptually we will write [rel : U -> U -> U]). We will call
+  "small types" the inhabitants of [U], and "large types" those taken
+  from a universe strictly larger than [U]. At the moment, [U] is
+  implicit, but as we drop Coq 8.4 support we may want declare an
+  explicit [Universe] to aid debugging and enhance clarity.
+
+  Generally speaking, [U] is a pretty large universe: for the most
+  part, the world of relational things sits well above the world of
+  the things we want relate, no matter how high-order those are.
+  Even [rel A B] is still a small type, so that
+  [@subrel : forall A B : U, rel (rel A B) (rel A B)]
+  above didn't cause any issue, although the type of [rel] itself,
+  namely [U -> U -> U : U+1], is of course a large type.
+
+  With this in mind, consider the relational operator
+  [rel_compose : forall A B C, rel A B -> rel B C -> rel A C].
+  We wish to register a monotonicity property for [rel_compose],
+  establishing that composing larger relations yields a larger
+  composite relation. As usual, we express this property by
+  establishing that [rel_compose] is related to itself by an
+  appropriate relation. However, the type of [rel_compose] may involve
+  [U : U+1] as the type of the arguments [A B C], so that the type of
+  [rel_compose] may itself be forced into sort [U+1]. Consequently,
+  attempting to define that relation will yield a universe
+  inconsistency as soon as, say, [subrel] is used as an argument of
+  [rel_compose].
+
+  Fortunately, even if [A B C : U], the specialized form
+  [rel_compose A B C] is still in the small type
+  [rel A B -> rel B C -> rel A C : U]. Moreover, there is no
+  relational structure that we want to capture regarding the type
+  parameters [A B C], so that we don't lose anything by defining our
+  monotonicity property for the specialized [rel_compose A B C],
+  as long as the property itself is generic in the specific values of
+  [A B C].
+
+  This is why, as a general rule, we define the [foo_subrel]
+  properties of our relators on partially applied versions thereof,
+  and use a [foo_subrel_params] hint to make sure our monotonicity
+  tactic can resolve them. *)
+
 (** ** Relators for function types *)
 
 (** *** Pointwise extension of a relation *)
@@ -192,10 +247,10 @@ Hint Extern 1 (RElim (forallp_rel _ _) _ _ _ _) =>
 Definition set_rel {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
   fun sA sB => forall a, sA a -> exists b, sB b /\ R a b.
 
-Global Instance set_subrel:
-  Monotonic (@set_rel) (forallr -, forallr -, subrel ++> subrel).
+Global Instance set_subrel {A B}:
+  Monotonic (@set_rel A B) (subrel ++> subrel).
 Proof.
-  intros A B R1 R2 HR sA sB Hs.
+  intros R1 R2 HR sA sB Hs.
   intros x Hx.
   destruct (Hs x) as (y & Hy & Hxy); eauto.
 Qed.
@@ -236,9 +291,9 @@ Global Existing Instance tt_rel.
   However, to minimize the need for [inversion]s we want to keep as
   many arguments as possible as parameters of the inductive type. *)
 
-Inductive sum_rel {A1 A2} RA {B1 B2} RB: rel (A1 + B1)%type (A2 + B2)%type :=
-  | inl_rel_def: (RA ++> sum_rel RA RB) (@inl A1 B1) (@inl A2 B2)
-  | inr_rel_def: (RB ++> sum_rel RA RB) (@inr A1 B1) (@inr A2 B2).
+Inductive sum_rel {A1 A2 B1 B2} RA RB: rel (A1 + B1)%type (A2 + B2)%type :=
+  | inl_rel_def: (RA ++> sum_rel RA RB)%rel (@inl A1 B1) (@inl A2 B2)
+  | inr_rel_def: (RB ++> sum_rel RA RB)%rel (@inr A1 B1) (@inr A2 B2).
 
 Infix "+" := sum_rel : rel_scope.
 
@@ -249,24 +304,25 @@ Infix "+" := sum_rel : rel_scope.
 Global Instance inl_rel:
   Monotonic (@inl) (forallr RA, forallr RB, RA ++> RA + RB).
 Proof.
-  exact @inl_rel_def.
+  repeat intro; apply inl_rel_def; assumption.
 Qed.
 
 Global Instance inr_rel:
   Monotonic (@inr) (forallr RA, forallr RB, RB ++> RA + RB).
 Proof.
-  exact @inr_rel_def.
+  repeat intro; apply inr_rel_def; assumption.
 Qed.
 
-Global Instance sum_subrel:
-  Monotonic
-    (@sum_rel)
-    (forallr -, forallr -, subrel ++> forallr -, forallr -, subrel ++> subrel).
+Global Instance sum_subrel {A1 A2 B1 B2}:
+  Monotonic (@sum_rel A1 A2 B1 B2) (subrel ++> subrel ++> subrel).
 Proof.
-  intros A1 A2 RA1 RA2 HRA B1 B2 RB1 RB2 HRB.
+  intros RA1 RA2 HRA RB1 RB2 HRB.
   intros x1 x2 Hx.
   destruct Hx; constructor; eauto.
 Qed.
+
+Global Instance sum_subrel_params:
+  Params (@sum) 4.
 
 Global Instance sum_rel_refl {A B} (R1: rel A A) (R2: rel B B):
   Reflexive R1 -> Reflexive R2 -> Reflexive (R1 + R2).
@@ -299,7 +355,7 @@ Qed.
 
 (** *** Pairs *)
 
-Definition prod_rel {A1 A2} RA {B1 B2} RB: rel (A1 * B1)%type (A2 * B2)%type :=
+Definition prod_rel {A1 A2 B1 B2} RA RB: rel (A1 * B1)%type (A2 * B2)%type :=
   fun x1 x2 => RA (fst x1) (fst x2) /\ RB (snd x1) (snd x2).
 
 Infix "*" := prod_rel : rel_scope.
@@ -328,10 +384,8 @@ Proof.
   assumption.
 Qed.
 
-Global Instance prod_subrel:
-  Monotonic
-    (@prod_rel)
-    (forallr -, forallr -, subrel ++> forallr -, forallr -, subrel ++> subrel).
+Global Instance prod_subrel {A1 A2 B1 B2}:
+  Monotonic (@prod_rel A1 A2 B1 B2) (subrel ++> subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
@@ -390,13 +444,16 @@ Proof.
   exact @None_rel_def.
 Qed.
 
-Global Instance option_subrel:
-  Monotonic (@option_rel) (forallr -, forallr -, subrel ++> subrel).
+Global Instance option_subrel {A1 A2}:
+  Monotonic (@option_rel A1 A2) (subrel ++> subrel).
 Proof.
-  intros A1 A2 RA1 RA2 HRA.
+  intros RA1 RA2 HRA.
   intros x1 x2 Hx.
   destruct Hx; constructor; eauto.
 Qed.
+
+Global Instance option_subrel_params:
+  Params (@option_rel) 3.
 
 Lemma option_rel_some_inv A B (R: rel A B) (x: option A) (y: option B) (a: A):
   option_rel R x y ->
@@ -426,13 +483,16 @@ Proof.
   exact @cons_rel_def.
 Qed.
 
-Global Instance list_subrel:
-  Monotonic (@list_rel) (forallr -, forallr -, subrel ++> subrel).
+Global Instance list_subrel {A1 A2}:
+  Monotonic (@list_rel A1 A2) (subrel ++> subrel).
 Proof.
-  intros A B R S HRS x y.
+  intros R S HRS x y.
   red in HRS.
   induction 1; constructor; eauto.
 Qed.
+
+Global Instance list_subrel_params:
+  Params (@list_rel) 3.
 
 Global Instance list_rel_refl `(HR: Reflexive):
   Reflexive (list_rel R).
@@ -510,22 +570,28 @@ Qed.
 Hint Extern 1 (RStep _ (_ -> _)) =>
   eapply fold_impl_rstep : typeclass_instances.
 
-Global Instance all_monotonic:
-  Monotonic (@all) (forallr -, (- ==> impl) ++> impl).
+Global Instance all_monotonic {A}:
+  Monotonic (@all A) ((- ==> impl) ++> impl).
 Proof.
-  intros A P Q HPQ H x.
+  intros P Q HPQ H x.
   apply HPQ.
   apply H.
 Qed.
 
-Global Instance ex_monotonic:
-  Monotonic (@ex) (forallr -, (- ==> impl) ++> impl).
+Global Instance all_monotonic_params:
+  Params (@all) 1.
+
+Global Instance ex_monotonic A:
+  Monotonic (@ex A) ((- ==> impl) ++> impl).
 Proof.
-  intros A P Q HPQ [x Hx].
+  intros P Q HPQ [x Hx].
   exists x.
   apply HPQ.
   assumption.
 Qed.
+
+Global Instance ex_monotonic_params:
+  Params (@ex) 1.
 
 Global Instance and_monotonic:
   Monotonic (@and) (impl ++> impl ++> impl).

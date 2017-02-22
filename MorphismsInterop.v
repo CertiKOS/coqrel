@@ -32,11 +32,14 @@ Require Import Monotonicity.
   so that [respectful] and the like can be used as just another set of
   "native" Coqrel relators. *)
 
-Global Instance respectful_subrel:
-  Monotonic (@respectful) (forallr -, forallr -, subrel --> subrel ++> subrel).
+Global Instance respectful_subrel A B:
+  Monotonic (@respectful A B) (subrel --> subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
+
+Global Instance respectful_params:
+  Params (@respectful) 4.
 
 Global Instance respectful_rintro {A B} (RA: relation A) (RB: relation B) f g:
   RIntro (forall x y, RA x y -> RB (f x) (g y)) (respectful RA RB) f g.
@@ -54,13 +57,14 @@ Qed.
 Hint Extern 1 (RElim (respectful _ _) _ _ _ _) =>
   eapply respectful_relim : typeclass_instances.
 
-Global Instance forall_relation_subrel:
-  Monotonic
-    (@forall_relation)
-    (forallr -, forallr -, (forallr -, subrel) ++> subrel).
+Global Instance forall_relation_subrel A P:
+  Monotonic (@forall_relation A P) ((forallr -, subrel) ++> subrel).
 Proof.
   firstorder.
 Qed.
+
+Global Instance forall_relation_params:
+  Params (@forall_relation) 3.
 
 Global Instance forall_relation_rintro {A B} (R: forall a:A, relation (B a)) f g:
   RIntro (forall a, R a (f a) (g a)) (forall_relation R) f g.
@@ -78,13 +82,14 @@ Qed.
 Hint Extern 1 (RElim (forall_relation _) _ _ _ _) =>
   eapply forall_relation_relim : typeclass_instances.
 
-Global Instance pointwise_relation_subrel:
-  Monotonic
-    (@pointwise_relation)
-    (forallr -, forallr -, subrel ++> subrel).
+Global Instance pointwise_relation_subrel A B:
+  Monotonic (@pointwise_relation A B) (subrel ++> subrel).
 Proof.
   firstorder.
 Qed.
+
+Global Instance pointwise_relation_params:
+  Params (@pointwise_relation) 3.
 
 Global Instance pointwise_relation_rintro {A B} (R: relation B) f g:
   RIntro (forall a, R (f a) (g a)) (pointwise_relation A R) f g.
