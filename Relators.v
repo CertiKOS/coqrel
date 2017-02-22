@@ -33,8 +33,8 @@ Require Import Coq.Lists.List.
   conceptually we will write [rel : U -> U -> U]). We will call
   "small types" the inhabitants of [U], and "large types" those taken
   from a universe strictly larger than [U]. At the moment, [U] is
-  implicit, but as we drop Coq 8.4 support we may want declare an
-  explicit [Universe] to aid debugging and enhance clarity.
+  implicit, but at some point we may want declare an explicit
+  [Universe] to aid debugging and enhance clarity.
 
   Generally speaking, [U] is a pretty large universe: for the most
   part, the world of relational things sits well above the world of
@@ -331,8 +331,6 @@ Proof.
   destruct Hxy; constructor; symmetry; eassumption.
 Qed.
 
-Arguments PreOrder A%type R%rel.
-
 Global Instance sum_rel_preorder {A B} (R1: rel A A) (R2: rel B B):
   PreOrder R1 -> PreOrder R2 -> PreOrder (R1 + R2).
 Proof.
@@ -418,7 +416,7 @@ Qed.
 (** *** Option types *)
 
 Inductive option_rel {A1 A2} (RA: rel A1 A2): rel (option A1) (option A2) :=
-  | Some_rel_def: (RA ++> option_rel RA) (@Some A1) (@Some A2)
+  | Some_rel_def: (RA ++> option_rel RA)%rel (@Some A1) (@Some A2)
   | None_rel_def: option_rel RA (@None A1) (@None A2).
 
 Global Instance Some_rel:
@@ -458,7 +456,7 @@ Qed.
 
 Inductive list_rel {A1 A2} (R: rel A1 A2): rel (list A1) (list A2) :=
   | nil_rel_def: (list_rel R) (@nil A1) (@nil A2)
-  | cons_rel_def: (R ++> list_rel R ++> list_rel R) (@cons A1) (@cons A2).
+  | cons_rel_def: (R ++> list_rel R ++> list_rel R)%rel (@cons A1) (@cons A2).
 
 Global Instance nil_rel:
   Monotonic (@nil) (forallr R, list_rel R).

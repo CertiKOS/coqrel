@@ -50,22 +50,10 @@ Definition rel (A1 A2: Type) := A1 -> A2 -> Prop.
 Delimit Scope rel_scope with rel.
 Bind Scope rel_scope with rel.
 
-Open Scope rel_scope.
-Open Scope type_scope.
-
 (** Make sure that the existing definitions based on
   [Relation_Definitions.relation] use our [rel_scope] as well. *)
 
 Bind Scope rel_scope with Relation_Definitions.relation.
-
-(** For Coq 8.4 we need to rescope the arguments for common
-  definitions; in 8.5 it seems it is done automatically. *)
-
-Arguments Reflexive {A%type} R%rel.
-Arguments Transitive {A%type} R%rel.
-Arguments Symmetric {A%type} R%rel.
-Arguments PreOrder {A%type} R%rel.
-Arguments Equivalence {A%type} R%rel.
 
 (** ** Proof step *)
 
@@ -388,10 +376,10 @@ Class Related {A B} (f: A) (g: B) (R: rel A B) :=
 
 Arguments Related {A%type B%type} _ _ R%rel.
 
-Notation "'@' 'Monotonic' T m R" := (@Related T T m m R)
+Notation "'@' 'Monotonic' T m R" := (@Related T T m m R%rel)
   (at level 10, T at next level, R at next level, m at next level).
 
-Notation Monotonic m R := (Related m m R).
+Notation Monotonic m R := (Related m m R%rel).
 
 (** Another issue related to unification of type arguments: because
   [rel] is not a proper definition, sometimes Coq beta-reduces

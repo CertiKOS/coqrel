@@ -1,5 +1,6 @@
 Require Import LogicalRelations.
 Require Import Coq.Lists.List.
+Local Open Scope rel_scope.
 
 (** * Tests *)
 
@@ -203,8 +204,6 @@ Qed.
 
 (** FIXME: this should work as well. *)
 
-(* This now triggers a "not an arity" anomaly with Coq 8.4 *)
-(*
 Goal
   forall A1 A2 B1 B2 C1 C2 (R1 R2: rel A1 A2) (R1': rel B1 B2) (R: rel C1 C2),
     subrel R1 R2 ->
@@ -215,7 +214,6 @@ Proof.
   intros A1 A2 B1 B2 C1 C2 R1 R2 R1' R HR12 x y H.
   try rewrite HR12.
 Abort.
-*)
 
 (** ** The [preorder] tactic *)
 

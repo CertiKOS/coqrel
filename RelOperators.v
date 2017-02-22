@@ -310,10 +310,10 @@ Definition uncurry {A B C} (f: A -> B -> C): A * B -> C :=
   fun ab => match ab with (a, b) => f a b end.
 
 Definition rel_curry {A1 B1 C1 A2 B2 C2} (R: rel (A1*B1->C1) (A2*B2->C2)) :=
-  R @@ uncurry.
+  (R @@ uncurry)%rel.
 
 Definition rel_uncurry {A1 B1 C1 A2 B2 C2} (R: rel (A1->B1->C1) (A2->B2->C2)) :=
-  R @@ curry.
+  (R @@ curry)%rel.
 
 (** In order to provide an [RElim] instance for [rel_curry], we will
   rely on the fact that:
