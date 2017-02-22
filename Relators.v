@@ -127,20 +127,6 @@ Qed.
 Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
   eapply arrow_pointwise_relim : typeclass_instances.
 
-(** XXX not sure weather that's necessary; if it is we'll probably
-  need to restrict its use more (by using an extern hint with
-  pattern). *)
-
-Global Instance arrow_pointwise_eq_subrel {A B1 B2} (RB1 RB2: rel B1 B2):
-  Related RB1 RB2 subrel ->
-  Related (- ==> RB1) (@eq A ==> RB2) subrel.
-Proof.
-  intros HRB f g Hfg x y Hxy.
-  subst.
-  apply HRB.
-  apply Hfg.
-Qed.
-
 (** *** Dependent pointwise extension *)
 
 (** Like we did for non-dependent functions, we can provide a simpler
