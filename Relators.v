@@ -390,6 +390,9 @@ Proof.
   firstorder.
 Qed.
 
+Global Instance prod_subrel_params:
+  Params (@prod_rel) 4.
+
 Global Instance prod_rdestruct {A1 B1 A2 B2} (RA: rel A1 A2) (RB: rel B1 B2):
   RDestruct
     (RA * RB)%rel
