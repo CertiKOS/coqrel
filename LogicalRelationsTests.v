@@ -214,7 +214,7 @@ Proof.
   assumption.
 Qed.
 
-(** ** The [preorder] tactic *)
+(** ** The [rgraph] tactic *)
 
 Goal
   forall {A} (R S T: rel A A),
@@ -222,6 +222,17 @@ Goal
     subrel S R ->
     subrel S T ->
     subrel R T.
+Proof.
+  intros.
+  rstep.
+Qed.
+
+Goal
+  forall `(PER) (x y z t : A),
+    R x y ->
+    R z y ->
+    R z t ->
+    R t x.
 Proof.
   intros.
   rstep.
