@@ -122,19 +122,23 @@ Qed.
 
 (** Now that we can interpret the relators used in [Morphisms]-style
   relational properties, we can simply hook instances of
-  [Morphisms.Proper] into our own database. We don't want to use the
-  corresponding deductive infrastructure in [Coq.Classes.Morphisms],
-  so we declare the following as an immediate hint so that we only use
-  "leaf" instances of [Proper]. *)
+  [Morphisms.Proper] into our own database.
 
-Lemma morphisms_proper_related {A} (R: relation A) (a: A):
-  Morphisms.Proper R a ->
+  We have to be careful about how this instance works. For one thing,
+  we are not interested in going through the whole resolution process
+  in [Coq.Classes.Morphisms], but are only interested in recovering
+  user-defined instances as-is. Moreover, we want to avoid a loop with
+  [solve_morphisms_proper] below, where our library (and hence
+  [Related] instances) are used to solve [Proper] queries.
+  We can make sure both of those things are avoided by using a
+  [normalization_done] hypothesis with our [Proper] query. *)
+
+Global Instance morphisms_proper_related {A} (R: relation A) (a: A):
+  (normalization_done -> Proper R a) ->
   Monotonic a R.
 Proof.
   firstorder.
 Qed.
-
-Hint Immediate morphisms_proper_related : typeclass_instances.
 
 (** *** [subrelation] instances *)
 
