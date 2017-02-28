@@ -408,7 +408,21 @@ Hint Extern 1 (RElim (rel_curry _) _ _ _ _) =>
 Inductive req {A} (a: A): rel A A :=
   req_intro: req a a a.
 
-Hint Constructors req.
+Lemma req_rintro {A} (a: A):
+  RIntro True (req a) a a.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ (req _) _ _) =>
+  eapply req_rintro : typeclass_instances.
+
+Global Instance req_eq_subrel {A} (a: A):
+  Related (req a) eq subrel.
+Proof.
+  destruct 1.
+  reflexivity.
+Qed.
 
 (** ** Checking predicates on the left and right elements *)
 
