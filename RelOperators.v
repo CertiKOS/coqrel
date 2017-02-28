@@ -143,12 +143,28 @@ Definition rel_bot {A B}: rel A B :=
 
 Notation "⊥" := rel_bot : rel_scope.
 
+Lemma rel_bot_relim {A B} (x: A) (y: B) P:
+  RElim ⊥ x y True P.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RElim ⊥ _ _ _ _) =>
+  eapply rel_bot_relim : typeclass_instances.
+
 Definition rel_top {A B}: rel A B :=
   fun x y => True.
 
 Notation "⊤" := rel_top : rel_scope.
 
-Hint Resolve (fun A B (x:A) (y:B) => I : rel_top x y).
+Lemma rel_top_rintro {A B} (x: A) (y: B):
+  RIntro True ⊤ x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ ⊤ _ _) =>
+  eapply rel_top_rintro : typeclass_instances.
 
 (** ** Relation equivalence *)
 
