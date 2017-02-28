@@ -4,6 +4,15 @@ Local Open Scope rel_scope.
 
 (** * Tests *)
 
+(** ** Reflexivity *)
+
+Goal
+  forall A (a: A), a = a.
+Proof.
+  intros.
+  rauto.
+Qed.
+
 (** ** Setoid rewriting *)
 
 Goal
@@ -15,6 +24,20 @@ Proof.
   rewrite <- H.
   reflexivity.
 Qed.
+
+(** There is an issue with the following. *)
+
+Goal
+  forall A (a b: A) (R: rel A A) (f: A -> A) (p: A -> Prop),
+    Monotonic f (R ++> R) ->
+    Monotonic p (R --> impl) ->
+    R a b ->
+    p (f b) ->
+    p (f a).
+Proof.
+  intros A a b R f p Hf Hp Hab H.
+  Fail rewrite <- Hab in H.
+Abort.
 
 (** ** Monotonicity tactics *)
 
