@@ -26,7 +26,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related _ (_ \/ _)%rel subrel) =>
+Hint Extern 0 (Related _ (_ \/ _)%rel _) =>
   eapply rel_union_introl : typeclass_instances.
 
 Lemma rel_union_intror {A B} (R1 R2: rel A B):
@@ -35,7 +35,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related _ (_ \/ _)%rel subrel) =>
+Hint Extern 0 (Related _ (_ \/ _)%rel _) =>
   eapply rel_union_introl : typeclass_instances.
 
 Lemma rel_union_lub {A B} (R1 R2 R: rel A B):
@@ -72,7 +72,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related (_ /\ _)%rel _ subrel) =>
+Hint Extern 0 (Related (_ /\ _)%rel _ _) =>
   eapply rel_inter_eliml : typeclass_instances.
 
 Lemma rel_inter_elimr {A B} (R1 R2: rel A B):
@@ -81,7 +81,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related (_ /\ _)%rel _ subrel) =>
+Hint Extern 0 (Related (_ /\ _)%rel _ _) =>
   eapply rel_inter_elimr : typeclass_instances.
 
 Lemma rel_inter_glb {A B} (R R1 R2: rel A B):
