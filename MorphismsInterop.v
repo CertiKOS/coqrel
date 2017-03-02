@@ -157,12 +157,6 @@ Hint Immediate subrelation_subrel : typeclass_instances.
 
 (** ** Satisfying [Morphisms.Proper] queries *)
 
-(** This is quite straightforward. The only slightly subtle part is,
-  we need to avoid a loop with [morphisms_proper_related] above. We
-  use a hypothesis of the following type as a flag to avoid reentry. *)
-
-CoInductive in_solve_morphisms_proper := in_solve_morphisms_proper_intro.
-
 Ltac solve_morphisms_proper :=
   match goal with
     | _ : normalization_done |- _ =>
