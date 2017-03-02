@@ -190,6 +190,21 @@ Proof.
   rauto.
 Qed.
 
+(** *** Generic rules *)
+
+(** At the moment we don't support this. We should be able to have
+  [f_equal]-like behavior as a last resort somehow. In the specific
+  case below, another (possibly preferable?) option would be to
+  declare the identity extension property that [subrel (eq * eq) eq]. *)
+
+Goal
+  forall A B (x1 x2 : A) (y1 y2 : B),
+    x1 = x2 -> y1 = y2 -> (x1, y1) = (x2, y2).
+Proof.
+  intros.
+  Fail rstep.
+Abort.
+
 (** ** Using [foo_subrel] instances *)
 
 (** Still broken because of the interaction between [subrel] and
