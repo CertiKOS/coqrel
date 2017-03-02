@@ -359,7 +359,7 @@ Class UnfoldUncurry {A} (before: A) (after: A) :=
 
 Ltac unfold_uncurry :=
   match goal with
-    | |- appcontext C[uncurry ?f ?p] =>
+    | |- context C[uncurry ?f ?p] =>
       is_evar p;
       let T := type of p in
       let Av := fresh in evar (Av: Type);

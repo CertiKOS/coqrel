@@ -82,7 +82,7 @@ Ltac set_rel_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
-        | appcontext [keyword] =>
+        | context [keyword] =>
           let Xv := fresh "X" in evar (Xv: Type);
           let X := eval red in Xv in clear Xv;
           unify B (X -> Prop);
@@ -106,7 +106,7 @@ Ltac rel_curry_set_rel_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
-        | appcontext [keyword] =>
+        | context [keyword] =>
           let Xv := fresh "X" in evar (Xv: Type);
           let X := eval red in Xv in clear Xv;
           let Yv := fresh "Y" in evar (Yv: Type);
@@ -129,7 +129,7 @@ Ltac rel_curry2_set_rel_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
-        | appcontext [keyword] =>
+        | context [keyword] =>
           let Xv := fresh "X" in evar (Xv: Type);
           let X := eval red in Xv in clear Xv;
           let Yv := fresh "Y" in evar (Yv: Type);
