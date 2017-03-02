@@ -310,32 +310,44 @@ Qed.
 Global Instance sum_subrel_params:
   Params (@sum) 4.
 
-Global Instance sum_rel_refl {A B} (R1: rel A A) (R2: rel B B):
+Lemma sum_rel_refl {A B} (R1: rel A A) (R2: rel B B):
   Reflexive R1 -> Reflexive R2 -> Reflexive (R1 + R2).
 Proof.
   intros H1 H2 x.
   destruct x; constructor; reflexivity.
 Qed.
 
-Global Instance sum_rel_trans {A B} (R1: rel A A) (R2: rel B B):
+Hint Extern 2 (Reflexive (_ + _)) =>
+  eapply sum_rel_refl : typeclass_instances.
+
+Lemma sum_rel_trans {A B} (R1: rel A A) (R2: rel B B):
   Transitive R1 -> Transitive R2 -> Transitive (R1 + R2).
 Proof.
   intros H1 H2 x y z Hxy Hyz.
   destruct Hxy; inversion Hyz; constructor; etransitivity; eassumption.
 Qed.
 
-Global Instance sum_rel_sym {A B} (R1: rel A A) (R2: rel B B):
+Hint Extern 2 (Transitive (_ + _)) =>
+  eapply sum_rel_trans : typeclass_instances.
+
+Lemma sum_rel_sym {A B} (R1: rel A A) (R2: rel B B):
   Symmetric R1 -> Symmetric R2 -> Symmetric (R1 + R2).
 Proof.
   intros H1 H2 x y Hxy.
   destruct Hxy; constructor; symmetry; eassumption.
 Qed.
 
-Global Instance sum_rel_preorder {A B} (R1: rel A A) (R2: rel B B):
+Hint Extern 2 (Symmetric (_ + _)) =>
+  eapply sum_rel_sym : typeclass_instances.
+
+Lemma sum_rel_preorder {A B} (R1: rel A A) (R2: rel B B):
   PreOrder R1 -> PreOrder R2 -> PreOrder (R1 + R2).
 Proof.
   split; typeclasses eauto.
 Qed.
+
+Hint Extern 2 (PreOrder (_ + _)) =>
+  eapply sum_rel_preorder : typeclass_instances.
 
 (** *** Pairs *)
 
@@ -386,32 +398,44 @@ Proof.
   firstorder.
 Qed.
 
-Global Instance prod_rel_refl {A B} (R1: rel A A) (R2: rel B B):
+Lemma prod_rel_refl {A B} (R1: rel A A) (R2: rel B B):
   Reflexive R1 -> Reflexive R2 -> Reflexive (R1 * R2).
 Proof.
   intros H1 H2 x.
   destruct x; constructor; reflexivity.
 Qed.
 
-Global Instance prod_rel_trans {A B} (R1: rel A A) (R2: rel B B):
+Hint Extern 2 (Reflexive (_ * _)) =>
+  eapply prod_rel_refl : typeclass_instances.
+
+Lemma prod_rel_trans {A B} (R1: rel A A) (R2: rel B B):
   Transitive R1 -> Transitive R2 -> Transitive (R1 * R2).
 Proof.
   intros H1 H2 x y z Hxy Hyz.
   destruct Hxy; inversion Hyz; constructor; etransitivity; eassumption.
 Qed.
 
-Global Instance prod_rel_sym {A B} (R1: rel A A) (R2: rel B B):
+Hint Extern 2 (Transitive (_ * _)) =>
+  eapply prod_rel_trans : typeclass_instances.
+
+Lemma prod_rel_sym {A B} (R1: rel A A) (R2: rel B B):
   Symmetric R1 -> Symmetric R2 -> Symmetric (R1 * R2).
 Proof.
   intros H1 H2 x y Hxy.
   destruct Hxy; constructor; symmetry; eassumption.
 Qed.
 
-Global Instance prod_rel_preorder {A B} (R1: rel A A) (R2: rel B B):
+Hint Extern 2 (Symmetric (_ * _)) =>
+  eapply prod_rel_sym : typeclass_instances.
+
+Lemma prod_rel_preorder {A B} (R1: rel A A) (R2: rel B B):
   PreOrder R1 -> PreOrder R2 -> PreOrder (R1 * R2).
 Proof.
   split; typeclasses eauto.
 Qed.
+
+Hint Extern 2 (PreOrder (_ * _)) =>
+  eapply prod_rel_preorder : typeclass_instances.
 
 (** *** Option types *)
 
@@ -481,27 +505,36 @@ Qed.
 Global Instance list_subrel_params:
   Params (@list_rel) 3.
 
-Global Instance list_rel_refl `(HR: Reflexive):
+Lemma list_rel_refl `(HR: Reflexive):
   Reflexive (list_rel R).
 Proof.
   intros l.
   induction l; constructor; eauto.
 Qed.
 
-Global Instance list_rel_sym `(HR: Symmetric):
+Hint Extern 1 (Reflexive (list_rel _)) =>
+  eapply list_rel_refl : typeclass_instances.
+
+Lemma list_rel_sym `(HR: Symmetric):
   Symmetric (list_rel R).
 Proof.
   intros l1 l2 Hl.
   induction Hl; constructor; eauto.
 Qed.
 
-Global Instance list_rel_trans `(HR: Transitive):
+Hint Extern 1 (Symmetric (list_rel _)) =>
+  eapply list_rel_sym : typeclass_instances.
+
+Lemma list_rel_trans `(HR: Transitive):
   Transitive (list_rel R).
 Proof.
   intros l1 l2 l3 Hl12 Hl23.
   revert l3 Hl23.
   induction Hl12; inversion 1; constructor; eauto.
 Qed.
+
+Hint Extern 1 (Transitive (list_rel _)) =>
+  eapply list_rel_trans : typeclass_instances.
 
 Global Instance app_rel:
   Monotonic
