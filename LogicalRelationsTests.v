@@ -126,6 +126,28 @@ Proof.
   rauto.
 Qed.
 
+Goal
+  forall {A} (R: rel A A),
+    Monotonic
+      (fun (b: bool) x y => if b then x else y)
+      (- ==> R ++> R ++> R).
+Proof.
+  intros.
+  rauto.
+Qed.
+
+Goal
+  forall {A} (R : rel A A) (b : bool) (x y : A),
+    b = b ->
+    R x x ->
+    R y y ->
+    R (if b then x else y)
+      (if b then x else y).
+Proof.
+  intros.
+  rauto.
+Qed.
+
 (** [rel_curry] *)
 
 Goal
