@@ -179,14 +179,15 @@ Proof.
   monotonicity.
 Qed.
 
-(* This still fails because [eq x y] shadows [R x y]. *)
+(* This still fail with Coq 8.5, but Coq 8.6 is able to backtrack and
+  try hypothesis from the context beyond the first one it finds. *)
 
 Goal
   forall {A} (R: rel A A) (x y: A),
     R x y -> eq x y -> R x y.
 Proof.
   intros A R x y Hxy Hyy.
-  Fail monotonicity.
+  try monotonicity.
 Abort.
 
 (** This used to fail because the flipped hypothesis would not be

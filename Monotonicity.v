@@ -294,10 +294,10 @@ Ltac context_candidate :=
       | is_evar m
       | unify f m
       | lazymatch m with ?n _ => is_prefixable f n end ] in
-  match goal with
+  multimatch goal with
     | H: _ ?f ?g |- @CandidateProperty ?A ?B ?R ?x ?y (_ ?m ?n) =>
       red;
-      first
+      once first
         [ is_prefix f m; is_prefixable g n
         | is_prefix g n; is_prefixable f m
         | is_prefix g m; is_prefixable f n;
