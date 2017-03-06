@@ -214,8 +214,7 @@ Qed.
 
 (** *** Generic rules *)
 
-(** At the moment we don't support this. We should be able to have
-  [f_equal]-like behavior as a last resort somehow. In the specific
+(** [monotonicity] behaves like [f_equal] as a last resort. In the specific
   case below, another (possibly preferable?) option would be to
   declare the identity extension property that [subrel (eq * eq) eq]. *)
 
@@ -224,7 +223,7 @@ Goal
     x1 = x2 -> y1 = y2 -> (x1, y1) = (x2, y2).
 Proof.
   intros.
-  Fail rstep.
+  rauto.
 Abort.
 
 (** ** Using [foo_subrel] instances *)

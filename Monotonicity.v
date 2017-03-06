@@ -383,27 +383,6 @@ Proof.
   firstorder.
 Qed.
 
-(** We also exploit [Reflexive] instances. A reflexive relation is one
-  for which all elements are proper elements. Then reflexivity is a
-  kind of general, nullary monotonicity property. In fact, in
-  principle we should use [Reflexive] to declare a generic
-  [Related] instance, and the instance below would follow. However,
-  such instances end up polluting the resolution process and causing
-  premature instanciations of existential variables.
-
-  Instead, we only use the following instance as a last resort, and
-  only to satisfy the goal directly (not in the search for relational
-  properties). This allows us to insist the related terms be exactly
-  identical, not just unifiable. *)
-
-Global Instance reflexive_monotonicity {A} (R: rel A A) (m: A):
-  NotEvar R ->
-  Reflexive R ->
-  Monotonicity True (R m m) | 10.
-Proof.
-  firstorder.
-Qed.
-
 (** The Ltac tactic simply applies [monotonicity]; typeclass
   resolution will do the rest. Note that using [apply] naively is too
   lenient because in a goal of type [A -> B], it will end up unifying
@@ -427,3 +406,49 @@ Global Instance monotonicity_rstep {A B} (P: Prop) (R: rel A B) m n:
 Proof.
   firstorder.
 Qed.
+
+
+(** ** Generic instances *)
+
+(** When all else fail, we would like to fall back on a behavior
+  similar to that of [f_equal]. To that end, we add a default
+  [CandidateProperty] that identifies the longest common prefix of the
+  applications in the goal and asserts that they are equal. *)
+
+Class CommonPrefix {A B C} (m1: A) (m2: B) (f: C).
+
+Ltac common_prefix m1 m2 f :=
+  match m1 with
+    | m2 => unify f m1
+    | ?m1' _ => match m2 with ?m2' _ => common_prefix m1' m2' f end
+  end.
+
+Hint Extern 1 (CommonPrefix ?m1 ?m2 ?f) =>
+  common_prefix m1 m2 f; constructor : typeclass_instances.
+
+Global Instance eq_candidate {A B C} R (m1: A) (m2: B) (f: C):
+  CommonPrefix m1 m2 f ->
+  CandidateProperty eq f f (R m1 m2) | 100.
+Proof.
+  firstorder.
+Qed.
+
+(** Then, we can use the following [RElim] instance to obtain the
+  behavior of the [f_equal] tactic. *)
+
+Lemma f_equal_relim {A B} f g m n P Q:
+  RElim eq (f m) (g n) P Q ->
+  RElim (@eq (A -> B)) f g (m = n /\ P) Q.
+Proof.
+  intros Helim Hf [Hmn HP].
+  apply Helim; eauto.
+  congruence.
+Qed.
+
+Hint Extern 1 (RElim (@eq (_ -> _)) _ _ _ _) =>
+  eapply f_equal_relim : typeclass_instances.
+
+(** Note that thanks to [eq_subrel], this will also apply to a goal
+  that uses a [Reflexive] relation, not just a goal that uses [eq].
+  In fact, this subsumes the [reflexivity] tactic as well, which
+  corresponds to the special case where all arguments are equal. *)
