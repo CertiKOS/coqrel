@@ -345,3 +345,14 @@ Proof.
   intros.
   rauto.
 Qed.
+
+(** The [RIntro] instance for [rel_pull] used to be less general. *)
+
+Goal
+  forall A B (f: A -> B) (R: rel B B) x y,
+    R (f x) (f y) ->
+    (R @@ f) x y.
+Proof.
+  intros.
+  rauto.
+Qed.

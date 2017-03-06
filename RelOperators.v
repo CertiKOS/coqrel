@@ -283,9 +283,8 @@ Hint Extern 1 (Transitive (rel_pull _ _ _)) =>
   underlying relation to provide corresponding instances for the
   pulled relation. *)
 
-Lemma rel_pull_rintro {A B A' B'} (f: A -> A') (g: B -> B') P R x y:
-  RIntro P R (f x) (g y) ->
-  RIntro P (R @@ (f, g)) x y.
+Lemma rel_pull_rintro {A B A' B'} (f: A -> A') (g: B -> B') R x y:
+  RIntro (R (f x) (g y)) (R @@ (f, g)) x y.
 Proof.
   firstorder.
 Qed.
