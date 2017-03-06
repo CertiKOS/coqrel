@@ -418,10 +418,15 @@ Qed.
 Class CommonPrefix {A B C} (m1: A) (m2: B) (f: C).
 
 Ltac common_prefix m1 m2 f :=
-  match m1 with
-    | m2 => unify f m1
-    | ?m1' _ => match m2 with ?m2' _ => common_prefix m1' m2' f end
-  end.
+  first
+    [ not_evar m1; not_evar m2;
+      unify m1 m2; unify f m1
+    | lazymatch m1 with ?m1' _ =>
+        lazymatch m2 with ?m2' _ =>
+          common_prefix m1' m2' f
+        end
+      end
+    | unify m1 m2; unify f m1 ].
 
 Hint Extern 1 (CommonPrefix ?m1 ?m2 ?f) =>
   common_prefix m1 m2 f; constructor : typeclass_instances.

@@ -13,6 +13,13 @@ Proof.
   rauto.
 Qed.
 
+Goal
+  forall A (a: A), exists b, b = a.
+Proof.
+  intros; eexists.
+  monotonicity.
+Qed.
+
 (** ** Setoid rewriting *)
 
 Goal
