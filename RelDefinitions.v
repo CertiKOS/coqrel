@@ -381,17 +381,6 @@ Notation "'@' 'Monotonic' T m R" := (@Related T T m m R%rel)
 
 Notation Monotonic m R := (Related m m R%rel).
 
-(** Another issue related to unification of type arguments: because
-  [rel] is not a proper definition, sometimes Coq beta-reduces
-  expressions spontaneously which interferes with typeclass
-  resolution. As a result we need the following hint for
-  [arrow_subrel] below to be used by the [monotonicity] tactic. When
-  we upgrade to Coq 8.5 and make [rel] a universe-polymorphic
-  definition instead of a notation, we can drop this. *)
-
-Hint Extern 50 (Related _ _ _) =>
-  progress cbv beta : typeclass_instances.
-
 (** We provide a [RStep] instance for unfolding [Related]. *)
 
 Lemma unfold_monotonic_rstep {A B} (R: rel A B) m n:

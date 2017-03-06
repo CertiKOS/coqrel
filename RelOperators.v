@@ -26,7 +26,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related _ (_ \/ _)%rel subrel) =>
+Hint Extern 0 (Related _ (_ \/ _)%rel _) =>
   eapply rel_union_introl : typeclass_instances.
 
 Lemma rel_union_intror {A B} (R1 R2: rel A B):
@@ -35,7 +35,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related _ (_ \/ _)%rel subrel) =>
+Hint Extern 0 (Related _ (_ \/ _)%rel _) =>
   eapply rel_union_introl : typeclass_instances.
 
 Lemma rel_union_lub {A B} (R1 R2 R: rel A B):
@@ -72,7 +72,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related (_ /\ _)%rel _ subrel) =>
+Hint Extern 0 (Related (_ /\ _)%rel _ _) =>
   eapply rel_inter_eliml : typeclass_instances.
 
 Lemma rel_inter_elimr {A B} (R1 R2: rel A B):
@@ -81,7 +81,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related (_ /\ _)%rel _ subrel) =>
+Hint Extern 0 (Related (_ /\ _)%rel _ _) =>
   eapply rel_inter_elimr : typeclass_instances.
 
 Lemma rel_inter_glb {A B} (R R1 R2: rel A B):
@@ -143,12 +143,28 @@ Definition rel_bot {A B}: rel A B :=
 
 Notation "⊥" := rel_bot : rel_scope.
 
+Lemma rel_bot_relim {A B} (x: A) (y: B) P:
+  RElim ⊥ x y True P.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RElim ⊥ _ _ _ _) =>
+  eapply rel_bot_relim : typeclass_instances.
+
 Definition rel_top {A B}: rel A B :=
   fun x y => True.
 
 Notation "⊤" := rel_top : rel_scope.
 
-Hint Resolve (fun A B (x:A) (y:B) => I : rel_top x y).
+Lemma rel_top_rintro {A B} (x: A) (y: B):
+  RIntro True ⊤ x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ ⊤ _ _) =>
+  eapply rel_top_rintro : typeclass_instances.
 
 (** ** Relation equivalence *)
 
@@ -343,7 +359,7 @@ Class UnfoldUncurry {A} (before: A) (after: A) :=
 
 Ltac unfold_uncurry :=
   match goal with
-    | |- appcontext C[uncurry ?f ?p] =>
+    | |- context C[uncurry ?f ?p] =>
       is_evar p;
       let T := type of p in
       let Av := fresh in evar (Av: Type);
@@ -392,7 +408,21 @@ Hint Extern 1 (RElim (rel_curry _) _ _ _ _) =>
 Inductive req {A} (a: A): rel A A :=
   req_intro: req a a a.
 
-Hint Constructors req.
+Lemma req_rintro {A} (a: A):
+  RIntro True (req a) a a.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ (req _) _ _) =>
+  eapply req_rintro : typeclass_instances.
+
+Global Instance req_eq_subrel {A} (a: A):
+  Related (req a) eq subrel.
+Proof.
+  destruct 1.
+  reflexivity.
+Qed.
 
 (** ** Checking predicates on the left and right elements *)
 

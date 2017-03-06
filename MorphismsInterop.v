@@ -107,23 +107,38 @@ Qed.
 Hint Extern 1 (RElim (pointwise_relation _ _) _ _ _ _) =>
   eapply pointwise_relation_relim : typeclass_instances.
 
-(** *** [Morphisms.Proper] instances *)
+(** The rewriting system sometimes generates arguments constraints of
+  the following form (when rewriting an argument of [arrow_rel] for
+  instance), which need to be matched against our relational
+  properties stated in terms of [subrel]. *)
 
-(** Now that we can interpret the relators used in [Morphisms]-style
-  relational properties, we can simply hook instances of
-  [Morphisms.Proper] into our own database. We don't want to use the
-  corresponding deductive infrastructure in [Coq.Classes.Morphisms],
-  so we declare the following as an immediate hint so that we only use
-  "leaf" instances of [Proper]. *)
-
-Lemma morphisms_proper_related {A} (R: relation A) (a: A):
-  Morphisms.Proper R a ->
-  Monotonic a R.
+Global Instance pointwise_relation_subrel_subrel A B:
+  Related (pointwise_relation A (pointwise_relation B impl)) subrel subrel.
 Proof.
   firstorder.
 Qed.
 
-Hint Immediate morphisms_proper_related : typeclass_instances.
+(** *** [Morphisms.Proper] instances *)
+
+(** Now that we can interpret the relators used in [Morphisms]-style
+  relational properties, we can simply hook instances of
+  [Morphisms.Proper] into our own database.
+
+  We have to be careful about how this instance works. For one thing,
+  we are not interested in going through the whole resolution process
+  in [Coq.Classes.Morphisms], but are only interested in recovering
+  user-defined instances as-is. Moreover, we want to avoid a loop with
+  [solve_morphisms_proper] below, where our library (and hence
+  [Related] instances) are used to solve [Proper] queries.
+  We can make sure both of those things are avoided by using a
+  [normalization_done] hypothesis with our [Proper] query. *)
+
+Global Instance morphisms_proper_related {A} (R: relation A) (a: A):
+  (normalization_done -> Proper R a) ->
+  Monotonic a R.
+Proof.
+  firstorder.
+Qed.
 
 (** *** [subrelation] instances *)
 
@@ -141,12 +156,6 @@ Hint Immediate subrelation_subrel : typeclass_instances.
 
 
 (** ** Satisfying [Morphisms.Proper] queries *)
-
-(** This is quite straightforward. The only slightly subtle part is,
-  we need to avoid a loop with [morphisms_proper_related] above. We
-  use a hypothesis of the following type as a flag to avoid reentry. *)
-
-CoInductive in_solve_morphisms_proper := in_solve_morphisms_proper_intro.
 
 Ltac solve_morphisms_proper :=
   match goal with

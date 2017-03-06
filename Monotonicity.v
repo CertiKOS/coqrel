@@ -10,97 +10,237 @@ Require Import Delay.
   make progress when the goal is an applied relation. Compared with
   setoid rewriting, [monotonicity] is less powerful, but more direct
   and simple. This means it is easier to debug, and it can seamlessly
-  handle dependent types and heterogenous relations. *)
+  handle dependent types and heterogenous relations.
+
+  The [monotonicity] tactic applies to a goal of the form
+  [R (f x1 x2 ... xn) (g y1 y2 ... yn)]. The basic idea is to first
+  locate a relational property declared by the user relating [f] and
+  [g], namely an instance of [Related f g R'], then to locate and
+  instance of [RElim] which will allow us to use [R' f g] to make
+  progress on the current goal. Most of the time, [f] and [g] will be
+  identical so that the corresponding relational property can be
+  writted [Monotonic f R'].
+
+  For instance, we can register the monotonicity of [plus] as an
+  instance of [Monotonic plus (lt ++> lt ++> lt)]. Given an goal of
+  the form [plus 5 6 < plus x 5], the monotonicity tactic will use
+  that property and, using the [RElim] rule for [++>], construct an
+  instance of
+  [RElim (lt ++> lt ++> lt) plus plus (lt 5 7 -> lt x 5 -> lt (plus 5 6) (plus x 5))]
+  to apply on the goal, leaving us with the subgoals [5 < 7] and
+  [x < 5].
+
+  While this basic principle is rather straightforward, there are some
+  subtleties that we have to consider in order to build a reliable
+  system: the relational property we need to use may be about a prefix
+  [f x1 x2 ... xk] ([k] < [n]) of the application that still has some
+  arguments applied; we want to be able to exploit [subrel]
+  relationships to extend the applicability of the declared relational
+  properties; we need to be need to be careful about how we treat
+  existential variables. *)
 
 (** *** Truncating applications *)
 
-(** The search is at first guided by the left-hand side term, so that
-  if the goal has the form [?R (?f ?x1 ?x2 ?x3 ... ?xn) ?y], we will
-  seek a [Related] instance for some prefix [f x1 ... xk]. This allows
-  both [R] and [y] to be existential variables, which is required in
-  particular by the [transport] tactic.
+(** The first complication arises from the fact that [f] and [g] may
+  themselves be partial applications, so the goal may in fact be of
+  the form
+  [R (f a1 a2 ... ak x1 x2 ... xn) (g b1 b2 ... bl y1 y2 ... yn)],
+  with [k] ≠ [l], where the relational property to apply will be of
+  the form [Related R' (f a1 a2 ... ak) (g b1 b2 ... bl)]. This is
+  particularly relevant when [f] and [g] may have implicit typeclass
+  arguments, or type arguments that cannot be covered by our dependent
+  relators without causing universe inconsistency issues.
 
-  However, peeling off the [xi]s one by one and conducting a
-  full-blown search at every step is very time-consuming. To deal with
-  this issue we narrow down the search to (in this order):
-    - the whole application [f x1 ... xk];
-    - prefixes constructed from user-declared [Params] instances;
-    - the head term [f] alone.
+  Finding the head terms [f] and [g], then locating a property
+  [Related R' f g] is rather straightforward, however in this case we
+  must only drop the last [n] arguments from the applications before
+  we look up the [Related] instance, with no way of guessing the
+  correct value of [n]. We want to avoid having to peel off arguments
+  one by one and performing a [Related] search at each step, so we ask
+  the user to pitch in and declare instances of [Params f n] and
+  [Params g n] to guide our search when partial applications with
+  heads [f] and [g] are involved.
 
-  In the following we define some tactics and classes to implement
-  this search process. *)
+  Note that the term in the goal itself may only be partially
+  applied. Suppose [f x1 x2 ... xn] is in expecting [p] more
+  arguments, and that we find an instance of [Params f q]; then we
+  should only drop [q - p] arguments to obtain the prefix
+  [f x1 x2 ... x_(n+p-q)].
 
-(** [ApplicationHead] finds the head term [f] for an application [m]. *)
+  The class [QueryParams m1 m2 n] asserts that the head terms of [m1]
+  and [m2] have [Params] declarations that instruct us to remove [n]
+  arguments from each of them before looking up a corresponding
+  relational property. *)
 
-Ltac application_head m f :=
-  lazymatch m with
-    | ?m' _ => application_head m' f
-    | _ => unify m f
-  end.
+Class QueryParams {A B} (m1: A) (m2: B) (n: nat).
 
-Class ApplicationHead {A B} (m: A) (f: B).
+(** If the head term on either side is an existential variable, we
+  only check [Params] declarations for the other side. This auxiliary
+  lemma is used to trigger this step; [p] should be the number of
+  unapplied arguments in whichever term [m1] of [m2] we extracted the
+  non-existential head term [h] from. *)
 
-Hint Extern 1 (ApplicationHead ?m ?f) =>
-  application_head m f; constructor : typeclass_instances.
+Lemma query_params_one {A B C} (h: A) p (m1: B) (m2: C) n:
+  Params h (p + n) ->
+  QueryParams m1 m2 n.
+Proof.
+  constructor.
+Qed.
 
-(** [RemoveParams] drops some arguments from the application [m] so
-  that the result [f] expects [n] parameters. We are careful to skip
-  an appropriate number of parameters when the type of term indicates
-  that it is already a partial application. Note that we need to make
-  sure we "open up" types such as [subrel] to expose the product,
-  accomplished here by using [eval cbv]. *)
+(** If neither head term is an existential variable, then the [Params]
+  declarations for both should agree. *)
 
-Ltac remove_params m n f :=
-  let rec remove m n :=
-    lazymatch n with
-      | S ?n' =>
-        lazymatch m with
-          | ?m' _ => remove m' n'
-        end
-      | O => unify m f
-    end in
-  let rec remove_from_partial m t n :=
-    let t := eval cbv in t in
+Lemma query_params_both {A B C D} (h1: A) (h2: B) p1 p2 (m1: C) (m2: D) n:
+  Params h1 (p1 + n) ->
+  Params h2 (p2 + n) ->
+  QueryParams m1 m2 n.
+Proof.
+  constructor.
+Qed.
+
+(** Now we need to choose which one of these lemmas to apply in a
+  given situation, and compute the appropriate values for [p].
+  We compute [p] by essentially counting the products in the type of
+  the related terms [m]. Note that we need to make sure we "open up"
+  types such as [subrel] to expose the products, accomplished here by
+  using [eval cbv]. *)
+
+(** FIXME: [count_unapplied_params] fails if [m] has a dependent type,
+  due to [t'] being a term under binders rather than a closed term.
+  This means [monotonicity] can't handle goal where the related terms
+  have dependent types if the corresponding relational property is
+  about a partial application. *)
+
+Ltac count_unapplied_params m :=
+  let rec count t :=
     lazymatch t with
-      | forall x, ?t' =>
-        lazymatch n with
-          | S ?n' => remove_from_partial m t' n'
-        end
-      | _ =>
-        remove m n
+      | forall x, ?t' => let n := count t' in constr:(S n)
+      | _ => constr:(O)
     end in
   let t := type of m in
-  remove_from_partial m t n.
+  let t := eval cbv in t in
+  count t.
 
-Class RemoveParams {A B} (m: A) (n: nat) (f: B).
+Ltac query_params m1 m2 :=
+  let rec head t := lazymatch t with ?t' _ => head t' | _ => t end in
+  let h1 := head m1 in
+  let p1 := count_unapplied_params m1 in
+  let h2 := head m2 in
+  let p2 := count_unapplied_params m2 in
+  first
+    [ not_evar h1; not_evar h2; eapply (query_params_both h1 h2 p1 p2)
+    | not_evar h1; is_evar  h2; eapply (query_params_one h1 p1)
+    | is_evar  h1; not_evar h2; eapply (query_params_one h2 p2) ].
 
-Hint Extern 1 (RemoveParams ?m ?n ?f) =>
-  remove_params m n f; constructor : typeclass_instances.
+Hint Extern 10 (QueryParams ?m1 ?m2 _) =>
+  query_params m1 m2 : typeclass_instances.
 
-(** With these, we can define [CandidatePrefix m f], which serves as
-  the source of possible prefixes [f] of the application [m]. *)
+(** Now that we can figure out how many parameters to drop, we use
+  that information to construct the pair of prefixes we use to locate
+  the relational property. We try the following (in this order):
+    - the whole applications [f x1 ... xn] and [g y1 ... yn];
+    - prefixes constructed as above from user-declared [Params] instances;
+    - the smallest prefix we can obtain by dropping arguments from
+      both applications simulataneously.
 
-Class CandidatePrefix {A B} (m: A) (f: B).
+  Again, we need to take into account that either application could
+  contain an eixstential variable. When we encounter an existential
+  variable while chopping off arguments, we short-circuit the process
+  and simply generate a new evar to serve as the shortened version. *)
 
-Global Instance candidate_prefix_self {A} (m: A):
-  CandidatePrefix m m | 10.
+Ltac pass_evar_to k :=
+  let Av := fresh "A" in evar (Av : Type);
+  let A := eval red in Av in clear Av;
+  let av := fresh "a" in evar (av : A);
+  let a := eval red in av in clear av;
+  k a.
 
-Global Instance candidate_prefix_params {A B C} (m: A) (h: B) (n: nat) (f: C):
-  ApplicationHead m h ->
-  Params h n ->
-  RemoveParams m n f ->
-  CandidatePrefix m f | 20.
+(** The class [RemoveParams] implements the concurrent removal of [n]
+  parameters from applications [m1] and [m2]. *)
 
-Global Instance candidate_prefix_head {A B} (m: A) (h: B):
-  ApplicationHead m h ->
-  CandidatePrefix m h | 30.
+Class RemoveParams {A B C D} (n: nat) (m1: A) (m2: B) (f: C) (g: D).
+
+Ltac remove_params_from n m k :=
+  lazymatch n with
+    | O => k m
+    | S ?n' =>
+      lazymatch m with
+        | ?m' _ => remove_params_from n' m' k
+        | _ => is_evar m; pass_evar_to k
+      end
+  end.
+
+Ltac remove_params n m1 m2 f g :=
+  remove_params_from n m1 ltac:(fun m1' => unify f m1';
+    remove_params_from n m2 ltac:(fun m2' => unify g m2')).
+
+Hint Extern 1 (RemoveParams ?n ?m1 ?m2 ?f ?g) =>
+  remove_params n m1 m2 f g; constructor : typeclass_instances.
+
+(** The class [RemoveAllParams] implements the concurrent removal of
+  as many arguments as possible. *)
+
+Class RemoveAllParams {A B C D} (m1: A) (m2: B) (f: C) (g: D).
+
+Ltac remove_all_params_from m k :=
+  lazymatch m with
+    | ?m' _ => remove_all_params_from m' k
+    | _ => not_evar m; k m
+  end.
+
+Ltac remove_all_params m1 m2 f g :=
+  first
+    [ is_evar m2;
+      remove_all_params_from m1
+        ltac:(fun m1' => unify f m1'; pass_evar_to ltac:(fun m2' => unify g m2'))
+    | is_evar m1;
+      remove_all_params_from m2
+        ltac:(fun m2' => unify g m2'; pass_evar_to ltac:(fun m1' => unify f m1'))
+    | lazymatch m1 with ?m1' _ =>
+        lazymatch m2 with ?m2' _ =>
+          remove_all_params m1' m2' f g
+        end
+      end
+    | not_evar m1; unify f m1;
+      not_evar m2; unify g m2 ].
+
+Hint Extern 1 (RemoveAllParams ?m1 ?m2 ?f ?g) =>
+  remove_all_params m1 m2 f g; constructor : typeclass_instances.
 
 (** *** Selecting a relational property *)
 
-Class CandidateProperty {A B} (R: rel A B) m n (Q: Prop) :=
-  candidate_related: R m n.
+(** With this machinery in place, we can implement the search for
+  candidate relational properties to use in conjunction with a given
+  goal [Q]. *)
 
-(** We first attempt to use any matching hypothesis. This takes
+Class CandidateProperty {A B} (R': rel A B) f g (Q: Prop) :=
+  candidate_related: R' f g.
+
+Instance as_is_candidate {A B} (R R': rel A B) m1 m2:
+  Related m1 m2 R' ->
+  CandidateProperty R' m1 m2 (R m1 m2) | 10.
+Proof.
+  firstorder.
+Qed.
+
+Instance remove_params_candidate {A B C D} R (m1: A) (m2: B) R' (f: C) (g: D) n:
+  QueryParams m1 m2 n ->
+  RemoveParams n m1 m2 f g ->
+  Related f g R' ->
+  CandidateProperty R' f g (R m1 m2) | 20.
+Proof.
+  firstorder.
+Qed.
+
+Instance remove_all_params_candidate {A B C D} R (m1:A) (m2:B) R' (f:C) (g:D):
+  RemoveAllParams m1 m2 f g ->
+  Related f g R' ->
+  CandidateProperty R' f g (R m1 m2) | 30.
+Proof.
+  firstorder.
+Qed.
+
+(** We also attempt to use any matching hypothesis. This takes
   priority and bypasses any [Params] declaration. We assume that we
   will always want such hypotheses to be used, at least when the left-
   or right-hand side matches exactly. There is a possibility that this
@@ -169,31 +309,6 @@ Ltac context_candidate :=
 
 Hint Extern 1 (CandidateProperty _ _ _ _) =>
   context_candidate : typeclass_instances.
-
-(** After we've tried the relevant hypotheses, we use [Related]
-  instances as described above. *)
-
-Lemma candidate_l {A B GA GB} (R: rel A B) f g (QR: rel GA GB) m n:
-  CandidatePrefix m f ->
-  Related f g R ->
-  CandidateProperty R f g (QR m n).
-Proof.
-  firstorder.
-Qed.
-
-Hint Extern 2 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
-  not_evar m; eapply candidate_l : typeclass_instances.
-
-Lemma candidate_r {A B QA QB} (R: rel A B) f g (QR: rel QA QB) m n:
-  CandidatePrefix n g ->
-  Related f g R ->
-  CandidateProperty R f g (QR m n).
-Proof.
-  firstorder.
-Qed.
-
-Hint Extern 3 (CandidateProperty _ _ _ (?QR ?m ?n)) =>
-  not_evar n; eapply candidate_r : typeclass_instances.
 
 (** *** Using [subrel] *)
 
@@ -268,27 +383,6 @@ Proof.
   firstorder.
 Qed.
 
-(** We also exploit [Reflexive] instances. A reflexive relation is one
-  for which all elements are proper elements. Then reflexivity is a
-  kind of general, nullary monotonicity property. In fact, in
-  principle we should use [Reflexive] to declare a generic
-  [Related] instance, and the instance below would follow. However,
-  such instances end up polluting the resolution process and causing
-  premature instanciations of existential variables.
-
-  Instead, we only use the following instance as a last resort, and
-  only to satisfy the goal directly (not in the search for relational
-  properties). This allows us to insist the related terms be exactly
-  identical, not just unifiable. *)
-
-Global Instance reflexive_monotonicity {A} (R: rel A A) (m: A):
-  NotEvar R ->
-  Reflexive R ->
-  Monotonicity True (R m m) | 10.
-Proof.
-  firstorder.
-Qed.
-
 (** The Ltac tactic simply applies [monotonicity]; typeclass
   resolution will do the rest. Note that using [apply] naively is too
   lenient because in a goal of type [A -> B], it will end up unifying
@@ -312,3 +406,54 @@ Global Instance monotonicity_rstep {A B} (P: Prop) (R: rel A B) m n:
 Proof.
   firstorder.
 Qed.
+
+
+(** ** Generic instances *)
+
+(** When all else fail, we would like to fall back on a behavior
+  similar to that of [f_equal]. To that end, we add a default
+  [CandidateProperty] that identifies the longest common prefix of the
+  applications in the goal and asserts that they are equal. *)
+
+Class CommonPrefix {A B C} (m1: A) (m2: B) (f: C).
+
+Ltac common_prefix m1 m2 f :=
+  first
+    [ not_evar m1; not_evar m2;
+      unify m1 m2; unify f m1
+    | lazymatch m1 with ?m1' _ =>
+        lazymatch m2 with ?m2' _ =>
+          common_prefix m1' m2' f
+        end
+      end
+    | unify m1 m2; unify f m1 ].
+
+Hint Extern 1 (CommonPrefix ?m1 ?m2 ?f) =>
+  common_prefix m1 m2 f; constructor : typeclass_instances.
+
+Global Instance eq_candidate {A B C} R (m1: A) (m2: B) (f: C):
+  CommonPrefix m1 m2 f ->
+  CandidateProperty eq f f (R m1 m2) | 100.
+Proof.
+  firstorder.
+Qed.
+
+(** Then, we can use the following [RElim] instance to obtain the
+  behavior of the [f_equal] tactic. *)
+
+Lemma f_equal_relim {A B} f g m n P Q:
+  RElim eq (f m) (g n) P Q ->
+  RElim (@eq (A -> B)) f g (m = n /\ P) Q.
+Proof.
+  intros Helim Hf [Hmn HP].
+  apply Helim; eauto.
+  congruence.
+Qed.
+
+Hint Extern 1 (RElim (@eq (_ -> _)) _ _ _ _) =>
+  eapply f_equal_relim : typeclass_instances.
+
+(** Note that thanks to [eq_subrel], this will also apply to a goal
+  that uses a [Reflexive] relation, not just a goal that uses [eq].
+  In fact, this subsumes the [reflexivity] tactic as well, which
+  corresponds to the special case where all arguments are equal. *)

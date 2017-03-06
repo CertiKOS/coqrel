@@ -4,6 +4,22 @@ Local Open Scope rel_scope.
 
 (** * Tests *)
 
+(** ** Reflexivity *)
+
+Goal
+  forall A (a: A), a = a.
+Proof.
+  intros.
+  rauto.
+Qed.
+
+Goal
+  forall A (a: A), exists b, b = a.
+Proof.
+  intros; eexists.
+  monotonicity.
+Qed.
+
 (** ** Setoid rewriting *)
 
 Goal
@@ -15,6 +31,20 @@ Proof.
   rewrite <- H.
   reflexivity.
 Qed.
+
+(** There is an issue with the following. *)
+
+Goal
+  forall A (a b: A) (R: rel A A) (f: A -> A) (p: A -> Prop),
+    Monotonic f (R ++> R) ->
+    Monotonic p (R --> impl) ->
+    R a b ->
+    p (f b) ->
+    p (f a).
+Proof.
+  intros A a b R f p Hf Hp Hab H.
+  Fail rewrite <- Hab in H.
+Abort.
 
 (** ** Monotonicity tactics *)
 
@@ -103,6 +133,28 @@ Proof.
   rauto.
 Qed.
 
+Goal
+  forall {A} (R: rel A A),
+    Monotonic
+      (fun (b: bool) x y => if b then x else y)
+      (- ==> R ++> R ++> R).
+Proof.
+  intros.
+  rauto.
+Qed.
+
+Goal
+  forall {A} (R : rel A A) (b : bool) (x y : A),
+    b = b ->
+    R x x ->
+    R y y ->
+    R (if b then x else y)
+      (if b then x else y).
+Proof.
+  intros.
+  rauto.
+Qed.
+
 (** [rel_curry] *)
 
 Goal
@@ -167,6 +219,20 @@ Proof.
   rauto.
 Qed.
 
+(** *** Generic rules *)
+
+(** [monotonicity] behaves like [f_equal] as a last resort. In the specific
+  case below, another (possibly preferable?) option would be to
+  declare the identity extension property that [subrel (eq * eq) eq]. *)
+
+Goal
+  forall A B (x1 x2 : A) (y1 y2 : B),
+    x1 = x2 -> y1 = y2 -> (x1, y1) = (x2, y2).
+Proof.
+  intros.
+  rauto.
+Abort.
+
 (** ** Using [foo_subrel] instances *)
 
 (** Still broken because of the interaction between [subrel] and
@@ -202,8 +268,6 @@ Proof.
   rauto.
 Qed.
 
-(** FIXME: this should work as well. *)
-
 Goal
   forall A1 A2 B1 B2 C1 C2 (R1 R2: rel A1 A2) (R1': rel B1 B2) (R: rel C1 C2),
     subrel R1 R2 ->
@@ -212,10 +276,11 @@ Goal
       (R1 * R1' ++> R) x y.
 Proof.
   intros A1 A2 B1 B2 C1 C2 R1 R2 R1' R HR12 x y H.
-  try rewrite HR12.
-Abort.
+  rewrite HR12.
+  assumption.
+Qed.
 
-(** ** The [preorder] tactic *)
+(** ** The [rgraph] tactic *)
 
 Goal
   forall {A} (R S T: rel A A),
@@ -223,6 +288,17 @@ Goal
     subrel S R ->
     subrel S T ->
     subrel R T.
+Proof.
+  intros.
+  rstep.
+Qed.
+
+Goal
+  forall `(PER) (x y z t : A),
+    R x y ->
+    R z y ->
+    R z t ->
+    R t x.
 Proof.
   intros.
   rstep.
