@@ -136,6 +136,44 @@ Proof.
   split; assumption.
 Qed.
 
+(** ** Implication *)
+
+Definition rel_impl {A B} (R1 R2: rel A B): rel A B :=
+  fun x y => R1 x y -> R2 x y.
+
+Global Instance rel_impl_subrel {A B}:
+  Monotonic (@rel_impl A B) (subrel --> subrel ++> subrel).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rel_impl_subrel_params:
+  Params (@rel_impl) 4.
+
+Lemma rel_impl_rintro {A B} (R1 R2: rel A B) x y:
+  RIntro (R1 x y -> R2 x y) (rel_impl R1 R2) x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ (rel_impl _ _) _ _) =>
+  eapply rel_impl_rintro : typeclass_instances.
+
+Lemma rel_impl_relim {A B} (R1 R2: rel A B) x y:
+  RElim (rel_impl R1 R2) x y (R1 x y) (R2 x y).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RElim (rel_impl _ _) _ _ _ _) =>
+  eapply rel_impl_relim : typeclass_instances.
+
+Lemma rel_impl_subrel_codomain {A B} (R1 R2: rel A B):
+  Related R2 (rel_impl R1 R2) subrel.
+Proof.
+  firstorder.
+Qed.
+
 (** ** The bottom and top relations *)
 
 Definition rel_bot {A B}: rel A B :=
