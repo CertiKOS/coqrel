@@ -368,6 +368,15 @@ Definition rel_curry {A1 B1 C1 A2 B2 C2} (R: rel (A1*B1->C1) (A2*B2->C2)) :=
 Definition rel_uncurry {A1 B1 C1 A2 B2 C2} (R: rel (A1->B1->C1) (A2->B2->C2)) :=
   (R @@ curry)%rel.
 
+(** We use the following notation for [rel_curry], which evokes
+  splitting a pair into two separate arguments. Note that we use the
+  same priority as for [++>], [-->], and [==>], because we usually
+  want [rel_curry] to nest in such a way that for instance,
+  [S ++> % R --> % R ++> impl] will be interpreted as
+  [S ++> rel_curry (R --> rel_curry (R ++> impl))]. *)
+
+Notation "% R" := (rel_curry R) (at level 55, right associativity) : rel_scope.
+
 (** In order to provide an [RElim] instance for [rel_curry], we will
   rely on the fact that:
 
@@ -422,17 +431,17 @@ Hint Extern 1 (UnfoldUncurry ?P ?Q) =>
 Lemma rel_curry_relim {A1 B1 C1 A2 B2 C2} R f g P Q Q':
   @RElim (A1 * B1 -> C1) (A2 * B2 -> C2) R (uncurry f) (uncurry g) P Q ->
   UnfoldUncurry Q Q' ->
-  @RElim (A1 -> B1 -> C1) (A2 -> B2 -> C2) (rel_curry R) f g P Q'.
+  @RElim (A1 -> B1 -> C1) (A2 -> B2 -> C2) (% R) f g P Q'.
 Proof.
   unfold UnfoldUncurry.
   intros; subst.
   assumption.
 Qed.
 
-Hint Extern 1 (RIntro _ (rel_curry _) _ _) =>
+Hint Extern 1 (RIntro _ (% _) _ _) =>
   eapply rel_pull_rintro : typeclass_instances.
 
-Hint Extern 1 (RElim (rel_curry _) _ _ _ _) =>
+Hint Extern 1 (RElim (% _) _ _ _ _) =>
   eapply rel_curry_relim : typeclass_instances.
 
 (** ** The [req] relation *)

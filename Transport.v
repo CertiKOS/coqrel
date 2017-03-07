@@ -94,7 +94,7 @@ Ltac set_rel_transport keyword :=
   [rel_curry], with a similar strategy. *)
 
 Lemma rel_curry_set_rel_transport {A1 A2 B1 B2} R sA sB (a1: A1) (a2: A2):
-  Transport (rel_curry (set_rel R)) sA sB
+  Transport (% set_rel R) sA sB
     (sA a1 a2)
     (exists (b1: B1) (b2: B2), sB b1 b2 /\ R (a1, a2) (b1, b2)).
 Proof.
@@ -117,7 +117,7 @@ Ltac rel_curry_set_rel_transport keyword :=
   end.
 
 Lemma rel_curry2_set_rel_transport {A1 A2 A3 B1 B2 B3} R sA sB (a1: A1) (a2: A2) (a3: A3):
-  Transport (rel_curry (rel_curry (set_rel R))) sA sB
+  Transport (% % set_rel R) sA sB
     (sA a1 a2 a3)
     (exists (b1: B1) (b2: B2) (b3: B3), sB b1 b2 b3 /\ R (a1, a2, a3) (b1, b2, b3)).
 Proof.
