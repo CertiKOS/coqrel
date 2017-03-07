@@ -536,6 +536,14 @@ Qed.
 Hint Extern 1 (Transitive (list_rel _)) =>
   eapply list_rel_trans : typeclass_instances.
 
+Global Instance length_rel:
+  Monotonic
+    (@length)
+    (forallr R : rel, list_rel R ++> eq).
+Proof.
+  induction 1; simpl; congruence.
+Qed.
+
 Global Instance app_rel:
   Monotonic
     (@app)
