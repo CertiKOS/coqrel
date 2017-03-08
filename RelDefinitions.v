@@ -596,3 +596,13 @@ Qed.
 
 Hint Extern 1 (RElim (flip _) _ _ _ _) =>
   eapply flip_relim : typeclass_instances.
+
+Lemma flip_rdestruct {A B} (R: rel A B) T:
+  RDestruct R T ->
+  RDestruct (flip R) (fun P => T (flip P)).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RDestruct (flip _) _) =>
+  eapply flip_rdestruct : typeclass_instances.
