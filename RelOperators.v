@@ -266,6 +266,9 @@ Qed.
 Definition rel_pull {A B A' B'} f g (R: rel A' B'): rel A B :=
   fun x y => R (f x) (g y).
 
+(** We use the following notation. Left associativity would make more
+  sense but we have to match [Coq.Classes.RelationPairs]. *)
+
 Notation "R @@ ( f , g )" := (rel_pull f g R)
   (at level 30, right associativity) : rel_scope.
 
@@ -339,6 +342,63 @@ Qed.
 
 Hint Extern 1 (RElim (_ @@ (_, _)) _ _ _ _) =>
   eapply rel_pull_relim : typeclass_instances.
+
+(** ** Pushing a relation along functions *)
+
+Inductive rel_push {A1 A2 B1 B2} f g (R: rel A1 A2): rel B1 B2 :=
+  rel_push_rintro x y: RIntro (R x y) (rel_push f g R) (f x) (g y).
+
+Hint Extern 1 (RIntro _ (rel_push _ _ _) _ _) =>
+  eapply rel_push_rintro : typeclass_instances.
+
+(** The level we choose here is to match the notation used for
+  [PTree.get] in Compcert's [Maps] library. *)
+
+Notation "R !! ( f , g )" := (rel_push f g R)
+  (at level 1) : rel_scope.
+
+Notation "R !! f" := (rel_push f f R)
+  (at level 1) : rel_scope.
+
+Notation "R !! ( f )" := (rel_push f f R)
+  (at level 1) : rel_scope.
+
+Global Instance rel_push_subrel {A1 A2 B1 B2} (f: A1 -> B1) (g: A2 -> B2):
+  Proper (subrel ++> subrel) (rel_push f g).
+Proof.
+  intros R1 R2 HR x y Hxy.
+  destruct Hxy.
+  rintro; eauto.
+Qed.
+
+(** When using [R !! fst] or [R !! snd], if [rel_push_intro] does not
+  apply, we can use the following instances instead. *)
+
+Lemma rel_push_fst_rexists {A1 A2 B1 B2} (x1:A1) (x2:A2) (y1:B1) (y2:B2) R:
+  RExists (R (x1, y1) (x2, y2)) (R !! fst) x1 x2.
+Proof.
+  intros H.
+  change x1 with (fst (x1, y1)).
+  change x2 with (fst (x2, y2)).
+  rintro.
+  assumption.
+Qed.
+
+Hint Extern 1 (RExists _ (_ !! fst) _ _) =>
+  eapply rel_push_fst_rexists : typeclass_instances.
+
+Lemma rel_push_snd_rexists {A1 A2 B1 B2} (x1:A1) (x2:A2) (y1:B1) (y2:B2) R:
+  RExists (R (x1, y1) (x2, y2)) (R !! snd) y1 y2.
+Proof.
+  intros H.
+  change y1 with (snd (x1, y1)).
+  change y2 with (snd (x2, y2)).
+  rintro.
+  assumption.
+Qed.
+
+Hint Extern 1 (RExists _ (_ !! snd) _ _) =>
+  eapply rel_push_snd_rexists : typeclass_instances.
 
 (** ** Relation currying *)
 
