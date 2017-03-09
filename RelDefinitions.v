@@ -245,26 +245,22 @@ Qed.
   induction principle. [T] expands to a conjunction of subgoals in the
   format expected by [Delay.split_conjunction]. For instance, the
   induction principle for [sum_rel] is:
-
-  <<<
-  sum_rel_ind:
-    forall ...,
-      (forall a1 a2, RA a1 a2 -> P (inl a1) (inl a2)) ->
-      (forall b1 b2, RB b1 b2 -> P (inr b1) (inr b2)) ->
-      (forall p1 p2, (RA + RB) p1 p2 -> P p1 p2)
-  >>>
-
+<<
+    sum_rel_ind:
+      forall ...,
+        (forall a1 a2, RA a1 a2 -> P (inl a1) (inl a2)) ->
+        (forall b1 b2, RB b1 b2 -> P (inr b1) (inr b2)) ->
+        (forall p1 p2, (RA + RB) p1 p2 -> P p1 p2)
+>>
   A corresponding instance of [RDestruct] would be:
-
-  <<<
-  sum_rdestruct:
-    RDestruct
-      (sum_rel RA RB)
-      (fun P =>
-        (forall a1 a2, RA a1 a2 -> P (inl a1) (inl a2)) /\
-        (forall b1 b2, RB b1 b2 -> P (inr b1) (inr b2)))
-  >>>
-
+<<
+    sum_rdestruct:
+      RDestruct
+        (sum_rel RA RB)
+        (fun P =>
+          (forall a1 a2, RA a1 a2 -> P (inl a1) (inl a2)) /\
+          (forall b1 b2, RB b1 b2 -> P (inr b1) (inr b2)))
+>>
   In the case of [sum_rel] however, which is defined as an inductive
   type with similar structure to [sum], we can rely on the default
   instance of [RDestruct], which simply uses the [destruct] tactic. *)

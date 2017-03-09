@@ -269,10 +269,10 @@ Global Existing Instance tt_rel.
 
 (** The definition of [sum_rel] could look something like this:
 <<
-  Inductive sum_rel:
-    forall {A1 A2 B1 B2}, rel A1 A2 -> rel B1 B2 -> rel (A1+B1) (A2+B2):=
-    | inl_rel: Proper (∀ RA : rel, ∀ RB : rel, RA ++> sum_rel RA RB) (@inl)
-    | inr_rel: Proper (∀ RA : rel, ∀ RB : rel, RB ++> sum_rel RA RB) (@inr).
+    Inductive sum_rel:
+      forall {A1 A2 B1 B2}, rel A1 A2 -> rel B1 B2 -> rel (A1+B1) (A2+B2):=
+      | inl_rel: Proper (∀ RA : rel, ∀ RB : rel, RA ++> sum_rel RA RB) (@inl)
+      | inr_rel: Proper (∀ RA : rel, ∀ RB : rel, RB ++> sum_rel RA RB) (@inr).
 >>
   However, to minimize the need for [inversion]s we want to keep as
   many arguments as possible as parameters of the inductive type. *)

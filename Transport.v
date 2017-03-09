@@ -63,10 +63,10 @@ Qed.
   anything, then applies the lemma with the required unification
   preparation. For example, [set_rel_transport] is used in the
   following way in the [SimClight] library:
-  <<<
-  Hint Extern 1 (Transport _ _ _ _ _) =>
-    set_rel_transport @assign_loc : typeclass_instances.
-  >>>
+<<
+    Hint Extern 1 (Transport _ _ _ _ _) =>
+      set_rel_transport @assign_loc : typeclass_instances.
+>>
   Note that it's necessary to use [@] because [assign_loc] is
   parametrized by typeclasses, and we want to avoid undue
   specialization at hint registration time. *)
@@ -145,10 +145,10 @@ Ltac rel_curry2_set_rel_transport keyword :=
   can apply to pretty much anything, we need to register it on a
   case-by-case basis. Here is an example used in the CertiKOS proof
   for hypotheses of the form [writable_block ge b]:
-  <<<
-  Hint Extern 10 (Transport _ _ _ (writable_block _ _) _) =>
-    eapply impl_transport : typeclass_instances.
-  >>> *)
+<<
+    Hint Extern 10 (Transport _ _ _ (writable_block _ _) _) =>
+      eapply impl_transport : typeclass_instances.
+>> *)
 
 Lemma impl_transport P Q:
   Transport impl P Q P Q.
