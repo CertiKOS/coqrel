@@ -269,10 +269,10 @@ Global Existing Instance tt_rel.
 
 (** The definition of [sum_rel] could look something like this:
 <<
-  Inductive sum_rel:
-    forall {A1 A2 B1 B2}, rel A1 A2 -> rel B1 B2 -> rel (A1+B1) (A2+B2):=
-    | inl_rel: Proper (∀ RA : rel, ∀ RB : rel, RA ++> sum_rel RA RB) (@inl)
-    | inr_rel: Proper (∀ RA : rel, ∀ RB : rel, RB ++> sum_rel RA RB) (@inr).
+    Inductive sum_rel:
+      forall {A1 A2 B1 B2}, rel A1 A2 -> rel B1 B2 -> rel (A1+B1) (A2+B2):=
+      | inl_rel: Proper (∀ RA : rel, ∀ RB : rel, RA ++> sum_rel RA RB) (@inl)
+      | inr_rel: Proper (∀ RA : rel, ∀ RB : rel, RB ++> sum_rel RA RB) (@inr).
 >>
   However, to minimize the need for [inversion]s we want to keep as
   many arguments as possible as parameters of the inductive type. *)
@@ -535,6 +535,14 @@ Qed.
 
 Hint Extern 1 (Transitive (list_rel _)) =>
   eapply list_rel_trans : typeclass_instances.
+
+Global Instance length_rel:
+  Monotonic
+    (@length)
+    (forallr R : rel, list_rel R ++> eq).
+Proof.
+  induction 1; simpl; congruence.
+Qed.
 
 Global Instance app_rel:
   Monotonic

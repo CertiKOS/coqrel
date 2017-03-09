@@ -136,6 +136,44 @@ Proof.
   split; assumption.
 Qed.
 
+(** ** Implication *)
+
+Definition rel_impl {A B} (R1 R2: rel A B): rel A B :=
+  fun x y => R1 x y -> R2 x y.
+
+Global Instance rel_impl_subrel {A B}:
+  Monotonic (@rel_impl A B) (subrel --> subrel ++> subrel).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rel_impl_subrel_params:
+  Params (@rel_impl) 4.
+
+Lemma rel_impl_rintro {A B} (R1 R2: rel A B) x y:
+  RIntro (R1 x y -> R2 x y) (rel_impl R1 R2) x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ (rel_impl _ _) _ _) =>
+  eapply rel_impl_rintro : typeclass_instances.
+
+Lemma rel_impl_relim {A B} (R1 R2: rel A B) x y:
+  RElim (rel_impl R1 R2) x y (R1 x y) (R2 x y).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RElim (rel_impl _ _) _ _ _ _) =>
+  eapply rel_impl_relim : typeclass_instances.
+
+Lemma rel_impl_subrel_codomain {A B} (R1 R2: rel A B):
+  Related R2 (rel_impl R1 R2) subrel.
+Proof.
+  firstorder.
+Qed.
+
 (** ** The bottom and top relations *)
 
 Definition rel_bot {A B}: rel A B :=
@@ -228,6 +266,9 @@ Qed.
 Definition rel_pull {A B A' B'} f g (R: rel A' B'): rel A B :=
   fun x y => R (f x) (g y).
 
+(** We use the following notation. Left associativity would make more
+  sense but we have to match [Coq.Classes.RelationPairs]. *)
+
 Notation "R @@ ( f , g )" := (rel_pull f g R)
   (at level 30, right associativity) : rel_scope.
 
@@ -283,9 +324,8 @@ Hint Extern 1 (Transitive (rel_pull _ _ _)) =>
   underlying relation to provide corresponding instances for the
   pulled relation. *)
 
-Lemma rel_pull_rintro {A B A' B'} (f: A -> A') (g: B -> B') P R x y:
-  RIntro P R (f x) (g y) ->
-  RIntro P (R @@ (f, g)) x y.
+Lemma rel_pull_rintro {A B A' B'} (f: A -> A') (g: B -> B') R x y:
+  RIntro (R (f x) (g y)) (R @@ (f, g)) x y.
 Proof.
   firstorder.
 Qed.
@@ -302,6 +342,63 @@ Qed.
 
 Hint Extern 1 (RElim (_ @@ (_, _)) _ _ _ _) =>
   eapply rel_pull_relim : typeclass_instances.
+
+(** ** Pushing a relation along functions *)
+
+Inductive rel_push {A1 A2 B1 B2} f g (R: rel A1 A2): rel B1 B2 :=
+  rel_push_rintro x y: RIntro (R x y) (rel_push f g R) (f x) (g y).
+
+Hint Extern 1 (RIntro _ (rel_push _ _ _) _ _) =>
+  eapply rel_push_rintro : typeclass_instances.
+
+(** The level we choose here is to match the notation used for
+  [PTree.get] in Compcert's [Maps] library. *)
+
+Notation "R !! ( f , g )" := (rel_push f g R)
+  (at level 1) : rel_scope.
+
+Notation "R !! f" := (rel_push f f R)
+  (at level 1) : rel_scope.
+
+Notation "R !! ( f )" := (rel_push f f R)
+  (at level 1) : rel_scope.
+
+Global Instance rel_push_subrel {A1 A2 B1 B2} (f: A1 -> B1) (g: A2 -> B2):
+  Proper (subrel ++> subrel) (rel_push f g).
+Proof.
+  intros R1 R2 HR x y Hxy.
+  destruct Hxy.
+  rintro; eauto.
+Qed.
+
+(** When using [R !! fst] or [R !! snd], if [rel_push_intro] does not
+  apply, we can use the following instances instead. *)
+
+Lemma rel_push_fst_rexists {A1 A2 B1 B2} (x1:A1) (x2:A2) (y1:B1) (y2:B2) R:
+  RExists (R (x1, y1) (x2, y2)) (R !! fst) x1 x2.
+Proof.
+  intros H.
+  change x1 with (fst (x1, y1)).
+  change x2 with (fst (x2, y2)).
+  rintro.
+  assumption.
+Qed.
+
+Hint Extern 1 (RExists _ (_ !! fst) _ _) =>
+  eapply rel_push_fst_rexists : typeclass_instances.
+
+Lemma rel_push_snd_rexists {A1 A2 B1 B2} (x1:A1) (x2:A2) (y1:B1) (y2:B2) R:
+  RExists (R (x1, y1) (x2, y2)) (R !! snd) y1 y2.
+Proof.
+  intros H.
+  change y1 with (snd (x1, y1)).
+  change y2 with (snd (x2, y2)).
+  rintro.
+  assumption.
+Qed.
+
+Hint Extern 1 (RExists _ (_ !! snd) _ _) =>
+  eapply rel_push_snd_rexists : typeclass_instances.
 
 (** ** Relation currying *)
 
@@ -330,6 +427,15 @@ Definition rel_curry {A1 B1 C1 A2 B2 C2} (R: rel (A1*B1->C1) (A2*B2->C2)) :=
 
 Definition rel_uncurry {A1 B1 C1 A2 B2 C2} (R: rel (A1->B1->C1) (A2->B2->C2)) :=
   (R @@ curry)%rel.
+
+(** We use the following notation for [rel_curry], which evokes
+  splitting a pair into two separate arguments. Note that we use the
+  same priority as for [++>], [-->], and [==>], because we usually
+  want [rel_curry] to nest in such a way that for instance,
+  [S ++> % R --> % R ++> impl] will be interpreted as
+  [S ++> rel_curry (R --> rel_curry (R ++> impl))]. *)
+
+Notation "% R" := (rel_curry R) (at level 55, right associativity) : rel_scope.
 
 (** In order to provide an [RElim] instance for [rel_curry], we will
   rely on the fact that:
@@ -385,17 +491,17 @@ Hint Extern 1 (UnfoldUncurry ?P ?Q) =>
 Lemma rel_curry_relim {A1 B1 C1 A2 B2 C2} R f g P Q Q':
   @RElim (A1 * B1 -> C1) (A2 * B2 -> C2) R (uncurry f) (uncurry g) P Q ->
   UnfoldUncurry Q Q' ->
-  @RElim (A1 -> B1 -> C1) (A2 -> B2 -> C2) (rel_curry R) f g P Q'.
+  @RElim (A1 -> B1 -> C1) (A2 -> B2 -> C2) (% R) f g P Q'.
 Proof.
   unfold UnfoldUncurry.
   intros; subst.
   assumption.
 Qed.
 
-Hint Extern 1 (RIntro _ (rel_curry _) _ _) =>
+Hint Extern 1 (RIntro _ (% _) _ _) =>
   eapply rel_pull_rintro : typeclass_instances.
 
-Hint Extern 1 (RElim (rel_curry _) _ _ _ _) =>
+Hint Extern 1 (RElim (% _) _ _ _ _) =>
   eapply rel_curry_relim : typeclass_instances.
 
 (** ** The [req] relation *)
