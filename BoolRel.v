@@ -48,6 +48,13 @@ Qed.
 Hint Extern 0 (RDestruct leb _) =>
   eapply leb_rdestruct : typeclass_instances.
 
+Global Instance leb_transport_eq_true x y:
+  Transport Bool.leb x y (x = true) (y = true).
+Proof.
+  clear.
+  destruct x, y; firstorder.
+Qed.
+
 (** ** Monotonicity of various definitions *)
 
 Global Instance true_leb b:
