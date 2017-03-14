@@ -42,24 +42,6 @@ Ltac use_rdestruct_rstep m n :=
 Hint Extern 40 (RStep _ (_ (match ?m with _=>_ end) (match ?n with _=>_ end))) =>
   use_rdestruct_rstep m n : typeclass_instances.
 
-(** In the special case where the terms matched on the left- and
-  right-hand sides are identical, we want to destruct that term
-  instead. At the moment, it's unclear to me whether this could be
-  formulated as an [RDestruct] instance for [eq], or whether the
-  process above could subsume this (we should conduct experiments with
-  real code at some point). *)
-
-Ltac destruct_rstep m :=
-  let H := fresh in
-  let n := fresh in
-  intros H;
-  generalize m;
-  delayed_conjunction (intros n; destruct n; delay);
-  eexact H.
-
-Hint Extern 39 (RStep _ (_ (match ?m with _=>_ end) (match ?m with _=>_ end))) =>
-  destruct_rstep m : typeclass_instances.
-
 (** ** Choosing to discard or keep equations *)
 
 (** The [RStep] above will leave us with a bunch of [rdestruct_result]
@@ -137,3 +119,23 @@ Ltac default_rdestruct :=
 
 Hint Extern 100 (RDestruct _ _) =>
   default_rdestruct : typeclass_instances.
+
+(** In the special case where the terms matched on the left- and
+  right-hand sides are identical, we want to destruct that term
+  instead. We accomplish this by introducing a special instance of
+  [RDestruct] for the relation [eq]. *)
+
+Ltac eq_rdestruct :=
+  let m := fresh "m" in
+  let n := fresh "n" in
+  let Hmn := fresh "H" m n in
+  let P := fresh "P" in
+  let H := fresh in
+  intros m n Hmn P H;
+  revert m n Hmn;
+  delayed_conjunction (intros m n Hmn; destruct Hmn; destruct m; delay);
+  pattern P;
+  eexact H.
+
+Hint Extern 99 (RDestruct eq _) =>
+  eq_rdestruct : typeclass_instances.
