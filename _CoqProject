@@ -5,6 +5,7 @@ RelDefinitions.v
 RelOperators.v
 Relators.v
 Monotonicity.v
+RDestruct.v
 MorphismsInterop.v
 Transport.v
 PreOrderTactic.v
