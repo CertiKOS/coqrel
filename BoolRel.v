@@ -57,17 +57,23 @@ Qed.
 
 (** ** Monotonicity of various definitions *)
 
-Global Instance true_leb b:
+Lemma true_leb b:
   Related b true leb.
 Proof.
   destruct b; reflexivity.
 Qed.
 
-Global Instance false_leb b:
+Hint Extern 0 (Related _ true _) =>
+  eapply true_leb : typeclass_instances.
+
+Lemma false_leb b:
   Related false b leb.
 Proof.
   destruct b; reflexivity.
 Qed.
+
+Hint Extern 0 (Related false _ _) =>
+  eapply false_leb : typeclass_instances.
 
 Global Instance negb_leb:
   Monotonic negb (leb --> leb).
