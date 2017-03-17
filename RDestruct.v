@@ -2,6 +2,27 @@ Require Export RelDefinitions.
 
 (** * The [RDestruct] class *)
 
+(** ** Introducing the hypothesis to be destructed *)
+
+(** The goal of [rdestruct] is usually to make progress on a goal
+  relating two [match] constructions, by breaking down the terms being
+  matched. The instances below will attempt to prove automatically
+  that these terms are related, then destruct the resulting hypothesis
+  in order to break them down and reduce the [match]es.
+
+  If proving the destructed hypothesis automatically is not possible,
+  the user can use the following tactic to introduce it manually. *)
+
+Ltac rdestruct_assert :=
+  lazymatch goal with
+    | |- _ (match ?m with _ => _ end) (match ?n with _ => _ end) =>
+      let Tm := type of m in
+      let Tn := type of n in
+      let R := fresh "R" in
+      evar (R: rel Tm Tn);
+      assert (R m n); subst R
+  end.
+
 (** ** [RDestruct] steps *)
 
 (** Sometimes we want to remember what the destructed terms were.
