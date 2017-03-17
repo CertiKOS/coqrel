@@ -236,7 +236,7 @@ Ltac relim H :=
   relational property as-is. *)
 
 Global Instance relim_base {A B} (R: rel A B) m n:
-  RElim R m n True (R m n).
+  RElim R m n True (R m n) | 10.
 Proof.
   firstorder.
 Qed.
