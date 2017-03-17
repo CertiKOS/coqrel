@@ -361,12 +361,6 @@ Proof.
   split; firstorder.
 Qed.
 
-Instance subrel_refl {A B} (R: rel A B):
-  Related R R subrel.
-Proof.
-  firstorder.
-Qed.
-
 Global Instance eq_subrel {A} (R: rel A A):
   Reflexive R ->
   Related eq R subrel.
