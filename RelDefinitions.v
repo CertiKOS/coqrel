@@ -37,6 +37,13 @@ Class Convertible {A} (x y: A) :=
 Hint Extern 1 (Convertible ?x ?y) =>
   eapply eq_refl : typeclass_instances.
 
+(** The following class can be used to inhibit backtracking. *)
+
+Class Once P := once : P.
+
+Hint Extern 1 (Once ?P) =>
+  red; once typeclasses eauto : typeclass_instances.
+
 
 (** * Relations *)
 
@@ -104,13 +111,22 @@ Ltac rauto :=
 
 (** After applying each step, we need to decompose the premise into
   individual subgoals, wrapping each one into a new [RAuto] goal so
-  that the process continues. *)
+  that the process continues.
+
+  Note the use of [Once] below: while choosing a step to apply next
+  can involve some backtracking, once a step has been chosen [RAuto]
+  never backtracks. This avoids exponential blow up in the search
+  space, so that [RAuto] remains efficient even in case of failure.
+  From a usability perspective, it also encourages proper hygiene when
+  declaring instances, since extraneous or too broadly applicable
+  instance will cause failures (rather than silently add weight to the
+  system). *)
 
 Class RAutoSubgoals (P: Prop) :=
   rauto_subgoals : P.
 
 Global Instance rauto_rstep P Q:
-  RStep P Q ->
+  Once (RStep P Q) ->
   RAutoSubgoals P ->
   RAuto Q.
 Proof.
