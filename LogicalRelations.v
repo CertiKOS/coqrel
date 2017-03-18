@@ -1,4 +1,5 @@
 Require Export RelDefinitions.
+Require Export RelClasses.
 Require Export RelOperators.
 Require Export Relators.
 Require Export Monotonicity.

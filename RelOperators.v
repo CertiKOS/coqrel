@@ -1,4 +1,5 @@
 Require Export RelDefinitions.
+Require Import RelClasses.
 Require Import Relators.
 
 (** ** Union of relations *)
@@ -104,6 +105,26 @@ Qed.
 
 Hint Extern 2 (Reflexive (_ /\ _)) =>
   eapply rel_inter_refl : typeclass_instances.
+
+Lemma rel_inter_corefl_l {A} (R1 R2: rel A A):
+  Coreflexive R1 ->
+  Coreflexive (R1 /\ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Coreflexive (_ /\ _)) =>
+  eapply rel_inter_corefl_l : typeclass_instances.
+
+Lemma rel_inter_corefl_r {A} (R1 R2: rel A A):
+  Coreflexive R2 ->
+  Coreflexive (R1 /\ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Coreflexive (_ /\ _)) =>
+  eapply rel_inter_corefl_r : typeclass_instances.
 
 Lemma rel_inter_trans {A} (R1 R2: rel A A):
   Transitive R1 ->
@@ -371,6 +392,18 @@ Proof.
   rintro; eauto.
 Qed.
 
+Lemma rel_push_corefl {A B} (f: A -> B) (R: rel A A):
+  Coreflexive R ->
+  Coreflexive (R !! f).
+Proof.
+  intros H _ _ [x y Hxy].
+  f_equal.
+  eauto using coreflexivity.
+Qed.
+
+Hint Extern 1 (Coreflexive (_ !! _)) =>
+  eapply rel_push_corefl : typeclass_instances.
+
 (** When using [R !! fst] or [R !! snd], if [rel_push_intro] does not
   apply, we can use the following instances instead. *)
 
@@ -523,12 +556,15 @@ Qed.
 Hint Extern 0 (RIntro _ (req _) _ _) =>
   eapply req_rintro : typeclass_instances.
 
-Global Instance req_eq_subrel {A} (a: A):
-  Related (req a) eq subrel.
+Lemma req_corefl {A} (a: A):
+  Coreflexive (req a).
 Proof.
   destruct 1.
   reflexivity.
 Qed.
+
+Hint Extern 0 (Coreflexive (req _)) =>
+  eapply req_corefl : typeclass_instances.
 
 (** ** Checking predicates on the left and right elements *)
 

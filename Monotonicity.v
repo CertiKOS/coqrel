@@ -438,7 +438,23 @@ Proof.
 Qed.
 
 (** Then, we can use the following [RElim] instance to obtain the
-  behavior of the [f_equal] tactic. *)
+  behavior of the [f_equal] tactic.
+
+  In practice, I find that [f_equal_relim] is too broadly applicable.
+  In situations where a relational property is missing or inapplicable
+  for some reason, we would like [repeat rstep] to leave us in a
+  situation where we can examine what is going wrong, or do a manual
+  proof when necessary. If we use [f_equal]-like behavior as a
+  default, we will instead be left several step further, where it is
+  no longer obvious which function is involved, and where the goal may
+  not be provable anymore.
+
+  With that said, if you would like to switch [f_equal] on, you can
+  register [f_equal_elim] as an instance with the following hint:
+<<
+    Hint Extern 1 (RElim (@eq (_ -> _)) _ _ _ _) =>
+      eapply f_equal_relim : typeclass_instances.
+>> *)
 
 Lemma f_equal_relim {A B} f g m n P Q:
   RElim eq (f m) (g n) P Q ->
@@ -449,10 +465,9 @@ Proof.
   congruence.
 Qed.
 
-Hint Extern 1 (RElim (@eq (_ -> _)) _ _ _ _) =>
-  eapply f_equal_relim : typeclass_instances.
-
 (** Note that thanks to [eq_subrel], this will also apply to a goal
   that uses a [Reflexive] relation, not just a goal that uses [eq].
   In fact, this subsumes the [reflexivity] tactic as well, which
-  corresponds to the special case where all arguments are equal. *)
+  corresponds to the special case where all arguments are equal;
+  in that case [relim_base] can be used directly and [f_equal_elim] is
+  not necessary. *)

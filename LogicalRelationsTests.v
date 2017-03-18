@@ -232,9 +232,9 @@ Qed.
 
 (** *** Generic rules *)
 
-(** [monotonicity] behaves like [f_equal] as a last resort. In the specific
-  case below, another (possibly preferable?) option would be to
-  declare the identity extension property that [subrel (eq * eq) eq]. *)
+(** The [coreflexivity] of [rel_prod] and [eq] makes it possible for
+  [pair_rel] to behave in the same way as [f_equal] below, since they
+  allow us to deduce that [eq * eq] is a [subrel] of [eq]. *)
 
 Goal
   forall A B (x1 x2 : A) (y1 y2 : B),
@@ -242,7 +242,7 @@ Goal
 Proof.
   intros.
   rauto.
-Abort.
+Qed.
 
 (** ** Using [foo_subrel] instances *)
 

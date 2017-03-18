@@ -2,6 +2,7 @@
 
 Delay.v
 RelDefinitions.v
+RelClasses.v
 RelOperators.v
 Relators.v
 Monotonicity.v

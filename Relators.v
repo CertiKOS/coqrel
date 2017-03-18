@@ -1,4 +1,5 @@
 Require Export RelDefinitions.
+Require Import RelClasses.
 Require Import Coq.Lists.List.
 
 
@@ -320,6 +321,17 @@ Qed.
 Hint Extern 2 (Reflexive (_ + _)) =>
   eapply sum_rel_refl : typeclass_instances.
 
+Lemma sum_rel_corefl {A B} (R1: rel A A) (R2: rel B B):
+  Coreflexive R1 -> Coreflexive R2 -> Coreflexive (R1 + R2).
+Proof.
+  intros H1 H2 _ _ [x y H | x y H];
+  f_equal;
+  eauto using coreflexivity.
+Qed.
+
+Hint Extern 2 (Coreflexive (_ + _)) =>
+  eapply sum_rel_corefl : typeclass_instances.
+
 Lemma sum_rel_trans {A B} (R1: rel A A) (R2: rel B B):
   Transitive R1 -> Transitive R2 -> Transitive (R1 + R2).
 Proof.
@@ -407,6 +419,16 @@ Qed.
 
 Hint Extern 2 (Reflexive (_ * _)) =>
   eapply prod_rel_refl : typeclass_instances.
+
+Lemma prod_rel_corefl {A B} (R1: rel A A) (R2: rel B B):
+  Coreflexive R1 -> Coreflexive R2 -> Coreflexive (R1 * R2).
+Proof.
+  intros H1 H2 [a1 b1] [a2 b2] [Ha Hb].
+  f_equal; eauto using coreflexivity.
+Qed.
+
+Hint Extern 2 (Coreflexive (_ * _)) =>
+  eapply prod_rel_corefl : typeclass_instances.
 
 Lemma prod_rel_trans {A B} (R1: rel A A) (R2: rel B B):
   Transitive R1 -> Transitive R2 -> Transitive (R1 * R2).
@@ -514,6 +536,17 @@ Qed.
 
 Hint Extern 1 (Reflexive (list_rel _)) =>
   eapply list_rel_refl : typeclass_instances.
+
+Lemma list_rel_corefl `(HR: Coreflexive):
+  Coreflexive (list_rel R).
+Proof.
+  intros l1 l2 Hl.
+  induction Hl as [ | x1 x2 Hx l1 l2 Hl IHl];
+  f_equal; eauto using coreflexivity.
+Qed.
+
+Hint Extern 1 (Coreflexive (list_rel _)) =>
+  eapply list_rel_corefl : typeclass_instances.
 
 Lemma list_rel_sym `(HR: Symmetric):
   Symmetric (list_rel R).
