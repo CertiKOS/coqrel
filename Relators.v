@@ -488,6 +488,10 @@ Qed.
 Global Instance option_subrel_params:
   Params (@option_rel) 3.
 
+(** XXX: This does not fit any of our existing patterns, we should
+  drop it for consistency or introduce a new convention and generalize
+  this kind of lemmas. *)
+
 Lemma option_rel_some_inv A B (R: rel A B) (x: option A) (y: option B) (a: A):
   option_rel R x y ->
   x = Some a ->
