@@ -41,11 +41,14 @@ Qed.
 Global Instance respectful_params:
   Params (@respectful) 4.
 
-Global Instance respectful_rintro {A B} (RA: relation A) (RB: relation B) f g:
+Lemma respectful_rintro {A B} (RA: relation A) (RB: relation B) f g:
   RIntro (forall x y, RA x y -> RB (f x) (g y)) (respectful RA RB) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (respectful _ _) _ _) =>
+  eapply respectful_rintro : typeclass_instances.
 
 Lemma respectful_relim {A B} (RA: relation A) (RB: relation B) f g m n P Q:
   RElim RB (f m) (g n) P Q ->
@@ -66,11 +69,14 @@ Qed.
 Global Instance forall_relation_params:
   Params (@forall_relation) 3.
 
-Global Instance forall_relation_rintro {A B} (R: forall a:A, relation (B a)) f g:
+Lemma forall_relation_rintro {A B} (R: forall a:A, relation (B a)) f g:
   RIntro (forall a, R a (f a) (g a)) (forall_relation R) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (forall_relation _) _ _) =>
+  eapply forall_relation_rintro : typeclass_instances.
 
 Lemma forall_relation_relim {A B} (R: forall a:A, relation (B a)) f g a P Q:
   RElim (R a) (f a) (g a) P Q ->
@@ -91,11 +97,14 @@ Qed.
 Global Instance pointwise_relation_params:
   Params (@pointwise_relation) 3.
 
-Global Instance pointwise_relation_rintro {A B} (R: relation B) f g:
+Lemma pointwise_relation_rintro {A B} (R: relation B) f g:
   RIntro (forall a, R (f a) (g a)) (pointwise_relation A R) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (pointwise_relation _ _) _ _) =>
+ eapply pointwise_relation_rintro : typeclass_instances.
 
 Lemma pointwise_relation_relim {A B} (R: relation B) f g a P Q:
   RElim R (f a) (g a) P Q ->

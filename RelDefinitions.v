@@ -418,11 +418,14 @@ Qed.
 Global Instance arrow_subrel_params:
   Params (@arrow_rel) 4.
 
-Global Instance arrow_rintro {A1 A2 B1 B2} (RA: rel A1 A2) (RB: rel B1 B2) f g:
+Lemma arrow_rintro {A1 A2 B1 B2} (RA: rel A1 A2) (RB: rel B1 B2) f g:
   RIntro (forall x y, RA x y -> RB (f x) (g y)) (RA ++> RB) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (_ ++> _) _ _) =>
+  eapply arrow_rintro : typeclass_instances.
 
 Lemma arrow_relim {A1 A2 B1 B2} RA RB f g m n P Q:
   @RElim B1 B2 RB (f m) (g n) P Q ->
@@ -493,13 +496,16 @@ Notation "'forallr' e , R" :=
   (forall_rel (fun _ _ e => R))
   (at level 200, e ident, right associativity) : rel_scope.
 
-Global Instance forall_rintro {V1 V2 E F1 F2} (FE: forall x y, _ -> rel _ _) f g:
+Lemma forall_rintro {V1 V2 E F1 F2} (FE: forall x y, _ -> rel _ _) f g:
   RIntro
     (forall u v e, FE u v e (f u) (g v))
     (@forall_rel V1 V2 E F1 F2 FE) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (forall_rel _) _ _) =>
+  eapply forall_rintro : typeclass_instances.
 
 Lemma forall_relim {V1 V2 E FV1 FV2} R f g v1 v2 e P Q:
   RElim (R v1 v2 e) (f v1) (g v2) P Q ->

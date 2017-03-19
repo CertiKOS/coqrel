@@ -99,11 +99,14 @@ Qed.
 Global Instance arrow_pointwise_subrel_params:
   Params (@arrow_pointwise_rel) 3.
 
-Global Instance arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
+Lemma arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
   RIntro (forall x: A, R (f x) (g x)) (- ==> R) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (- ==> _) _ _) =>
+  eapply arrow_pointwise_rintro : typeclass_instances.
 
 (** Note that although the elimination rule could use a single
   variable and dispense with the equality premise, it actually uses
@@ -157,13 +160,16 @@ Notation "'forallr' - , FE" :=
   (forall_pointwise_rel (fun _ => FE))
   (at level 200).
 
-Global Instance forall_pointwise_rintro {V FV1 FV2} (FE: forall v, rel _ _) f g:
+Lemma forall_pointwise_rintro {V FV1 FV2} (FE: forall v, rel _ _) f g:
   RIntro
     (forall v, FE v (f v) (g v))
     (@forall_pointwise_rel V FV1 FV2 FE) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (forall_pointwise_rel _) _ _) =>
+  eapply forall_pointwise_rintro : typeclass_instances.
 
 Lemma forall_pointwise_relim {V FV1 FV2} R f g v P Q:
   RElim (R v) (f v) (g v) P Q ->
@@ -193,13 +199,16 @@ Notation "'forallr' v1 v2 : E , R" :=
   (at level 200, v1 ident, v2 ident, right associativity)
   : rel_scope.
 
-Global Instance forallp_rintro {V1 V2} {E: rel V1 V2} {F1 F2} (FE: forall v1 v2, rel _ _) f g:
+Lemma forallp_rintro {V1 V2} {E: rel V1 V2} {F1 F2} (FE: forall v1 v2, rel _ _) f g:
   RIntro
     (forall v1 v2, E v1 v2 -> FE v1 v2 (f v1) (g v2))
     (@forallp_rel V1 V2 E F1 F2 FE) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (forallp_rel _ _) _ _) =>
+  eapply forallp_rintro : typeclass_instances.
 
 (** Since [e : E v1 v2] cannot be unified in [Q], the elimination rule
   adds an [E v1 v2] premise to [P] instead. *)
