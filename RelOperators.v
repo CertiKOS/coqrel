@@ -21,6 +21,30 @@ Qed.
 Global Instance rel_union_subrel_params:
   Params (@rel_union) 4.
 
+(** Since we're forced to commit to a branch, we can't use [RIntro],
+  but can still provide [RExists] instances. *)
+
+Lemma rel_union_rexists_l {A B} (R1 R2: rel A B) x y:
+  RExists (R1 x y) (R1 \/ R2) x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
+  eapply rel_union_rexists_l : typeclass_instances.
+
+Lemma rel_union_rexists_r {A B} (R1 R2: rel A B) x y:
+  RExists (R2 x y) (R1 \/ R2) x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
+  eapply rel_union_rexists_r : typeclass_instances.
+
+(** More often, we can solve a [rel_union] goal using a monotonicity
+  property, and the [subrel] instances below. *)
+
 Lemma rel_union_introl {A B} (R1 R2: rel A B):
   Related R1 (R1 \/ R2)%rel subrel.
 Proof.
@@ -48,6 +72,48 @@ Qed.
 Hint Extern 2 (RIntro _ subrel (_ \/ _)%rel _) =>
   eapply rel_union_lub : typeclass_instances.
 
+Lemma rel_union_refl_l {A} (R1 R2: rel A A):
+  Reflexive R1 ->
+  Reflexive (R1 \/ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (_ \/ _)) =>
+  eapply rel_union_refl_l : typeclass_instances.
+
+Lemma rel_union_refl_r {A} (R1 R2: rel A A):
+  Reflexive R2 ->
+  Reflexive (R1 \/ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (_ \/ _)) =>
+  eapply rel_union_refl_r : typeclass_instances.
+
+Lemma rel_union_corefl {A} (R1 R2: rel A A):
+  Coreflexive R1 ->
+  Coreflexive R2 ->
+  Coreflexive (R1 \/ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Coreflexive (_ \/ _)) =>
+  eapply rel_union_corefl : typeclass_instances.
+
+Lemma rel_union_sym {A} (R1 R2: rel A A):
+  Symmetric R1 ->
+  Symmetric R2 ->
+  Symmetric (R1 \/ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Symmetric (_ \/ _)) =>
+  eapply rel_union_sym : typeclass_instances.
+
 (** ** Intersection of relations *)
 
 Definition rel_inter {A B} (R1 R2: rel A B): rel A B :=
@@ -66,6 +132,22 @@ Qed.
 
 Global Instance rel_inter_params:
   Params (@rel_inter) 4.
+
+(** In some cases, the relation in the goal will cause existential
+  variables to be instantiated accordingly; for instance, [rstep] run
+  on [?R x y |- (R1 /\ R2) x y] will instantiate [?R := R1 /\ R2].
+  Because of this, splitting a [rel_inter] goal into two subgoals may
+  cause a dead-end and we have to use [RExists] for the following
+  rule. *)
+
+Lemma rel_inter_rexists {A B} (R1 R2: rel A B) x y:
+  RExists (R1 x y /\ R2 x y) (R1 /\ R2) x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RExists _ (_ /\ _) _ _) =>
+  eapply rel_inter_rexists : typeclass_instances.
 
 Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
   Related (R1 /\ R2)%rel R1 subrel.
