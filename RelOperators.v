@@ -423,18 +423,25 @@ Qed.
 Hint Extern 1 (Transitive (rel_pull _ _ _)) =>
   eapply rel_pull_trans : typeclass_instances.
 
-(** We can also reuse instances of [RIntro] and [RElim] for the
-  underlying relation to provide corresponding instances for the
-  pulled relation. *)
+(** The introduction rule is straightforward, but changes the head
+  terms to the functions used with [rel_pull]. This means that an
+  [RIntro] rule would short-circuit any relational property formulated
+  for the original terms, even if the codomain is a matching
+  [rel_pull] relation and we have an appropriate [RElim] instance.
+  To avoid shadowing such properties, we define our introduction rule
+  as an [RStep] with a low priority. See test [rel_pull_2]. *)
 
 Lemma rel_pull_rintro {A B A' B'} (f: A -> A') (g: B -> B') R x y:
-  RIntro (R (f x) (g y)) (R @@ (f, g)) x y.
+  RStep (R (f x) (g y)) ((R @@ (f, g))%rel x y).
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RIntro _ (_ @@ (_, _)) _ _) =>
+Hint Extern 60 (RStep _ ((_ @@ (_, _))%rel _ _)) =>
   eapply rel_pull_rintro : typeclass_instances.
+
+(** We can reuse an instance of [RElim] for the underlying relation to
+  provide corresponding instances for the pulled relation. *)
 
 Lemma rel_pull_relim {A B A' B'} (f: A -> A') (g: B -> B') R x y P Q:
   RElim R (f x) (g y) P Q ->
@@ -613,7 +620,7 @@ Proof.
   assumption.
 Qed.
 
-Hint Extern 1 (RIntro _ (% _) _ _) =>
+Hint Extern 60 (RStep _ ((% _)%rel _ _)) =>
   eapply rel_pull_rintro : typeclass_instances.
 
 Hint Extern 1 (RElim (% _) _ _ _ _) =>

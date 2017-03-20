@@ -356,3 +356,15 @@ Proof.
   intros.
   rauto.
 Qed.
+
+(** We don't want the introduction rule for [rel_pull] to shadow
+  relational properties. *)
+
+Lemma rel_pull_2:
+  forall A B (f: A -> B) (R: rel B B) (g: A -> A) x y,
+    Monotonic g (⊤ ==> R @@ f) ->
+    (R @@ f) (g x) (g y).
+Proof.
+  intros.
+  rauto.
+Qed.
