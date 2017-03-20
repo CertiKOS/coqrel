@@ -675,7 +675,7 @@ Definition rel_all {A B C} (R: C -> rel A B): rel A B :=
   fun x y => forall c, R c x y.
 
 Notation "'rforall' x .. y , p" :=
-  (rel_all (fun x => .. (rel_all (fun y => p)) .. ))
+  (rel_all (fun x => .. (rel_all (fun y => p%rel)) .. ))
   (at level 200, x binder, right associativity)
   : rel_scope.
 
@@ -702,12 +702,12 @@ Definition rel_ex {A B C} (R: C -> rel A B): rel A B :=
   fun x y => exists c, R c x y.
 
 Notation "'rexists' x .. y , p" :=
-  (rel_ex (fun x => .. (rel_ex (fun y => p)) ..))
+  (rel_ex (fun x => .. (rel_ex (fun y => p%rel)) ..))
   (at level 200, x binder, right associativity)
   : rel_scope.
 
-Lemma rel_ex_rintro {A B C} (R: C -> rel A B) m n:
-  RExists (exists c : C, R c m n) (rel_ex R) m n.
+Lemma rel_ex_rintro {A B C} (R: C -> rel A B) c m n:
+  RExists (R c m n) (rel_ex R) m n.
 Proof.
   firstorder.
 Qed.

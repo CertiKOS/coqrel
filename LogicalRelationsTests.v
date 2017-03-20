@@ -333,6 +333,8 @@ Qed.
 
 (** ** Tests for specific relators *)
 
+(** *** [list_rel] *)
+
 (** [list_subrel] use to not work because of a missing [Params] declaration. *)
 
 Goal
@@ -345,6 +347,8 @@ Proof.
   intros.
   rauto.
 Qed.
+
+(** *** [rel_pull] *)
 
 (** The [RIntro] instance for [rel_pull] used to be less general. *)
 
@@ -364,6 +368,16 @@ Lemma rel_pull_2:
   forall A B (f: A -> B) (R: rel B B) (g: A -> A) x y,
     Monotonic g (⊤ ==> R @@ f) ->
     (R @@ f) (g x) (g y).
+Proof.
+  intros.
+  rauto.
+Qed.
+
+(** *** [rel_ex] *)
+
+Lemma rel_ex_1:
+  forall {A} (x: A),
+    (rexists a, req a) x x.
 Proof.
   intros.
   rauto.
