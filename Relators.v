@@ -251,6 +251,9 @@ Proof.
   destruct (Hs x) as (y & Hy & Hxy); eauto.
 Qed.
 
+Global Instance set_subrel_params:
+  Params (@set_rel) 3.
+
 (** ** Inductive types *)
 
 (** For inductive types, there is a systematic way of converting their
