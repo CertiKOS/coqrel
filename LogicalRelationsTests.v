@@ -373,6 +373,16 @@ Proof.
   rauto.
 Qed.
 
+(** *** [rel_all] *)
+
+Lemma rel_all_1:
+  forall {A} (x: A),
+    (rforall a, req a) x x -> forall a, req a x x.
+Proof.
+  intros.
+  rauto.
+Qed.
+
 (** *** [rel_ex] *)
 
 Lemma rel_ex_1:
@@ -382,3 +392,4 @@ Proof.
   intros.
   rauto.
 Qed.
+
