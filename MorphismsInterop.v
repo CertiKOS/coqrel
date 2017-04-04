@@ -144,7 +144,7 @@ Qed.
 
 Global Instance morphisms_proper_related {A} (R: relation A) (a: A):
   (normalization_done -> Proper R a) ->
-  Monotonic a R.
+  Monotonic a R | 10.
 Proof.
   firstorder.
 Qed.
