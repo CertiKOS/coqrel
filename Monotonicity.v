@@ -406,6 +406,30 @@ Proof.
   firstorder.
 Qed.
 
+(** *** [subrel] constraint as a subgoal *)
+
+(** When [monotonicity] fails it can be hard to figure out what is
+  going wrong, especially if the problem occurs in the [subrel] goal
+  of [rimpl_subrel]. The following tactic emits this constraint as a
+  subgoal instead of solving it with [RAuto], so that the user can
+  figure out what's broken and/or prove it manually in contexts where
+  an automatic resolution is tricky.  *)
+
+Class SubrelMonotonicity (P Q: Prop): Prop :=
+  subrel_monotonicity: P -> Q.
+
+Global Instance apply_candidate_subrel {A B C D} (R: rel A B) m n P Rc Rg x y:
+  CandidateProperty R m n (Rg x y) ->
+  RElim R m n P (Rc x y) ->
+  SubrelMonotonicity (@subrel C D Rc Rg /\ P) (Rg x y).
+Proof.
+  firstorder.
+Qed.
+
+Ltac subrel_monotonicity :=
+  lazymatch goal with |- ?Q => apply (subrel_monotonicity (Q:=Q)) end;
+  Delay.split_conjunction.
+
 
 (** ** Generic instances *)
 
