@@ -393,3 +393,24 @@ Proof.
   rauto.
 Qed.
 
+(** *** [rel_top] *)
+
+(** We used to only have an [RIntro] instance for [⊤%rel], which is
+  enough for proving all goals of the form [⊤%rel x y] but not enough
+  to derive properties of relations in which [⊤%rel] is a component. *)
+
+Lemma rel_top_component_refl:
+  forall {A} (x: list A),
+    list_rel ⊤ x x.
+Proof.
+  intros.
+  rauto.
+Qed.
+
+Lemma rel_top_component_trsym:
+  forall {A} (x y z: list A),
+    list_rel ⊤ x y -> list_rel ⊤ z y -> list_rel ⊤ x z.
+Proof.
+  intros.
+  rauto.
+Qed.

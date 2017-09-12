@@ -307,6 +307,12 @@ Qed.
 Hint Extern 0 (RIntro _ ⊤ _ _) =>
   eapply rel_top_rintro : typeclass_instances.
 
+Global Instance rel_top_equiv {A}:
+  @Equivalence A ⊤.
+Proof.
+  repeat constructor.
+Qed.
+
 (** ** Relation equivalence *)
 
 Definition eqrel {A B}: rel (rel A B) (rel A B) :=
