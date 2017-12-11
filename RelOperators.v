@@ -733,6 +733,8 @@ Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
 
 (** ** The [rel_incr] construction *)
 
+(** XXX: this is on the way out, see KLR.v *)
+
 (** When dealing with Kripke logical relations, we have a family of
   relations indexed by a type of worlds, as well as an accessibility
   relation over this type of worlds. We often want to state that there

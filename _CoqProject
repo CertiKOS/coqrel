@@ -13,5 +13,6 @@ PreOrderTactic.v
 LogicalRelations.v
 
 BoolRel.v
+KLR.v
 
 LogicalRelationsTests.v
