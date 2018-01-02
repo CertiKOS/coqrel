@@ -166,6 +166,27 @@ Proof.
   monotonicity.
 Abort.
 
+(** If we can deduce some terms are equal, we should be able to
+  rewrite them under any context. However right now this can only be
+  done by declaring the [f_equal_relim] hint.
+
+  Maybe a good solution for this might even go further: abstract the
+  common context and use [eq_rect] if it's possible to prove equality
+  between the variant parts. *)
+
+Goal
+  forall {A} (R: rel A A) (f: A -> A) (C: A -> Prop) x y,
+    Monotonic f (R ++> eq) ->
+    R x y ->
+    C (f x) ->
+    C (f y).
+Proof.
+  intros A R f C x y Hf Hxy.
+  Fail rauto.
+  pose proof @f_equal_relim.
+  rauto.
+Qed.
+
 (** *** Hypotheses from the context *)
 
 (* This used to fail because [Hyy] would
