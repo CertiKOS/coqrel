@@ -49,36 +49,36 @@ Proof.
   eauto.
 Qed.
 
-(** For [set_rel] the situation is slightly more involved, for two
-  reasons. First, a regular [eapply set_rel_transport] fails to unify
+(** For [set_le] the situation is slightly more involved, for two
+  reasons. First, a regular [eapply set_le_transport] fails to unify
   the parameter [B] of [Transport] against the [_ -> Prop] provied by
   the instance below. This can be worked around by pre-unifying that
-  specific parameter. Second, because [set_rel_transport] is
+  specific parameter. Second, because [set_le_transport] is
   potentially applicable to virtually any hypothesis (since there is
   no strongly distinguishing syntactic format in our target
   hypotheses), it makes [transport_hyps] very slow.
 
   To address this, we explicitely register hints based on the
-  [set_rel_transport] tactic, which looks for "keywords" before doing
+  [set_le_transport] tactic, which looks for "keywords" before doing
   anything, then applies the lemma with the required unification
-  preparation. For example, [set_rel_transport] is used in the
+  preparation. For example, [set_le_transport] is used in the
   following way in the [SimClight] library:
 <<
     Hint Extern 1 (Transport _ _ _ _ _) =>
-      set_rel_transport @assign_loc : typeclass_instances.
+      set_le_transport @assign_loc : typeclass_instances.
 >>
   Note that it's necessary to use [@] because [assign_loc] is
   parametrized by typeclasses, and we want to avoid undue
   specialization at hint registration time. *)
 
-Lemma set_rel_transport {A B} (R: rel A B) sA sB a:
-  Transport (set_rel R) sA sB (sA a) (exists b, sB b /\ R a b).
+Lemma set_le_transport {A B} (R: rel A B) sA sB a:
+  Transport (set_le R) sA sB (sA a) (exists b, sB b /\ R a b).
 Proof.
   intros HsAB Ha.
   edestruct HsAB; eauto.
 Qed.
 
-Ltac set_rel_transport keyword :=
+Ltac set_le_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
@@ -86,15 +86,15 @@ Ltac set_rel_transport keyword :=
           let Xv := fresh "X" in evar (Xv: Type);
           let X := eval red in Xv in clear Xv;
           unify B (X -> Prop);
-          eapply set_rel_transport
+          eapply set_le_transport
       end
   end.
       
-(** We defined a few more relation patterns based on [set_rel] and
+(** We defined a few more relation patterns based on [set_le] and
   [rel_curry], with a similar strategy. *)
 
-Lemma rel_curry_set_rel_transport {A1 A2 B1 B2} R sA sB (a1: A1) (a2: A2):
-  Transport (% set_rel R) sA sB
+Lemma rel_curry_set_le_transport {A1 A2 B1 B2} R sA sB (a1: A1) (a2: A2):
+  Transport (% set_le R) sA sB
     (sA a1 a2)
     (exists (b1: B1) (b2: B2), sB b1 b2 /\ R (a1, a2) (b1, b2)).
 Proof.
@@ -102,7 +102,7 @@ Proof.
   destruct (HsAB (a1, a2)) as ([b1 b2] & Hb & Hab); eauto.
 Qed.
 
-Ltac rel_curry_set_rel_transport keyword :=
+Ltac rel_curry_set_le_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
@@ -112,12 +112,12 @@ Ltac rel_curry_set_rel_transport keyword :=
           let Yv := fresh "Y" in evar (Yv: Type);
           let Y := eval red in Yv in clear Yv;
           unify B (X -> Y -> Prop);
-          eapply rel_curry_set_rel_transport
+          eapply rel_curry_set_le_transport
       end
   end.
 
-Lemma rel_curry2_set_rel_transport {A1 A2 A3 B1 B2 B3} R sA sB (a1: A1) (a2: A2) (a3: A3):
-  Transport (% % set_rel R) sA sB
+Lemma rel_curry2_set_le_transport {A1 A2 A3 B1 B2 B3} R sA sB (a1: A1) (a2: A2) (a3: A3):
+  Transport (% % set_le R) sA sB
     (sA a1 a2 a3)
     (exists (b1: B1) (b2: B2) (b3: B3), sB b1 b2 b3 /\ R (a1, a2, a3) (b1, b2, b3)).
 Proof.
@@ -125,7 +125,7 @@ Proof.
   destruct (HsAB (a1, a2, a3)) as ([[b1 b2] b3] & Hb & Hab); eauto.
 Qed.
 
-Ltac rel_curry2_set_rel_transport keyword :=
+Ltac rel_curry2_set_le_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
@@ -137,7 +137,7 @@ Ltac rel_curry2_set_rel_transport keyword :=
           let Zv := fresh "Y" in evar (Yv: Type);
           let Z := eval red in Yv in clear Yv;
           unify B (X -> Y -> Z -> Prop);
-          eapply rel_curry2_set_rel_transport
+          eapply rel_curry2_set_le_transport
       end
   end.
 

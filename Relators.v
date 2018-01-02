@@ -240,19 +240,19 @@ Hint Extern 1 (RElim (forallp_rel _ _) _ _ _ _) =>
   element of the second set which is related to it. This is useful for
   example when defining simulation diagrams. *)
 
-Definition set_rel {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
+Definition set_le {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
   fun sA sB => forall a, sA a -> exists b, sB b /\ R a b.
 
-Global Instance set_subrel {A B}:
-  Monotonic (@set_rel A B) (subrel ++> subrel).
+Global Instance set_le_subrel {A B}:
+  Monotonic (@set_le A B) (subrel ++> subrel).
 Proof.
   intros R1 R2 HR sA sB Hs.
   intros x Hx.
   destruct (Hs x) as (y & Hy & Hxy); eauto.
 Qed.
 
-Global Instance set_subrel_params:
-  Params (@set_rel) 3.
+Global Instance set_le_subrel_params:
+  Params (@set_le) 3.
 
 (** ** Inductive types *)
 
