@@ -500,6 +500,15 @@ Qed.
 Global Instance option_subrel_params:
   Params (@option_rel) 3.
 
+Global Instance option_map_rel:
+  Monotonic
+    (@option_map)
+    (forallr RA, forallr RB, (RA ++> RB) ++> option_rel RA ++> option_rel RB).
+Proof.
+  intros A1 A2 RA B1 B2 RB f g Hfg x y Hxy.
+  destruct Hxy; constructor; eauto.
+Qed.
+
 (** XXX: This does not fit any of our existing patterns, we should
   drop it for consistency or introduce a new convention and generalize
   this kind of lemmas. *)
