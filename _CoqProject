@@ -13,6 +13,7 @@ PreOrderTactic.v
 LogicalRelations.v
 
 BoolRel.v
+OptionRel.v
 KLR.v
 
 LogicalRelationsTests.v
