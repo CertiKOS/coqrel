@@ -64,11 +64,17 @@ Section LIFT.
     unfold k; rauto.
   Qed.
 
-  Global Instance k_rintro P R (w: W) (x: A) (y: B):
-    RIntro P R x y ->
-    RIntro P (k R w) x y.
+  Lemma k_rintro R (w: W) (x: A) (y: B):
+    RIntro (R x y) (k R w) x y.
   Proof.
     firstorder.
+  Qed.
+
+  Lemma k_relim (R: rel A B) w x y P Q:
+    RElim R x y P Q ->
+    RElim (k R w) x y P Q.
+  Proof.
+    tauto.
   Qed.
 
   (** For relators of higher arities, we let the original relator [RR]
@@ -83,11 +89,17 @@ Section LIFT.
     unfold k1; rauto.
   Qed.
 
-  Global Instance k1_rintro P RR (R1: klr A1 B1) w x y:
-    RIntro P (RR (R1 w)) x y ->
-    RIntro P (k1 RR R1 w) x y.
+  Lemma k1_rintro RR (R1: klr A1 B1) w x y:
+    RIntro (RR (R1 w) x y) (k1 RR R1 w) x y.
   Proof.
     firstorder.
+  Qed.
+
+  Lemma k1_relim RR (R1: klr A1 B1) w x y P Q:
+    RElim (RR (R1 w)) x y P Q ->
+    RElim (k1 RR R1 w) x y P Q.
+  Proof.
+    tauto.
   Qed.
 
   Definition k2 RR (R1: klr A1 B1) (R2: klr A2 B2): klr A B :=
@@ -101,17 +113,44 @@ Section LIFT.
     unfold k2; rauto.
   Qed.
 
-  Global Instance k2_rintro P RR (R1: klr A1 B1) (R2: klr A2 B2) w x y:
-    RIntro P (RR (R1 w) (R2 w)) x y ->
-    RIntro P (k2 RR R1 R2 w) x y.
+  Lemma k2_rintro RR (R1: klr A1 B1) (R2: klr A2 B2) w x y:
+    RIntro (RR (R1 w) (R2 w) x y) (k2 RR R1 R2 w) x y.
   Proof.
     firstorder.
+  Qed.
+
+  Lemma k2_relim RR (R1: klr A1 B1) (R2: klr A2 B2) w x y P Q:
+    RElim (RR (R1 w) (R2 w)) x y P Q ->
+    RElim (k2 RR R1 R2 w) x y P Q.
+  Proof.
+    tauto.
+  Qed.
+
+  Global Instance k2_unfold RR (R1: klr A1 B1) (R2: klr A2 B2) w:
+    Related (RR (R1 w) (R2 w)) (k2 RR R1 R2 w) subrel.
+  Proof.
+    red. reflexivity.
   Qed.
 End LIFT.
 
 Global Instance k_rel_params: Params (@k) 4.
 Global Instance k1_rel_params: Params (@k1) 5.
 Global Instance k2_rel_params: Params (@k2) 6.
+
+Hint Extern 0 (RIntro _ (k _ _) _ _) =>
+  eapply k_rintro : typeclass_instances.
+Hint Extern 1 (RElim (k _ _) _ _ _ _) =>
+  eapply k_relim : typeclass_instances.
+
+Hint Extern 0 (RIntro _ (k1 _ _ _) _ _) =>
+  eapply k1_rintro : typeclass_instances.
+Hint Extern 1 (RElim (k1 _ _ _) _ _ _ _) =>
+  eapply k1_relim : typeclass_instances.
+
+Hint Extern 0 (RIntro _ (k2 _ _ _ _) _ _) =>
+  eapply k2_rintro : typeclass_instances.
+Hint Extern 1 (RElim (k2 _ _ _ _) _ _ _ _) =>
+  eapply k2_relim : typeclass_instances.
 
 (** *** Usual relators *)
 
@@ -123,6 +162,9 @@ Section USUAL.
 
   Definition arrow_klr {A1 A2 B1 B2} :=
     k2 (@arrow_rel A1 A2 B1 B2).
+
+  Definition arrow_pointwise_klr A {B1 B2} :=
+    k1 (@arrow_pointwise_rel A B1 B2).
 
   Definition prod_klr {A1 A2 B1 B2} :=
     k2 (@prod_rel A1 A2 B1 B2).
@@ -144,9 +186,40 @@ Section USUAL.
 End USUAL.
 
 Infix "++>" := arrow_klr : klr_scope.
+Notation "- ==> R" := (arrow_pointwise_klr _ R) : klr_scope.
 Infix "*" := prod_klr : klr_scope.
 Infix "+" := sum_klr : klr_scope.
 Notation "% R" := (klr_curry R) : klr_scope.
+
+Hint Extern 0 (RIntro _ (arrow_klr _ _ _) _ _) =>
+  eapply k2_rintro : typeclass_instances.
+Hint Extern 1 (RElim (arrow_klr _ _ _) _ _ _ _) =>
+  eapply k2_relim : typeclass_instances.
+
+Hint Extern 0 (RIntro _ (arrow_pointwise_klr _ _ _) _ _) =>
+  eapply k1_rintro : typeclass_instances.
+Hint Extern 1 (RElim (arrow_pointwise_klr _ _ _) _ _ _ _) =>
+  eapply k1_relim : typeclass_instances.
+
+Hint Extern 0 (RIntro _ (prod_klr _ _ _) _ _) =>
+  eapply k2_rintro : typeclass_instances.
+Hint Extern 1 (RElim (prod_klr _ _ _) _ _ _ _) =>
+  eapply k2_relim : typeclass_instances.
+
+Hint Extern 0 (RIntro _ (sum_klr _ _ _) _ _) =>
+  eapply k2_rintro : typeclass_instances.
+Hint Extern 1 (RElim (sum_klr _ _ _) _ _ _ _) =>
+  eapply k2_relim : typeclass_instances.
+
+Hint Extern 0 (RIntro _ (list_klr _ _) _ _) =>
+  eapply k1_rintro : typeclass_instances.
+Hint Extern 1 (RElim (list_klr _ _) _ _ _ _) =>
+  eapply k1_relim : typeclass_instances.
+
+Hint Extern 0 (RIntro _ (klr_curry _ _) _ _) =>
+  eapply k1_rintro : typeclass_instances.
+Hint Extern 1 (RElim (klr_curry _ _) _ _ _ _) =>
+  eapply k1_relim : typeclass_instances.
 
 (** ** Modal relators *)
 
@@ -175,6 +248,14 @@ Section MODALITIES.
     firstorder.
   Qed.
 
+  Lemma klr_box_relim {A B} (R: klr A B) w w' x y P Q:
+    RElim (R w') x y P Q ->
+    RElim (klr_box R w) x y (w ~> w' /\ P) Q.
+  Proof.
+    intros H Hxy [Hw' HP].
+    apply H; auto.
+  Qed.
+
   (** Dually, the diamond modality asserts that the relation holds at
     some possible future world. Note the order of the premises in our
     intro rule: we want to first determine what [w'] should be, then
@@ -194,6 +275,14 @@ Section MODALITIES.
   Proof.
     firstorder.
   Qed.
+
+  Lemma klr_diam_relim {A B} (R: klr A B) w x y P Q:
+    (forall w', w ~> w' -> RElim (R w') x y P Q) ->
+    RElim (klr_diam R w) x y P Q.
+  Proof.
+    intros H (w' & Hw' & Hxy) HP.
+    eapply H; eauto.
+  Qed.
 End MODALITIES.
 
 Global Instance klr_box_subrel_params: Params (@klr_box) 4.
@@ -201,12 +290,16 @@ Global Instance klr_diam_subrel_params: Params (@klr_diam) 4.
 
 Hint Extern 0 (RIntro _ (klr_box _ _) _ _) =>
   eapply klr_box_rintro : typeclass_instances.
+Hint Extern 1 (RElim (klr_box _ _) _ _ _ _) =>
+  eapply klr_box_relim : typeclass_instances.
 
 Hint Extern 0 (RExists _ (klr_diam _ _) _ _) =>
   eapply klr_diam_rintro : typeclass_instances.
+Hint Extern 1 (RElim (klr_diam _ _) _ _ _ _) =>
+  eapply klr_diam_relim : typeclass_instances.
 
-Notation "[] R" := (klr_box R) (at level 35) : klr_scope.
-Notation "<> R" := (klr_diam R) (at level 35) : klr_scope.
+Notation "[] R" := (klr_box R) (at level 65) : klr_scope.
+Notation "<> R" := (klr_diam R) (at level 65) : klr_scope.
 
 (** ** Flattening KLRs *)
 
@@ -231,6 +324,14 @@ Section UNKRIPKIFY.
     firstorder.
   Qed.
 
+  Lemma rel_box_relim {A B} (R: klr A B) w x y P Q:
+    RElim (R w) x y P Q ->
+    RElim (rel_box R) x y (winit w /\ P) Q.
+  Proof.
+    intros H Hxy [Hw HP].
+    eauto.
+  Qed.
+
   Definition rel_diam {A B} (R: klr A B): rel A B :=
     fun x y => exists w, winit w /\ R w x y.
 
@@ -245,6 +346,14 @@ Section UNKRIPKIFY.
   Proof.
     firstorder.
   Qed.
+
+  Lemma rel_diam_relim {A B} (R: klr A B) x y P Q:
+    (forall w, winit w -> RElim (R w) x y P Q) ->
+    RElim (rel_diam R) x y P Q.
+  Proof.
+    intros H (w & Hw & Hxy) HP.
+    eapply H; eauto.
+  Qed.
 End UNKRIPKIFY.
 
 Global Instance rel_box_subrel_params: Params (@rel_box) 3.
@@ -253,9 +362,15 @@ Global Instance rel_diam_subrel_params: Params (@rel_diam) 3.
 Hint Extern 0 (RIntro _ (rel_box _) _ _) =>
   eapply rel_box_rintro : typeclass_instances.
 
+Hint Extern 1 (RElim (rel_box _) _ _ _ _) =>
+  eapply rel_box_relim : typeclass_instances.
+
 Hint Extern 0 (RExists _ (rel_diam _) _ _) =>
   eapply rel_diam_rintro : typeclass_instances.
 
-Notation "[] R" := (rel_box R) (at level 35) : rel_scope.
-Notation "<> R" := (rel_diam R) (at level 35) : rel_scope.
+Hint Extern 1 (RElim (rel_diam _) _ _ _ _) =>
+  eapply rel_diam_relim : typeclass_instances.
+
+Notation "[] R" := (rel_box R) (at level 65) : rel_scope.
+Notation "<> R" := (rel_diam R) (at level 65) : rel_scope.
 
