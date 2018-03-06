@@ -38,6 +38,16 @@ Global Existing Instance right_le.
 
 (** ** Properties *)
 
+Global Instance leb_preo:
+  PreOrder leb.
+Proof.
+  split.
+  - intros [|]; simpl; eauto.
+  - intros [|]; simpl; eauto.
+    intros [|]; simpl; eauto.
+    discriminate.
+Qed.
+
 Lemma leb_rdestruct:
   RDestruct leb (fun P => P false false /\ P true true /\ P false true).
 Proof.
