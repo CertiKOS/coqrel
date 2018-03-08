@@ -284,6 +284,15 @@ Definition rel_bot {A B}: rel A B :=
 
 Notation "⊥" := rel_bot : rel_scope.
 
+Lemma rel_bot_subrel {A B} (R: rel A B):
+  Related ⊥%rel R subrel.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (Related ⊥%rel _ _) =>
+  eapply rel_bot_subrel : typeclass_instances.
+
 Lemma rel_bot_relim {A B} (x: A) (y: B) P:
   RElim ⊥ x y True P.
 Proof.
