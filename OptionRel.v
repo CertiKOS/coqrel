@@ -30,10 +30,10 @@ Qed.
 Global Instance option_le_subrel_params:
   Params (@option_le) 3.
 
-Global Instance option_le_rel {A B} (R: rel A B):
-  Related (option_rel R) (option_le R) subrel.
+Global Instance option_le_rel {A B}:
+  Related (@option_rel A B) (@option_le A B) (subrel ++> subrel) | 10.
 Proof.
-  intros _ _ []; constructor; eauto.
+  intros R1 R2 HR _ _ []; constructor; eauto.
 Qed.
 
 Lemma option_le_refl {A} (R: relation A):
@@ -60,13 +60,6 @@ Qed.
 Hint Extern 1 (Transitive (option_le ?R)) =>
   eapply option_le_trans : typeclass_instances.
 
-Global Instance option_le_transport_eq_some {A B} (R: rel A B) x y a:
-  Transport (option_le R) x y (x = Some a) (exists b, y = Some b /\ R a b).
-Proof.
-  intros Hxy Hx.
-  subst; inversion Hxy; eauto.
-Qed.
-
 Global Instance option_map_le:
   Monotonic
     (@option_map)
@@ -74,4 +67,21 @@ Global Instance option_map_le:
 Proof.
   intros A1 A2 RA B1 B2 RB f g Hfg x y Hxy.
   destruct Hxy; constructor; eauto.
+Qed.
+
+
+(** * [Transport] instances for [option] relations *)
+
+Global Instance option_le_transport_eq_some {A B} (R: rel A B) x y a:
+  Transport (option_le R) x y (x = Some a) (exists b, y = Some b /\ R a b).
+Proof.
+  intros Hxy Hx.
+  subst; inversion Hxy; eauto.
+Qed.
+
+Global Instance option_rel_transport_eq_none {A B} (R: rel A B) x y:
+  Transport (option_rel R) x y (x = None) (y = None).
+Proof.
+  intros Hxy Hx.
+  subst; inversion Hxy; eauto.
 Qed.

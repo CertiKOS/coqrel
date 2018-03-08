@@ -19,25 +19,13 @@ Require Export Monotonicity.
 Class Transport {A B} (R: rel A B) (a: A) (b: B) (PA: Prop) (PB: Prop) :=
   transport: R a b -> PA -> PB.
 
-(** The stereotypical example is [option_rel], which we can use to
-  transport hypotheses as per the following instances. *)
+(** One stereotypical example is [option_le]: the [Transport] instance
+  defined in the [OptionRel] library allows us to transport hypothese
+  of the form [x = Some a] into hypotheses of the form [y = Some b],
+  with [a] and [b] related by [R] whenever [x] and [y] are related by
+  [option_le R], and similarly for [None] and [option_rel].
 
-Global Instance option_rel_transport_eq_some {A B} (R: rel A B) x y a:
-  Transport (option_rel R) x y (x = Some a) (exists b, y = Some b /\ R a b).
-Proof.
-  intros Hxy Hx.
-  subst; inversion Hxy; eauto.
-Qed.
-
-Global Instance option_rel_transport_eq_none {A B} (R: rel A B) x y:
-  Transport (option_rel R) x y (x = None) (y = None).
-Proof.
-  intros Hxy Hx.
-  subst; inversion Hxy; eauto.
-Qed.
-
-(** A similar approach can be used to transport hypotheses which assert
-  a element of a product type is equal to a specific pair. *)
+  Other instances are declared below. *)
 
 Global Instance prod_rel_transport_eq_pair {A1 B1 A2 B2} (R1: rel A1 B1) (R2: rel A2 B2) x y a1 a2:
   Transport (prod_rel R1 R2) x y (x = (a1, a2)) (exists b1 b2, y = (b1, b2) /\ R1 a1 b1 /\ R2 a2 b2).

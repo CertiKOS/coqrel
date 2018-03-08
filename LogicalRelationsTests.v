@@ -1,5 +1,6 @@
 Require Import LogicalRelations.
 Require Import Coq.Lists.List.
+Require Import OptionRel.
 Local Open Scope rel_scope.
 
 (** * Tests *)
