@@ -285,16 +285,6 @@ Qed.
 Class RDestruct {A B: Type} (R: rel A B) (T: rel A B -> Prop) :=
   rdestruct m n: R m n -> forall P, T P -> P m n.
 
-Ltac rdestruct H :=
-  lazymatch type of H with
-    | ?R ?m ?n =>
-      not_evar R;
-      pattern m, n;
-      apply (rdestruct (R:=R) m n H);
-      clear H;
-      Delay.split_conjunction
-  end.
-
 (** See the [RDestruct] library for the corresponding instance of
   [RStep], the default instance of [RDestruct], and a way to control
   whether or not we should keep equations for the destructed terms. *)

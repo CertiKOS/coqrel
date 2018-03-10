@@ -2,6 +2,52 @@ Require Export RelDefinitions.
 
 (** * The [RDestruct] class *)
 
+(** ** Tactics *)
+
+(** The [rdestruct] tactic locates and uses an [RDestruct] instance
+  for a given hypothesis. *)
+
+Ltac rdestruct H :=
+  lazymatch type of H with
+    | ?R ?m ?n =>
+      not_evar R;
+      pattern m, n;
+      apply (rdestruct (R:=R) m n H);
+      clear H;
+      Delay.split_conjunction
+  end.
+
+(** The [rinversion] tactic is similar, but it remembers the terms
+  related by the destructed hypothesis. *)
+
+Ltac rinversion_tac H Hm Hn :=
+  lazymatch type of H with
+    | ?R ?m ?n =>
+      not_evar R;
+      pattern m, n;
+      lazymatch goal with
+        | |- ?Q _ _ =>
+          generalize (eq_refl m), (eq_refl n);
+          change ((fun x y => Delay.delayed_goal (x = m -> y = n -> Q x y)) m n);
+          apply (rdestruct (R:=R) m n H);
+          Delay.split_conjunction;
+          intros Hm Hn
+      end
+  end.
+
+Tactic Notation "rinversion" constr(H) "as" ident(Hl) "," ident(Hr) :=
+  rinversion_tac H Hl Hr.
+
+Tactic Notation "rinversion" hyp(H) :=
+  let Hl := fresh H "l" in
+  let Hr := fresh H "r" in
+  rinversion_tac H Hl Hr.
+
+Tactic Notation "rinversion" constr(H) :=
+  let Hl := fresh "Hl" in
+  let Hr := fresh "Hr" in
+  rinversion_tac H Hl Hr.
+
 (** ** Introducing the hypothesis to be destructed *)
 
 (** The goal of [rdestruct] is usually to make progress on a goal
