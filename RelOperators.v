@@ -675,8 +675,26 @@ Hint Extern 0 (Coreflexive (req _)) =>
 Definition lsat {A B} (P: A -> Prop): rel A B :=
   fun x y => P x.
 
+Global Instance lsat_subrel A B:
+  Monotonic (@lsat A B) ((- ==> impl) ++> subrel).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance lsat_subrel_params:
+  Params (@lsat) 3.
+
 Definition rsat {A B} (P: B -> Prop): rel A B :=
   fun x y => P y.
+
+Global Instance rsat_subrel A B:
+  Monotonic (@rsat A B) ((- ==> impl) ++> subrel).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rsat_subrel_params:
+  Params (@rsat) 3.
 
 (** ** Relation versions of [ex] and [all] *)
 
