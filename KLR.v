@@ -1,4 +1,4 @@
-Require Export LogicalRelations.
+Require Export Monotonicity.
 
 (** Kripke logical relations generalize logical relations along the
   lines of the Kripke semantics of modal logic. A Kripke logical

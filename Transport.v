@@ -1,4 +1,5 @@
 Require Export Monotonicity.
+Require Import KLR.
 
 (** ** The [transport] tactic *)
 
@@ -178,6 +179,14 @@ Ltac split_hyp H :=
       let Hw' := fresh "H" w' in
       destruct H as (w' & Hw' & H);
       split_hyp H
+    | klr_diam ?R ?w ?x ?y =>
+      let w' := fresh w "'" in
+      let Hw' := fresh "H" w' in
+      destruct H as (w' & Hw' & H);
+      split_hyp H
+    | prod_klr ?Rx ?Ry ?w (?x1, ?y1) (?x2, ?y2) =>
+      change (Rx w x1 x2 /\ Ry w y1 y2) in H;
+      split_hyp H
     | _ =>
       idtac
   end.
@@ -191,6 +200,12 @@ Ltac split_hyps :=
         destruct H
       | H: prod_rel ?Rx ?Ry (?x1, ?y1) (?x2, ?y2) |- _ =>
         change (Rx x1 x2 /\ Ry y1 y2) in H
+      | H: klr_diam ?R ?w ?x ?y |- _ =>
+        let w' := fresh w "'" in
+        let Hw' := fresh "H" w' in
+        destruct H as (w' & Hw' & H)
+      | H: prod_klr ?Rx ?Ry ?w (?x1, ?y1) (?x2, ?y2) |- _ =>
+        change (Rx w x1 x2 /\ Ry w y1 y2) in H
     end.
 
 (** We're now ready to defined the [transport] tactic, which
