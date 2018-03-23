@@ -239,6 +239,21 @@ Proof.
   split; assumption.
 Qed.
 
+(** On a related note, a symmetric subrelation of [R] is also a
+  subrelation of its inverse. *)
+
+Lemma subrel_sym_flip {A} (R R': relation A):
+  Symmetric R ->
+  RStep (subrel R R') (subrel R (flip R')).
+Proof.
+  intros HR H x y Hxy.
+  symmetry in Hxy.
+  firstorder.
+Qed.
+
+Hint Extern 60 (RStep _ (subrel _ (flip _))) =>
+  eapply subrel_sym_flip : typeclass_instances.
+
 (** ** Implication *)
 
 Definition rel_impl {A B} (R1 R2: rel A B): rel A B :=
@@ -334,6 +349,12 @@ Global Instance eqrel_equivalence A B:
 Proof.
   unfold eqrel.
   split; typeclasses eauto.
+Qed.
+
+Global Instance eqrel_subrel A B:
+  Related (@eqrel A B) (@subrel A B) subrel.
+Proof.
+  firstorder.
 Qed.
 
 (** ** Relation composition *)
