@@ -16,19 +16,18 @@ Require Export Monotonicity.
 (** * Kripke frames and logical relations *)
 
 (** Kripke frames specify the set of worlds over which a KLR is
-  indexed, as well an associated set of initial worlds and
-  accessibility relation. For a given Kripke frame, the type [klr]
-  is a [W]-indexed version of [rel]. *)
+  indexed and an associated accessibility relation. For a given Kripke
+  frame, the type [klr] is a [W]-indexed version of [rel]. *)
+
+Definition klr W A B: Type :=
+  W -> rel A B.
 
 Class KripkeFrame (W: Type) :=
   {
     acc: rel W W;
-    winit: W -> Prop;
-    klr A B := W -> rel A B;
   }.
 
 Infix "~>" := acc (at level 70).
-Notation "* ~> w" := (winit w) (at level 40).
 
 Delimit Scope klr_scope with klr.
 Bind Scope klr_scope with klr.
@@ -55,7 +54,7 @@ Section LIFT.
   (** For elementary relations, the corresponding Kripke relation can
     just ignore the Kripke world. *)
 
-  Definition k (R: rel A B): klr A B :=
+  Definition k (R: rel A B): klr W A B :=
     fun w => R.
 
   Global Instance k_rel var:
@@ -80,7 +79,7 @@ Section LIFT.
   (** For relators of higher arities, we let the original relator [RR]
     operate independently at each world [w]. *)
 
-  Definition k1 RR (R1: klr A1 B1): klr A B :=
+  Definition k1 RR (R1: klr W A1 B1): klr W A B :=
     fun w => RR (R1 w).
 
   Global Instance k1_rel var1 var:
@@ -89,20 +88,20 @@ Section LIFT.
     unfold k1; rauto.
   Qed.
 
-  Lemma k1_rintro RR (R1: klr A1 B1) w x y:
+  Lemma k1_rintro RR (R1: klr W A1 B1) w x y:
     RIntro (RR (R1 w) x y) (k1 RR R1 w) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma k1_relim RR (R1: klr A1 B1) w x y P Q:
+  Lemma k1_relim RR (R1: klr W A1 B1) w x y P Q:
     RElim (RR (R1 w)) x y P Q ->
     RElim (k1 RR R1 w) x y P Q.
   Proof.
     tauto.
   Qed.
 
-  Definition k2 RR (R1: klr A1 B1) (R2: klr A2 B2): klr A B :=
+  Definition k2 RR (R1: klr W A1 B1) (R2: klr W A2 B2): klr W A B :=
     fun w => RR (R1 w) (R2 w).
 
   Global Instance k2_rel var1 var2 var:
@@ -113,20 +112,20 @@ Section LIFT.
     unfold k2; rauto.
   Qed.
 
-  Lemma k2_rintro RR (R1: klr A1 B1) (R2: klr A2 B2) w x y:
+  Lemma k2_rintro RR (R1: klr W A1 B1) (R2: klr W A2 B2) w x y:
     RIntro (RR (R1 w) (R2 w) x y) (k2 RR R1 R2 w) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma k2_relim RR (R1: klr A1 B1) (R2: klr A2 B2) w x y P Q:
+  Lemma k2_relim RR (R1: klr W A1 B1) (R2: klr W A2 B2) w x y P Q:
     RElim (RR (R1 w) (R2 w)) x y P Q ->
     RElim (k2 RR R1 R2 w) x y P Q.
   Proof.
     tauto.
   Qed.
 
-  Global Instance k2_unfold RR (R1: klr A1 B1) (R2: klr A2 B2) w:
+  Global Instance k2_unfold RR (R1: klr W A1 B1) (R2: klr W A2 B2) w:
     Related (RR (R1 w) (R2 w)) (k2 RR R1 R2 w) subrel.
   Proof.
     red. reflexivity.
@@ -161,28 +160,28 @@ Section USUAL.
   Context `{kf: KripkeFrame}.
 
   Definition arrow_klr {A1 A2 B1 B2} :=
-    k2 (@arrow_rel A1 A2 B1 B2).
+    k2 (W:=W) (@arrow_rel A1 A2 B1 B2).
 
   Definition arrow_pointwise_klr A {B1 B2} :=
-    k1 (@arrow_pointwise_rel A B1 B2).
+    k1 (W:=W) (@arrow_pointwise_rel A B1 B2).
 
   Definition prod_klr {A1 A2 B1 B2} :=
-    k2 (@prod_rel A1 A2 B1 B2).
+    k2 (W:=W) (@prod_rel A1 A2 B1 B2).
 
   Definition sum_klr {A1 A2 B1 B2} :=
-    k2 (@sum_rel A1 A2 B1 B2).
+    k2 (W:=W) (@sum_rel A1 A2 B1 B2).
 
   Definition list_klr {A1 A2} :=
-    k1 (@list_rel A1 A2).
+    k1 (W:=W) (@list_rel A1 A2).
 
-  Definition set_kle {A B} (R: klr A B): klr (A -> Prop) (B -> Prop) :=
+  Definition set_kle {A B} (R: klr W A B): klr W (A -> Prop) (B -> Prop) :=
     fun w sA sB => forall a, sA a -> exists b, sB b /\ R w a b.
 
-  Definition set_kge {A B} (R: klr A B): klr (A -> Prop) (B -> Prop) :=
+  Definition set_kge {A B} (R: klr W A B): klr W (A -> Prop) (B -> Prop) :=
     fun w sA sB => forall b, sB b -> exists a, sA a /\ R w a b.
 
-  Definition klr_curry `{KripkeFrame} {A1 B1 C1 A2 B2 C2} :=
-    k1 (@rel_curry A1 B1 C1 A2 B2 C2).
+  Definition klr_curry {W A1 B1 C1 A2 B2 C2} :=
+    k1 (W:=W) (@rel_curry A1 B1 C1 A2 B2 C2).
 End USUAL.
 
 Infix "++>" := arrow_klr : klr_scope.
@@ -233,7 +232,7 @@ Section MODALITIES.
   (** The box modality asserts that the relation holds at all
     possible future worlds. *)
 
-  Definition klr_box {A B} (R: klr A B): klr A B :=
+  Definition klr_box {A B} (R: klr W A B): klr W A B :=
     fun w x y => forall w', w ~> w' -> R w' x y.
 
   Global Instance klr_box_subrel {A B}:
@@ -242,13 +241,13 @@ Section MODALITIES.
     firstorder.
   Qed.
 
-  Lemma klr_box_rintro {A B} (R: klr A B) w x y:
+  Lemma klr_box_rintro {A B} (R: klr W A B) w x y:
     RIntro (forall w' (Hw': w ~> w'), R w' x y) (klr_box R w) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_box_relim {A B} (R: klr A B) w w' x y P Q:
+  Lemma klr_box_relim {A B} (R: klr W A B) w w' x y P Q:
     RElim (R w') x y P Q ->
     RElim (klr_box R w) x y (w ~> w' /\ P) Q.
   Proof.
@@ -261,7 +260,7 @@ Section MODALITIES.
     intro rule: we want to first determine what [w'] should be, then
     attempt to prove [w ~> w']. *)
 
-  Definition klr_diam {A B} (R: klr A B): klr A B :=
+  Definition klr_diam {A B} (R: klr W A B): klr W A B :=
     fun w x y => exists w', w ~> w' /\ R w' x y.
 
   Global Instance klr_diam_subrel {A B}:
@@ -270,13 +269,13 @@ Section MODALITIES.
     firstorder.
   Qed.
 
-  Lemma klr_diam_rintro {A B} (R: klr A B) w w' x y:
+  Lemma klr_diam_rintro {A B} (R: klr W A B) w w' x y:
     RExists (R w' x y /\ w ~> w') (klr_diam R w) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_diam_relim {A B} (R: klr A B) w x y P Q:
+  Lemma klr_diam_relim {A B} (R: klr W A B) w x y P Q:
     (forall w', w ~> w' -> RElim (R w') x y P Q) ->
     RElim (klr_diam R w) x y P Q.
   Proof.
@@ -309,8 +308,8 @@ Notation "<> R" := (klr_diam R) (at level 65) : klr_scope.
 Section UNKRIPKIFY.
   Context `{kf: KripkeFrame}.
 
-  Definition rel_box {A B} (R: klr A B): rel A B :=
-    fun x y => forall w, winit w -> R w x y.
+  Definition rel_box {A B} (R: klr W A B): rel A B :=
+    fun x y => forall w, R w x y.
 
   Global Instance rel_box_subrel A B:
     Monotonic (@rel_box A B) ((- ==> subrel) ++> subrel).
@@ -318,22 +317,21 @@ Section UNKRIPKIFY.
     firstorder.
   Qed.
 
-  Lemma rel_box_rintro {A B} (R: klr A B) x y:
-    RIntro (forall w (Hw : winit w), R w x y) (rel_box R) x y.
+  Lemma rel_box_rintro {A B} (R: klr W A B) x y:
+    RIntro (forall w, R w x y) (rel_box R) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma rel_box_relim {A B} (R: klr A B) w x y P Q:
+  Lemma rel_box_relim {A B} (R: klr W A B) w x y P Q:
     RElim (R w) x y P Q ->
-    RElim (rel_box R) x y (winit w /\ P) Q.
+    RElim (rel_box R) x y P Q.
   Proof.
-    intros H Hxy [Hw HP].
-    eauto.
+    firstorder.
   Qed.
 
-  Definition rel_diam {A B} (R: klr A B): rel A B :=
-    fun x y => exists w, winit w /\ R w x y.
+  Definition rel_diam {A B} (R: klr W A B): rel A B :=
+    fun x y => exists w, R w x y.
 
   Global Instance rel_diam_subrel A B:
     Monotonic (@rel_diam A B) ((- ==> subrel) ++> subrel).
@@ -341,18 +339,17 @@ Section UNKRIPKIFY.
     firstorder.
   Qed.
 
-  Lemma rel_diam_rintro {A B} (R: klr A B) w x y:
-    RExists (R w x y /\ winit w) (rel_diam R) x y.
+  Lemma rel_diam_rintro {A B} (R: klr W A B) w x y:
+    RExists (R w x y) (rel_diam R) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma rel_diam_relim {A B} (R: klr A B) x y P Q:
-    (forall w, winit w -> RElim (R w) x y P Q) ->
+  Lemma rel_diam_relim {A B} (R: klr W A B) x y P Q:
+    (forall w, RElim (R w) x y P Q) ->
     RElim (rel_diam R) x y P Q.
   Proof.
-    intros H (w & Hw & Hxy) HP.
-    eapply H; eauto.
+    firstorder.
   Qed.
 End UNKRIPKIFY.
 
@@ -374,3 +371,40 @@ Hint Extern 1 (RElim (rel_diam _) _ _ _ _) =>
 Notation "[] R" := (rel_box R) (at level 65) : rel_scope.
 Notation "<> R" := (rel_diam R) (at level 65) : rel_scope.
 
+(** ** Pulling along a Kripke frame morphism *)
+
+Definition klr_pullw {W1 W2 A B} (f: W1 -> W2) (R: klr W2 A B): klr W1 A B :=
+  fun w => R (f w).
+
+Notation "R @@ [ f ]" := (klr_pullw f R)
+  (at level 30, right associativity) : klr_scope.
+
+Global Instance klr_pullw_subrel {W1 W2 A B} RW1 RW2:
+  Monotonic
+    (@klr_pullw W1 W2 A B)
+    ((RW1 ++> RW2) ++> (RW2 ++> subrel) ++> (RW1 ++> subrel)).
+Proof.
+  unfold klr_pullw. rauto.
+Qed.
+
+Global Instance klr_pullw_subrel_params:
+  Params (@klr_pullw) 5.
+
+Lemma klr_pullw_rintro {W1 W2 A B} (f: W1 -> W2) R w (x:A) (y:B):
+  RIntro (R (f w) x y) (klr_pullw f R w) x y.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RIntro _ (klr_pullw _ _ _) _ _) =>
+  eapply klr_pullw_rintro : typeclass_instances.
+
+Lemma klr_pullw_relim {W1 W2 A B} (f: W1 -> W2) R w (x:A) (y:B) P Q:
+  RElim (R (f w)) x y P Q ->
+  RElim (klr_pullw f R w) x y P Q.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RElim (klr_pullw _ _ _) _ _ _ _) =>
+  eapply klr_pullw_relim : typeclass_instances.
