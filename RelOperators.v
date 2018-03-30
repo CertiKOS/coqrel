@@ -45,23 +45,23 @@ Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
 (** More often, we can solve a [rel_union] goal using a monotonicity
   property, and the [subrel] instances below. *)
 
-Lemma rel_union_introl {A B} (R1 R2: rel A B):
-  Related R1 (R1 \/ R2)%rel subrel.
+Lemma rel_union_subrel_rexists_l {A B} (R R1 R2: rel A B):
+  RExists (subrel R R1) subrel R (R1 \/ R2)%rel.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related _ (_ \/ _)%rel _) =>
-  eapply rel_union_introl : typeclass_instances.
+Hint Extern 0 (RExists _ subrel _ (_ \/ _)%rel) =>
+  eapply rel_union_subrel_rexists_l : typeclass_instances.
 
-Lemma rel_union_intror {A B} (R1 R2: rel A B):
-  Related R2 (R1 \/ R2)%rel subrel.
+Lemma rel_union_subrel_rexists_r {A B} (R R1 R2: rel A B):
+  RExists (subrel R R2) subrel R (R1 \/ R2)%rel.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related _ (_ \/ _)%rel _) =>
-  eapply rel_union_introl : typeclass_instances.
+Hint Extern 0 (RExists _ subrel _ (_ \/ _)%rel) =>
+  eapply rel_union_subrel_rexists_r : typeclass_instances.
 
 Lemma rel_union_lub {A B} (R1 R2 R: rel A B):
   RIntro (subrel R1 R /\ subrel R2 R) subrel (R1 \/ R2)%rel R.
@@ -149,23 +149,23 @@ Qed.
 Hint Extern 0 (RExists _ (_ /\ _) _ _) =>
   eapply rel_inter_rexists : typeclass_instances.
 
-Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
-  Related (R1 /\ R2)%rel R1 subrel.
+Lemma rel_inter_subrel_rexists_l {A B} (R1 R2 R: rel A B):
+  RExists (subrel R1 R) subrel (R1 /\ R2)%rel R.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related (_ /\ _)%rel _ _) =>
-  eapply rel_inter_eliml : typeclass_instances.
+Hint Extern 0 (RExists _ subrel (_ /\ _)%rel _) =>
+  eapply rel_inter_subrel_rexists_l : typeclass_instances.
 
-Lemma rel_inter_elimr {A B} (R1 R2: rel A B):
-  Related (R1 /\ R2)%rel R2 subrel.
+Lemma rel_inter_subrel_rexists_r {A B} (R1 R2 R: rel A B):
+  RExists (subrel R2 R) subrel (R1 /\ R2)%rel R.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related (_ /\ _)%rel _ _) =>
-  eapply rel_inter_elimr : typeclass_instances.
+Hint Extern 0 (RExists _ subrel (_ /\ _)%rel _) =>
+  eapply rel_inter_subrel_rexists_r : typeclass_instances.
 
 Lemma rel_inter_glb {A B} (R R1 R2: rel A B):
   RIntro (subrel R R1 /\ subrel R R2) subrel R (R1 /\ R2)%rel.
