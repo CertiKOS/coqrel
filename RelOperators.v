@@ -517,6 +517,9 @@ Proof.
   rintro; eauto.
 Qed.
 
+Global Instance rel_push_subrel_params:
+  Params (@rel_push) 3.
+
 Lemma rel_push_corefl {A B} (f: A -> B) (R: rel A A):
   Coreflexive R ->
   Coreflexive (R !! f).
