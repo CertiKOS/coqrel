@@ -720,6 +720,28 @@ Qed.
 Global Instance rsat_subrel_params:
   Params (@rsat) 3.
 
+Inductive psat {A} (I: A -> Prop) (x: A): A -> Prop :=
+  psat_intro: I x -> psat I x x.
+
+Global Instance psat_subrel A:
+  Monotonic (@psat A) ((- ==> impl) ++> subrel).
+Proof.
+  intros P Q HPQ x _ [Hx].
+  constructor. apply HPQ. assumption.
+Qed.
+
+Global Instance psat_subrel_params:
+  Params (@psat) 3.
+
+Lemma psat_corefl {A} (I: A -> Prop):
+  Coreflexive (psat I).
+Proof.
+  intros x _ [_]. reflexivity.
+Qed.
+
+Hint Extern 0 (Coreflexive (psat _)) =>
+  eapply psat_corefl : typeclass_instances.
+
 (** ** Relation versions of [ex] and [all] *)
 
 (** Ideally we would overload the [forall] and [exists] notation to
