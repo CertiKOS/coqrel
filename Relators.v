@@ -254,6 +254,20 @@ Qed.
 Global Instance set_le_subrel_params:
   Params (@set_le) 3.
 
+(** We define [set_ge] as well. *)
+
+Definition set_ge {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
+  fun sA sB => forall b, sB b -> exists a, sA a /\ R a b.
+
+Global Instance set_ge_subrel {A B}:
+  Monotonic (@set_ge A B) (subrel ++> subrel).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance set_ge_subrel_params:
+  Params (@set_ge) 3.
+
 (** ** Inductive types *)
 
 (** For inductive types, there is a systematic way of converting their
