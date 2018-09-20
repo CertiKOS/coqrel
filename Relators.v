@@ -514,6 +514,15 @@ Qed.
 Global Instance option_subrel_params:
   Params (@option_rel) 3.
 
+Lemma option_rel_refl `(HR: Reflexive):
+  Reflexive (option_rel R).
+Proof.
+  intros [x | ]; constructor; reflexivity.
+Qed.
+
+Hint Extern 1 (Reflexive (option_rel _)) =>
+  eapply option_rel_refl : typeclass_instances.
+
 Global Instance option_map_rel:
   Monotonic
     (@option_map)
