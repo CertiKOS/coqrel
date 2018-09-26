@@ -254,6 +254,16 @@ Qed.
 Global Instance set_le_subrel_params:
   Params (@set_le) 3.
 
+Lemma set_le_refl {A} (R : relation A) :
+  Reflexive R ->
+  Reflexive (set_le R).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (set_le _)) =>
+  eapply set_le_refl : typeclass_instances.
+
 (** We define [set_ge] as well. *)
 
 Definition set_ge {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
@@ -267,6 +277,16 @@ Qed.
 
 Global Instance set_ge_subrel_params:
   Params (@set_ge) 3.
+
+Lemma set_ge_refl {A} (R : relation A) :
+  Reflexive R ->
+  Reflexive (set_ge R).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (set_ge _)) =>
+  eapply set_ge_refl : typeclass_instances.
 
 (** ** Inductive types *)
 
