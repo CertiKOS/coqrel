@@ -362,6 +362,8 @@ Qed.
 Definition rel_compose {A B C} (RAB: rel A B) (RBC: rel B C): rel A C :=
   fun x z => exists y, RAB x y /\ RBC y z.
 
+Hint Unfold rel_compose.
+
 Global Instance rel_compose_subrel {A B C}:
   Monotonic (@rel_compose A B C) (subrel ++> subrel ++> subrel).
 Proof.
