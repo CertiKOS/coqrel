@@ -92,3 +92,49 @@ Tactic Notation "rdecompose" constr(H) :=
 
 Tactic Notation "rdecompose" hyp(H) :=
   rdecompose H as (? & ? & ?).
+
+
+(** * Instances for core relators *)
+
+(** ** [arrow_rel] *)
+
+Global Instance arrow_refl {A B} (RA : relation A) (RB : relation B) :
+  Coreflexive RA ->
+  Reflexive RB ->
+  Reflexive (RA ++> RB).
+Proof.
+  intros HA HB f a b Hab.
+  apply coreflexivity in Hab. subst.
+  reflexivity.
+Qed.
+
+Global Instance arrow_corefl {A B} (RA : relation A) (RB : relation B) :
+  Reflexive RA ->
+  Coreflexive RB ->
+  Coreflexive (RA ++> RB).
+Proof.
+  (* This requires an extensionality axiom *)
+Abort.
+
+Section ARROW_REL_COMPOSE.
+  Context {A1 A2 A3} (RA12 : rel A1 A2) (RA23 : rel A2 A3) (RA13 : rel A1 A3).
+  Context {B1 B2 B3} (RB12 : rel B1 B2) (RB23 : rel B2 B3) (RB13 : rel B1 B3).
+
+  Global Instance arrow_rcompose :
+    RDecompose RA12 RA23 RA13 ->
+    RCompose RB12 RB23 RB13 ->
+    RCompose (RA12 ++> RB12) (RA23 ++> RB23) (RA13 ++> RB13).
+  Proof.
+    intros HA HB f g h Hfg Hgh a1 a3 Ha.
+    rdecompose Ha as (a2 & Ha12 & Ha23).
+    firstorder.
+  Qed.
+
+  Global Instance arrow_rdecompose :
+    RCompose RA12 RA23 RA13 ->
+    RDecompose RB12 RB23 RB13 ->
+    RDecompose (RA12 ++> RB12) (RA23 ++> RB23) (RA13 ++> RB13).
+  Proof.
+    (* This requires a choice axiom. *)
+  Abort.
+End ARROW_REL_COMPOSE.
