@@ -402,6 +402,34 @@ Proof.
   split; intros x y; firstorder; congruence.
 Qed.
 
+(** Transitivity and decomposition can be expressed in terms of
+  [rel_compose] in the following way. *)
+
+Global Instance rel_compose_rcompose {A B C} (RAB : rel A B) (RBC : rel B C) :
+  RCompose RAB RBC (rel_compose RAB RBC).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rel_compose_rdecompose {A B C} (RAB : rel A B) (RBC : rel B C) :
+  RDecompose RAB RBC (rel_compose RAB RBC).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rcompose_subrel `(RCompose) :
+  Related (rel_compose RAB RBC) RAC subrel.
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rdecompose_subrel `(RDecompose) :
+  Related RAC (rel_compose RAB RBC) subrel.
+Proof.
+  firstorder.
+Qed.
+
+
 (** ** Pulling a relation along functions *)
 
 Definition rel_pull {A B A' B'} f g (R: rel A' B'): rel A B :=

@@ -131,6 +131,21 @@ Qed.
 Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
   eapply arrow_pointwise_relim : typeclass_instances.
 
+Lemma arrow_pointwise_refl {T} `(Reflexive) :
+  @Reflexive (T -> A) (- ==> R).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (- ==> _)) =>
+  eapply arrow_pointwise_refl : typeclass_instances.
+
+Global Instance arrow_pointwise_rel_compose {T} `(RCompose) :
+  RCompose (A := T -> A) (- ==> RAB) (- ==> RBC) (- ==> RAC).
+Proof.
+  firstorder.
+Qed.
+
 (** *** Dependent pointwise extension *)
 
 (** Like we did for non-dependent functions, we can provide a simpler
@@ -264,6 +279,14 @@ Qed.
 Hint Extern 1 (Reflexive (set_le _)) =>
   eapply set_le_refl : typeclass_instances.
 
+Global Instance set_le_compose `(RCompose) :
+  RCompose (set_le RAB) (set_le RBC) (set_le RAC).
+Proof.
+  intros sa sb sc Hsab Hsbc a Ha.
+  edestruct Hsab as (b & Hb & Hab); eauto.
+  edestruct Hsbc as (c & Hc & Hbc); eauto.
+Qed.
+
 (** We define [set_ge] as well. *)
 
 Definition set_ge {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
@@ -287,6 +310,14 @@ Qed.
 
 Hint Extern 1 (Reflexive (set_ge _)) =>
   eapply set_ge_refl : typeclass_instances.
+
+Global Instance set_ge_compose `(RCompose) :
+  RCompose (set_ge RAB) (set_ge RBC) (set_ge RAC).
+Proof.
+  intros sa sb sc Hsab Hsbc c Hc.
+  edestruct Hsbc as (b & Hb & Hbc); eauto.
+  edestruct Hsab as (a & Ha & Hab); eauto.
+Qed.
 
 (** ** Inductive types *)
 
