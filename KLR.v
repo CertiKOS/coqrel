@@ -24,10 +24,12 @@ Definition klr W A B: Type :=
 
 Class KripkeFrame (W: Type) :=
   {
+    initw: W -> Prop;
     acc: rel W W;
   }.
 
 Infix "~>" := acc (at level 70).
+Notation "# ~> w" := (initw w) (at level 70).
 
 Delimit Scope klr_scope with klr.
 Bind Scope klr_scope with klr.
@@ -308,8 +310,30 @@ Notation "<> R" := (klr_diam R) (at level 65) : klr_scope.
 Section UNKRIPKIFY.
   Context `{kf: KripkeFrame}.
 
-  Definition rel_box {A B} (R: klr W A B): rel A B :=
+  Definition rel_kvd {A B} (R: klr W A B): rel A B :=
     fun x y => forall w, R w x y.
+
+  Global Instance rel_kvd_subrel A B:
+    Monotonic (@rel_kvd A B) ((- ==> subrel) ++> subrel).
+  Proof.
+    firstorder.
+  Qed.
+
+  Lemma rel_kvd_rintro {A B} (R: klr W A B) x y:
+    RIntro (forall w, R w x y) (rel_kvd R) x y.
+  Proof.
+    firstorder.
+  Qed.
+
+  Lemma rel_kvd_relim {A B} (R: klr W A B) w x y P Q:
+    RElim (R w) x y P Q ->
+    RElim (rel_kvd R) x y P Q.
+  Proof.
+    firstorder.
+  Qed.
+
+  Definition rel_box {A B} (R: klr W A B): rel A B :=
+    fun x y => forall w, # ~> w -> R w x y.
 
   Global Instance rel_box_subrel A B:
     Monotonic (@rel_box A B) ((- ==> subrel) ++> subrel).
@@ -318,20 +342,20 @@ Section UNKRIPKIFY.
   Qed.
 
   Lemma rel_box_rintro {A B} (R: klr W A B) x y:
-    RIntro (forall w, R w x y) (rel_box R) x y.
+    RIntro (forall w, # ~> w -> R w x y) (rel_box R) x y.
   Proof.
     firstorder.
   Qed.
 
   Lemma rel_box_relim {A B} (R: klr W A B) w x y P Q:
     RElim (R w) x y P Q ->
-    RElim (rel_box R) x y P Q.
+    RElim (rel_box R) x y (P /\ # ~> w) Q.
   Proof.
     firstorder.
   Qed.
 
   Definition rel_diam {A B} (R: klr W A B): rel A B :=
-    fun x y => exists w, R w x y.
+    fun x y => exists w, # ~> w /\ R w x y.
 
   Global Instance rel_diam_subrel A B:
     Monotonic (@rel_diam A B) ((- ==> subrel) ++> subrel).
@@ -340,21 +364,28 @@ Section UNKRIPKIFY.
   Qed.
 
   Lemma rel_diam_rintro {A B} (R: klr W A B) w x y:
-    RExists (R w x y) (rel_diam R) x y.
+    RExists (R w x y /\ # ~> w) (rel_diam R) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma rel_diam_relim {A B} (R: klr W A B) x y P Q:
-    (forall w, RElim (R w) x y P Q) ->
+  Lemma rel_diam_relim {A B} (R: klr W A B) x y (P Q: Prop):
+    (forall w, RElim (R w) x y ((# ~> w) -> P) Q) ->
     RElim (rel_diam R) x y P Q.
   Proof.
     firstorder.
   Qed.
 End UNKRIPKIFY.
 
+Global Instance rel_kvd_subrel_params: Params (@rel_kvd) 3.
 Global Instance rel_box_subrel_params: Params (@rel_box) 3.
 Global Instance rel_diam_subrel_params: Params (@rel_diam) 3.
+
+Hint Extern 0 (RIntro _ (rel_kvd _) _ _) =>
+  eapply rel_kvd_rintro : typeclass_instances.
+
+Hint Extern 1 (RElim (rel_kvd _) _ _ _ _) =>
+  eapply rel_kvd_relim : typeclass_instances.
 
 Hint Extern 0 (RIntro _ (rel_box _) _ _) =>
   eapply rel_box_rintro : typeclass_instances.
@@ -368,6 +399,7 @@ Hint Extern 0 (RExists _ (rel_diam _) _ _) =>
 Hint Extern 1 (RElim (rel_diam _) _ _ _ _) =>
   eapply rel_diam_relim : typeclass_instances.
 
+Notation "|= R" := (rel_kvd R) (at level 65) : rel_scope.
 Notation "[] R" := (rel_box R) (at level 65) : rel_scope.
 Notation "<> R" := (rel_diam R) (at level 65) : rel_scope.
 
