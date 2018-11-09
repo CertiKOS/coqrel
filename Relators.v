@@ -1,4 +1,5 @@
 Require Export RelDefinitions.
+Require Import RelClasses.
 Require Import Coq.Lists.List.
 
 
@@ -98,11 +99,14 @@ Qed.
 Global Instance arrow_pointwise_subrel_params:
   Params (@arrow_pointwise_rel) 3.
 
-Global Instance arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
+Lemma arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
   RIntro (forall x: A, R (f x) (g x)) (- ==> R) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (- ==> _) _ _) =>
+  eapply arrow_pointwise_rintro : typeclass_instances.
 
 (** Note that although the elimination rule could use a single
   variable and dispense with the equality premise, it actually uses
@@ -126,6 +130,21 @@ Qed.
 
 Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
   eapply arrow_pointwise_relim : typeclass_instances.
+
+Lemma arrow_pointwise_refl {T} `(Reflexive) :
+  @Reflexive (T -> A) (- ==> R).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (- ==> _)) =>
+  eapply arrow_pointwise_refl : typeclass_instances.
+
+Global Instance arrow_pointwise_rel_compose {T} `(RCompose) :
+  RCompose (A := T -> A) (- ==> RAB) (- ==> RBC) (- ==> RAC).
+Proof.
+  firstorder.
+Qed.
 
 (** *** Dependent pointwise extension *)
 
@@ -156,13 +175,16 @@ Notation "'forallr' - , FE" :=
   (forall_pointwise_rel (fun _ => FE))
   (at level 200).
 
-Global Instance forall_pointwise_rintro {V FV1 FV2} (FE: forall v, rel _ _) f g:
+Lemma forall_pointwise_rintro {V FV1 FV2} (FE: forall v, rel _ _) f g:
   RIntro
     (forall v, FE v (f v) (g v))
     (@forall_pointwise_rel V FV1 FV2 FE) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (forall_pointwise_rel _) _ _) =>
+  eapply forall_pointwise_rintro : typeclass_instances.
 
 Lemma forall_pointwise_relim {V FV1 FV2} R f g v P Q:
   RElim (R v) (f v) (g v) P Q ->
@@ -192,13 +214,16 @@ Notation "'forallr' v1 v2 : E , R" :=
   (at level 200, v1 ident, v2 ident, right associativity)
   : rel_scope.
 
-Global Instance forallp_rintro {V1 V2} {E: rel V1 V2} {F1 F2} (FE: forall v1 v2, rel _ _) f g:
+Lemma forallp_rintro {V1 V2} {E: rel V1 V2} {F1 F2} (FE: forall v1 v2, rel _ _) f g:
   RIntro
     (forall v1 v2, E v1 v2 -> FE v1 v2 (f v1) (g v2))
     (@forallp_rel V1 V2 E F1 F2 FE) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (forallp_rel _ _) _ _) =>
+  eapply forallp_rintro : typeclass_instances.
 
 (** Since [e : E v1 v2] cannot be unified in [Q], the elimination rule
   adds an [E v1 v2] premise to [P] instead. *)
@@ -230,15 +255,68 @@ Hint Extern 1 (RElim (forallp_rel _ _) _ _ _ _) =>
   element of the second set which is related to it. This is useful for
   example when defining simulation diagrams. *)
 
-Definition set_rel {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
+Definition set_le {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
   fun sA sB => forall a, sA a -> exists b, sB b /\ R a b.
 
-Global Instance set_subrel {A B}:
-  Monotonic (@set_rel A B) (subrel ++> subrel).
+Global Instance set_le_subrel {A B}:
+  Monotonic (@set_le A B) (subrel ++> subrel).
 Proof.
   intros R1 R2 HR sA sB Hs.
   intros x Hx.
   destruct (Hs x) as (y & Hy & Hxy); eauto.
+Qed.
+
+Global Instance set_le_subrel_params:
+  Params (@set_le) 3.
+
+Lemma set_le_refl {A} (R : relation A) :
+  Reflexive R ->
+  Reflexive (set_le R).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (set_le _)) =>
+  eapply set_le_refl : typeclass_instances.
+
+Global Instance set_le_compose `(RCompose) :
+  RCompose (set_le RAB) (set_le RBC) (set_le RAC).
+Proof.
+  intros sa sb sc Hsab Hsbc a Ha.
+  edestruct Hsab as (b & Hb & Hab); eauto.
+  edestruct Hsbc as (c & Hc & Hbc); eauto.
+Qed.
+
+(** We define [set_ge] as well. *)
+
+Definition set_ge {A B} (R: rel A B): rel (A -> Prop) (B -> Prop) :=
+  fun sA sB => forall b, sB b -> exists a, sA a /\ R a b.
+
+Global Instance set_ge_subrel {A B}:
+  Monotonic (@set_ge A B) (subrel ++> subrel).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance set_ge_subrel_params:
+  Params (@set_ge) 3.
+
+Lemma set_ge_refl {A} (R : relation A) :
+  Reflexive R ->
+  Reflexive (set_ge R).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (set_ge _)) =>
+  eapply set_ge_refl : typeclass_instances.
+
+Global Instance set_ge_compose `(RCompose) :
+  RCompose (set_ge RAB) (set_ge RBC) (set_ge RAC).
+Proof.
+  intros sa sb sc Hsab Hsbc c Hc.
+  edestruct Hsbc as (b & Hb & Hbc); eauto.
+  edestruct Hsab as (a & Ha & Hab); eauto.
 Qed.
 
 (** ** Inductive types *)
@@ -319,6 +397,17 @@ Qed.
 
 Hint Extern 2 (Reflexive (_ + _)) =>
   eapply sum_rel_refl : typeclass_instances.
+
+Lemma sum_rel_corefl {A B} (R1: rel A A) (R2: rel B B):
+  Coreflexive R1 -> Coreflexive R2 -> Coreflexive (R1 + R2).
+Proof.
+  intros H1 H2 _ _ [x y H | x y H];
+  f_equal;
+  eauto using coreflexivity.
+Qed.
+
+Hint Extern 2 (Coreflexive (_ + _)) =>
+  eapply sum_rel_corefl : typeclass_instances.
 
 Lemma sum_rel_trans {A B} (R1: rel A A) (R2: rel B B):
   Transitive R1 -> Transitive R2 -> Transitive (R1 + R2).
@@ -408,6 +497,16 @@ Qed.
 Hint Extern 2 (Reflexive (_ * _)) =>
   eapply prod_rel_refl : typeclass_instances.
 
+Lemma prod_rel_corefl {A B} (R1: rel A A) (R2: rel B B):
+  Coreflexive R1 -> Coreflexive R2 -> Coreflexive (R1 * R2).
+Proof.
+  intros H1 H2 [a1 b1] [a2 b2] [Ha Hb].
+  f_equal; eauto using coreflexivity.
+Qed.
+
+Hint Extern 2 (Coreflexive (_ * _)) =>
+  eapply prod_rel_corefl : typeclass_instances.
+
 Lemma prod_rel_trans {A B} (R1: rel A A) (R2: rel B B):
   Transitive R1 -> Transitive R2 -> Transitive (R1 * R2).
 Proof.
@@ -466,6 +565,28 @@ Qed.
 Global Instance option_subrel_params:
   Params (@option_rel) 3.
 
+Lemma option_rel_refl `(HR: Reflexive):
+  Reflexive (option_rel R).
+Proof.
+  intros [x | ]; constructor; reflexivity.
+Qed.
+
+Hint Extern 1 (Reflexive (option_rel _)) =>
+  eapply option_rel_refl : typeclass_instances.
+
+Global Instance option_map_rel:
+  Monotonic
+    (@option_map)
+    (forallr RA, forallr RB, (RA ++> RB) ++> option_rel RA ++> option_rel RB).
+Proof.
+  intros A1 A2 RA B1 B2 RB f g Hfg x y Hxy.
+  destruct Hxy; constructor; eauto.
+Qed.
+
+(** XXX: This does not fit any of our existing patterns, we should
+  drop it for consistency or introduce a new convention and generalize
+  this kind of lemmas. *)
+
 Lemma option_rel_some_inv A B (R: rel A B) (x: option A) (y: option B) (a: A):
   option_rel R x y ->
   x = Some a ->
@@ -514,6 +635,17 @@ Qed.
 
 Hint Extern 1 (Reflexive (list_rel _)) =>
   eapply list_rel_refl : typeclass_instances.
+
+Lemma list_rel_corefl `(HR: Coreflexive):
+  Coreflexive (list_rel R).
+Proof.
+  intros l1 l2 Hl.
+  induction Hl as [ | x1 x2 Hx l1 l2 Hl IHl];
+  f_equal; eauto using coreflexivity.
+Qed.
+
+Hint Extern 1 (Coreflexive (list_rel _)) =>
+  eapply list_rel_corefl : typeclass_instances.
 
 Lemma list_rel_sym `(HR: Symmetric):
   Symmetric (list_rel R).

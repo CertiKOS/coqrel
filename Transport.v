@@ -1,4 +1,5 @@
 Require Export Monotonicity.
+Require Import KLR.
 
 (** ** The [transport] tactic *)
 
@@ -19,25 +20,13 @@ Require Export Monotonicity.
 Class Transport {A B} (R: rel A B) (a: A) (b: B) (PA: Prop) (PB: Prop) :=
   transport: R a b -> PA -> PB.
 
-(** The stereotypical example is [option_rel], which we can use to
-  transport hypotheses as per the following instances. *)
+(** One stereotypical example is [option_le]: the [Transport] instance
+  defined in the [OptionRel] library allows us to transport hypothese
+  of the form [x = Some a] into hypotheses of the form [y = Some b],
+  with [a] and [b] related by [R] whenever [x] and [y] are related by
+  [option_le R], and similarly for [None] and [option_rel].
 
-Global Instance option_rel_transport_eq_some {A B} (R: rel A B) x y a:
-  Transport (option_rel R) x y (x = Some a) (exists b, y = Some b /\ R a b).
-Proof.
-  intros Hxy Hx.
-  subst; inversion Hxy; eauto.
-Qed.
-
-Global Instance option_rel_transport_eq_none {A B} (R: rel A B) x y:
-  Transport (option_rel R) x y (x = None) (y = None).
-Proof.
-  intros Hxy Hx.
-  subst; inversion Hxy; eauto.
-Qed.
-
-(** A similar approach can be used to transport hypotheses which assert
-  a element of a product type is equal to a specific pair. *)
+  Other instances are declared below. *)
 
 Global Instance prod_rel_transport_eq_pair {A1 B1 A2 B2} (R1: rel A1 B1) (R2: rel A2 B2) x y a1 a2:
   Transport (prod_rel R1 R2) x y (x = (a1, a2)) (exists b1 b2, y = (b1, b2) /\ R1 a1 b1 /\ R2 a2 b2).
@@ -49,36 +38,36 @@ Proof.
   eauto.
 Qed.
 
-(** For [set_rel] the situation is slightly more involved, for two
-  reasons. First, a regular [eapply set_rel_transport] fails to unify
+(** For [set_le] the situation is slightly more involved, for two
+  reasons. First, a regular [eapply set_le_transport] fails to unify
   the parameter [B] of [Transport] against the [_ -> Prop] provied by
   the instance below. This can be worked around by pre-unifying that
-  specific parameter. Second, because [set_rel_transport] is
+  specific parameter. Second, because [set_le_transport] is
   potentially applicable to virtually any hypothesis (since there is
   no strongly distinguishing syntactic format in our target
   hypotheses), it makes [transport_hyps] very slow.
 
   To address this, we explicitely register hints based on the
-  [set_rel_transport] tactic, which looks for "keywords" before doing
+  [set_le_transport] tactic, which looks for "keywords" before doing
   anything, then applies the lemma with the required unification
-  preparation. For example, [set_rel_transport] is used in the
+  preparation. For example, [set_le_transport] is used in the
   following way in the [SimClight] library:
 <<
     Hint Extern 1 (Transport _ _ _ _ _) =>
-      set_rel_transport @assign_loc : typeclass_instances.
+      set_le_transport @assign_loc : typeclass_instances.
 >>
   Note that it's necessary to use [@] because [assign_loc] is
   parametrized by typeclasses, and we want to avoid undue
   specialization at hint registration time. *)
 
-Lemma set_rel_transport {A B} (R: rel A B) sA sB a:
-  Transport (set_rel R) sA sB (sA a) (exists b, sB b /\ R a b).
+Lemma set_le_transport {A B} (R: rel A B) sA sB a:
+  Transport (set_le R) sA sB (sA a) (exists b, sB b /\ R a b).
 Proof.
   intros HsAB Ha.
   edestruct HsAB; eauto.
 Qed.
 
-Ltac set_rel_transport keyword :=
+Ltac set_le_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
@@ -86,15 +75,15 @@ Ltac set_rel_transport keyword :=
           let Xv := fresh "X" in evar (Xv: Type);
           let X := eval red in Xv in clear Xv;
           unify B (X -> Prop);
-          eapply set_rel_transport
+          eapply set_le_transport
       end
   end.
       
-(** We defined a few more relation patterns based on [set_rel] and
+(** We defined a few more relation patterns based on [set_le] and
   [rel_curry], with a similar strategy. *)
 
-Lemma rel_curry_set_rel_transport {A1 A2 B1 B2} R sA sB (a1: A1) (a2: A2):
-  Transport (% set_rel R) sA sB
+Lemma rel_curry_set_le_transport {A1 A2 B1 B2} R sA sB (a1: A1) (a2: A2):
+  Transport (% set_le R) sA sB
     (sA a1 a2)
     (exists (b1: B1) (b2: B2), sB b1 b2 /\ R (a1, a2) (b1, b2)).
 Proof.
@@ -102,7 +91,7 @@ Proof.
   destruct (HsAB (a1, a2)) as ([b1 b2] & Hb & Hab); eauto.
 Qed.
 
-Ltac rel_curry_set_rel_transport keyword :=
+Ltac rel_curry_set_le_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
@@ -112,12 +101,12 @@ Ltac rel_curry_set_rel_transport keyword :=
           let Yv := fresh "Y" in evar (Yv: Type);
           let Y := eval red in Yv in clear Yv;
           unify B (X -> Y -> Prop);
-          eapply rel_curry_set_rel_transport
+          eapply rel_curry_set_le_transport
       end
   end.
 
-Lemma rel_curry2_set_rel_transport {A1 A2 A3 B1 B2 B3} R sA sB (a1: A1) (a2: A2) (a3: A3):
-  Transport (% % set_rel R) sA sB
+Lemma rel_curry2_set_le_transport {A1 A2 A3 B1 B2 B3} R sA sB (a1: A1) (a2: A2) (a3: A3):
+  Transport (% % set_le R) sA sB
     (sA a1 a2 a3)
     (exists (b1: B1) (b2: B2) (b3: B3), sB b1 b2 b3 /\ R (a1, a2, a3) (b1, b2, b3)).
 Proof.
@@ -125,7 +114,7 @@ Proof.
   destruct (HsAB (a1, a2, a3)) as ([[b1 b2] b3] & Hb & Hab); eauto.
 Qed.
 
-Ltac rel_curry2_set_rel_transport keyword :=
+Ltac rel_curry2_set_le_transport keyword :=
   lazymatch goal with
     | |- @Transport ?A ?B ?R ?a ?b ?PA ?PB =>
       lazymatch PA with
@@ -137,7 +126,7 @@ Ltac rel_curry2_set_rel_transport keyword :=
           let Zv := fresh "Y" in evar (Yv: Type);
           let Z := eval red in Yv in clear Yv;
           unify B (X -> Y -> Z -> Prop);
-          eapply rel_curry2_set_rel_transport
+          eapply rel_curry2_set_le_transport
       end
   end.
 
@@ -190,6 +179,14 @@ Ltac split_hyp H :=
       let Hw' := fresh "H" w' in
       destruct H as (w' & Hw' & H);
       split_hyp H
+    | klr_diam ?R ?w ?x ?y =>
+      let w' := fresh w "'" in
+      let Hw' := fresh "H" w' in
+      destruct H as (w' & Hw' & H);
+      split_hyp H
+    | prod_klr ?Rx ?Ry ?w (?x1, ?y1) (?x2, ?y2) =>
+      change (Rx w x1 x2 /\ Ry w y1 y2) in H;
+      split_hyp H
     | _ =>
       idtac
   end.
@@ -203,6 +200,12 @@ Ltac split_hyps :=
         destruct H
       | H: prod_rel ?Rx ?Ry (?x1, ?y1) (?x2, ?y2) |- _ =>
         change (Rx x1 x2 /\ Ry y1 y2) in H
+      | H: klr_diam ?R ?w ?x ?y |- _ =>
+        let w' := fresh w "'" in
+        let Hw' := fresh "H" w' in
+        destruct H as (w' & Hw' & H)
+      | H: prod_klr ?Rx ?Ry ?w (?x1, ?y1) (?x2, ?y2) |- _ =>
+        change (Rx w x1 x2 /\ Ry w y1 y2) in H
     end.
 
 (** We're now ready to defined the [transport] tactic, which

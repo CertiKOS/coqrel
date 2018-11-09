@@ -38,6 +38,16 @@ Global Existing Instance right_le.
 
 (** ** Properties *)
 
+Global Instance leb_preo:
+  PreOrder leb.
+Proof.
+  split.
+  - intros [|]; simpl; eauto.
+  - intros [|]; simpl; eauto.
+    intros [|]; simpl; eauto.
+    discriminate.
+Qed.
+
 Lemma leb_rdestruct:
   RDestruct leb (fun P => P false false /\ P true true /\ P false true).
 Proof.
@@ -48,19 +58,32 @@ Qed.
 Hint Extern 0 (RDestruct leb _) =>
   eapply leb_rdestruct : typeclass_instances.
 
+Global Instance leb_transport_eq_true x y:
+  Transport Bool.leb x y (x = true) (y = true).
+Proof.
+  clear.
+  destruct x, y; firstorder.
+Qed.
+
 (** ** Monotonicity of various definitions *)
 
-Global Instance true_leb b:
+Lemma true_leb b:
   Related b true leb.
 Proof.
   destruct b; reflexivity.
 Qed.
 
-Global Instance false_leb b:
+Hint Extern 0 (Related _ true _) =>
+  eapply true_leb : typeclass_instances.
+
+Lemma false_leb b:
   Related false b leb.
 Proof.
   destruct b; reflexivity.
 Qed.
+
+Hint Extern 0 (Related false _ _) =>
+  eapply false_leb : typeclass_instances.
 
 Global Instance negb_leb:
   Monotonic negb (leb --> leb).

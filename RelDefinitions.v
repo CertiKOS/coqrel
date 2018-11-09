@@ -1,4 +1,5 @@
 Require Export Coq.Program.Basics.
+Require Export Coq.Relations.Relation_Definitions.
 Require Export Coq.Classes.Morphisms.
 Require Setoid.
 Require Export Delay.
@@ -36,6 +37,13 @@ Class Convertible {A} (x y: A) :=
 
 Hint Extern 1 (Convertible ?x ?y) =>
   eapply eq_refl : typeclass_instances.
+
+(** The following class can be used to inhibit backtracking. *)
+
+Class Once P := once : P.
+
+Hint Extern 1 (Once ?P) =>
+  red; once typeclasses eauto : typeclass_instances.
 
 
 (** * Relations *)
@@ -104,13 +112,22 @@ Ltac rauto :=
 
 (** After applying each step, we need to decompose the premise into
   individual subgoals, wrapping each one into a new [RAuto] goal so
-  that the process continues. *)
+  that the process continues.
+
+  Note the use of [Once] below: while choosing a step to apply next
+  can involve some backtracking, once a step has been chosen [RAuto]
+  never backtracks. This avoids exponential blow up in the search
+  space, so that [RAuto] remains efficient even in case of failure.
+  From a usability perspective, it also encourages proper hygiene when
+  declaring instances, since extraneous or too broadly applicable
+  instance will cause failures (rather than silently add weight to the
+  system). *)
 
 Class RAutoSubgoals (P: Prop) :=
   rauto_subgoals : P.
 
 Global Instance rauto_rstep P Q:
-  RStep P Q ->
+  Once (RStep P Q) ->
   RAutoSubgoals P ->
   RAuto Q.
 Proof.
@@ -220,7 +237,7 @@ Ltac relim H :=
   relational property as-is. *)
 
 Global Instance relim_base {A B} (R: rel A B) m n:
-  RElim R m n True (R m n).
+  RElim R m n True (R m n) | 10.
 Proof.
   firstorder.
 Qed.
@@ -268,79 +285,9 @@ Qed.
 Class RDestruct {A B: Type} (R: rel A B) (T: rel A B -> Prop) :=
   rdestruct m n: R m n -> forall P, T P -> P m n.
 
-Ltac rdestruct H :=
-  lazymatch type of H with
-    | ?R ?m ?n =>
-      not_evar R;
-      pattern m, n;
-      apply (rdestruct (R:=R) m n H);
-      clear H;
-      Delay.split_conjunction
-  end.
-
-Ltac default_rdestruct :=
-  let m := fresh "m" in
-  let n := fresh "n" in
-  let Hmn := fresh "H" m n in
-  let P := fresh "P" in
-  let H := fresh in
-  intros m n Hmn P H;
-  revert m n Hmn;
-  delayed_conjunction (intros m n Hmn; destruct Hmn; delay);
-  pattern P;
-  eexact H.
-
-Hint Extern 100 (RDestruct _ _) =>
-  default_rdestruct : typeclass_instances.
-
-(** To use [RDestruct] instances to reduce a goal involving pattern
-  matching [G] := [_ (match m with _ end) (match n with _ end)], we
-  need to establish that [m] and [n] are related by some relation [R],
-  then locate an instance of [RDestruct] that corresponds to [R]. It
-  is essential that this happens in one step. At some point, I tried
-  to split the process in two different [RStep]s, so that the user
-  could control the resolution of the [?R m n] subgoal. However, in
-  situation where [RDestruct] is not the right strategy, this may
-  push a [delayed rauto] into a dead end. Thankfully, now we can use
-  the [RAuto] typeclass to solve the [?R m n] subgoal in one swoop. *)
-
-Lemma rdestruct_rstep {A B} m n (R: rel A B) P Q:
-  RAuto (R m n) ->
-  RDestruct R P ->
-  P Q ->
-  Q m n.
-Proof.
-  intros Hmn HR H.
-  firstorder.
-Qed.
-
-Ltac use_rdestruct_rstep m n :=
-  let H := fresh in
-  intro H;
-  pattern m, n;
-  eapply (rdestruct_rstep m n);
-  [ .. | eexact H].
-
-Hint Extern 40 (RStep _ (_ (match ?m with _=>_ end) (match ?n with _=>_ end))) =>
-  use_rdestruct_rstep m n : typeclass_instances.
-
-(** In the special case where the terms matched on the left- and
-  right-hand sides are identical, we want to destruct that term
-  instead. At the moment, it's unclear to me whether this could be
-  formulated as an [RDestruct] instance for [eq], or whether the
-  process above could subsume this (we should conduct experiments with
-  real code at some point). *)
-
-Ltac destruct_rstep m :=
-  let H := fresh in
-  let n := fresh in
-  intros H;
-  generalize m;
-  delayed_conjunction (intros n; destruct n; delay);
-  eexact H.
-
-Hint Extern 39 (RStep _ (_ (match ?m with _=>_ end) (match ?m with _=>_ end))) =>
-  destruct_rstep m : typeclass_instances.
+(** See the [RDestruct] library for the corresponding instance of
+  [RStep], the default instance of [RDestruct], and a way to control
+  whether or not we should keep equations for the destructed terms. *)
 
 (** ** Monotonicity properties *)
 
@@ -405,12 +352,6 @@ Proof.
   split; firstorder.
 Qed.
 
-Instance subrel_refl {A B} (R: rel A B):
-  Related R R subrel.
-Proof.
-  firstorder.
-Qed.
-
 Global Instance eq_subrel {A} (R: rel A A):
   Reflexive R ->
   Related eq R subrel.
@@ -467,11 +408,14 @@ Qed.
 Global Instance arrow_subrel_params:
   Params (@arrow_rel) 4.
 
-Global Instance arrow_rintro {A1 A2 B1 B2} (RA: rel A1 A2) (RB: rel B1 B2) f g:
+Lemma arrow_rintro {A1 A2 B1 B2} (RA: rel A1 A2) (RB: rel B1 B2) f g:
   RIntro (forall x y, RA x y -> RB (f x) (g y)) (RA ++> RB) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (_ ++> _) _ _) =>
+  eapply arrow_rintro : typeclass_instances.
 
 Lemma arrow_relim {A1 A2 B1 B2} RA RB f g m n P Q:
   @RElim B1 B2 RB (f m) (g n) P Q ->
@@ -542,13 +486,16 @@ Notation "'forallr' e , R" :=
   (forall_rel (fun _ _ e => R))
   (at level 200, e ident, right associativity) : rel_scope.
 
-Global Instance forall_rintro {V1 V2 E F1 F2} (FE: forall x y, _ -> rel _ _) f g:
+Lemma forall_rintro {V1 V2 E F1 F2} (FE: forall x y, _ -> rel _ _) f g:
   RIntro
     (forall u v e, FE u v e (f u) (g v))
     (@forall_rel V1 V2 E F1 F2 FE) f g.
 Proof.
   firstorder.
 Qed.
+
+Hint Extern 0 (RIntro _ (forall_rel _) _ _) =>
+  eapply forall_rintro : typeclass_instances.
 
 Lemma forall_relim {V1 V2 E FV1 FV2} R f g v1 v2 e P Q:
   RElim (R v1 v2 e) (f v1) (g v2) P Q ->

@@ -1,4 +1,5 @@
 Require Export RelDefinitions.
+Require Import RelClasses.
 Require Import Relators.
 
 (** ** Union of relations *)
@@ -20,23 +21,47 @@ Qed.
 Global Instance rel_union_subrel_params:
   Params (@rel_union) 4.
 
-Lemma rel_union_introl {A B} (R1 R2: rel A B):
-  Related R1 (R1 \/ R2)%rel subrel.
+(** Since we're forced to commit to a branch, we can't use [RIntro],
+  but can still provide [RExists] instances. *)
+
+Lemma rel_union_rexists_l {A B} (R1 R2: rel A B) x y:
+  RExists (R1 x y) (R1 \/ R2) x y.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related _ (_ \/ _)%rel _) =>
-  eapply rel_union_introl : typeclass_instances.
+Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
+  eapply rel_union_rexists_l : typeclass_instances.
 
-Lemma rel_union_intror {A B} (R1 R2: rel A B):
-  Related R2 (R1 \/ R2)%rel subrel.
+Lemma rel_union_rexists_r {A B} (R1 R2: rel A B) x y:
+  RExists (R2 x y) (R1 \/ R2) x y.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related _ (_ \/ _)%rel _) =>
-  eapply rel_union_introl : typeclass_instances.
+Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
+  eapply rel_union_rexists_r : typeclass_instances.
+
+(** More often, we can solve a [rel_union] goal using a monotonicity
+  property, and the [subrel] instances below. *)
+
+Lemma rel_union_subrel_rexists_l {A B} (R R1 R2: rel A B):
+  RExists (subrel R R1) subrel R (R1 \/ R2)%rel.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RExists _ subrel _ (_ \/ _)%rel) =>
+  eapply rel_union_subrel_rexists_l : typeclass_instances.
+
+Lemma rel_union_subrel_rexists_r {A B} (R R1 R2: rel A B):
+  RExists (subrel R R2) subrel R (R1 \/ R2)%rel.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RExists _ subrel _ (_ \/ _)%rel) =>
+  eapply rel_union_subrel_rexists_r : typeclass_instances.
 
 Lemma rel_union_lub {A B} (R1 R2 R: rel A B):
   RIntro (subrel R1 R /\ subrel R2 R) subrel (R1 \/ R2)%rel R.
@@ -46,6 +71,48 @@ Qed.
 
 Hint Extern 2 (RIntro _ subrel (_ \/ _)%rel _) =>
   eapply rel_union_lub : typeclass_instances.
+
+Lemma rel_union_refl_l {A} (R1 R2: rel A A):
+  Reflexive R1 ->
+  Reflexive (R1 \/ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (_ \/ _)) =>
+  eapply rel_union_refl_l : typeclass_instances.
+
+Lemma rel_union_refl_r {A} (R1 R2: rel A A):
+  Reflexive R2 ->
+  Reflexive (R1 \/ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Reflexive (_ \/ _)) =>
+  eapply rel_union_refl_r : typeclass_instances.
+
+Lemma rel_union_corefl {A} (R1 R2: rel A A):
+  Coreflexive R1 ->
+  Coreflexive R2 ->
+  Coreflexive (R1 \/ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Coreflexive (_ \/ _)) =>
+  eapply rel_union_corefl : typeclass_instances.
+
+Lemma rel_union_sym {A} (R1 R2: rel A A):
+  Symmetric R1 ->
+  Symmetric R2 ->
+  Symmetric (R1 \/ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Symmetric (_ \/ _)) =>
+  eapply rel_union_sym : typeclass_instances.
 
 (** ** Intersection of relations *)
 
@@ -66,23 +133,39 @@ Qed.
 Global Instance rel_inter_params:
   Params (@rel_inter) 4.
 
-Lemma rel_inter_eliml {A B} (R1 R2: rel A B):
-  Related (R1 /\ R2)%rel R1 subrel.
+(** In some cases, the relation in the goal will cause existential
+  variables to be instantiated accordingly; for instance, [rstep] run
+  on [?R x y |- (R1 /\ R2) x y] will instantiate [?R := R1 /\ R2].
+  Because of this, splitting a [rel_inter] goal into two subgoals may
+  cause a dead-end and we have to use [RExists] for the following
+  rule. *)
+
+Lemma rel_inter_rexists {A B} (R1 R2: rel A B) x y:
+  RExists (R1 x y /\ R2 x y) (R1 /\ R2) x y.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related (_ /\ _)%rel _ _) =>
-  eapply rel_inter_eliml : typeclass_instances.
+Hint Extern 0 (RExists _ (_ /\ _) _ _) =>
+  eapply rel_inter_rexists : typeclass_instances.
 
-Lemma rel_inter_elimr {A B} (R1 R2: rel A B):
-  Related (R1 /\ R2)%rel R2 subrel.
+Lemma rel_inter_subrel_rexists_l {A B} (R1 R2 R: rel A B):
+  RExists (subrel R1 R) subrel (R1 /\ R2)%rel R.
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related (_ /\ _)%rel _ _) =>
-  eapply rel_inter_elimr : typeclass_instances.
+Hint Extern 0 (RExists _ subrel (_ /\ _)%rel _) =>
+  eapply rel_inter_subrel_rexists_l : typeclass_instances.
+
+Lemma rel_inter_subrel_rexists_r {A B} (R1 R2 R: rel A B):
+  RExists (subrel R2 R) subrel (R1 /\ R2)%rel R.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (RExists _ subrel (_ /\ _)%rel _) =>
+  eapply rel_inter_subrel_rexists_r : typeclass_instances.
 
 Lemma rel_inter_glb {A B} (R R1 R2: rel A B):
   RIntro (subrel R R1 /\ subrel R R2) subrel R (R1 /\ R2)%rel.
@@ -104,6 +187,26 @@ Qed.
 
 Hint Extern 2 (Reflexive (_ /\ _)) =>
   eapply rel_inter_refl : typeclass_instances.
+
+Lemma rel_inter_corefl_l {A} (R1 R2: rel A A):
+  Coreflexive R1 ->
+  Coreflexive (R1 /\ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Coreflexive (_ /\ _)) =>
+  eapply rel_inter_corefl_l : typeclass_instances.
+
+Lemma rel_inter_corefl_r {A} (R1 R2: rel A A):
+  Coreflexive R2 ->
+  Coreflexive (R1 /\ R2).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (Coreflexive (_ /\ _)) =>
+  eapply rel_inter_corefl_r : typeclass_instances.
 
 Lemma rel_inter_trans {A} (R1 R2: rel A A):
   Transitive R1 ->
@@ -135,6 +238,21 @@ Proof.
   intros x y [Hxy Hyx].
   split; assumption.
 Qed.
+
+(** On a related note, a symmetric subrelation of [R] is also a
+  subrelation of its inverse. *)
+
+Lemma subrel_sym_flip {A} (R R': relation A):
+  Symmetric R ->
+  RStep (subrel R R') (subrel R (flip R')).
+Proof.
+  intros HR H x y Hxy.
+  symmetry in Hxy.
+  firstorder.
+Qed.
+
+Hint Extern 60 (RStep _ (subrel _ (flip _))) =>
+  eapply subrel_sym_flip : typeclass_instances.
 
 (** ** Implication *)
 
@@ -181,6 +299,15 @@ Definition rel_bot {A B}: rel A B :=
 
 Notation "⊥" := rel_bot : rel_scope.
 
+Lemma rel_bot_subrel {A B} (R: rel A B):
+  Related ⊥%rel R subrel.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 0 (Related ⊥%rel _ _) =>
+  eapply rel_bot_subrel : typeclass_instances.
+
 Lemma rel_bot_relim {A B} (x: A) (y: B) P:
   RElim ⊥ x y True P.
 Proof.
@@ -204,6 +331,12 @@ Qed.
 Hint Extern 0 (RIntro _ ⊤ _ _) =>
   eapply rel_top_rintro : typeclass_instances.
 
+Global Instance rel_top_equiv {A}:
+  @Equivalence A ⊤.
+Proof.
+  repeat constructor.
+Qed.
+
 (** ** Relation equivalence *)
 
 Definition eqrel {A B}: rel (rel A B) (rel A B) :=
@@ -218,10 +351,18 @@ Proof.
   split; typeclasses eauto.
 Qed.
 
+Global Instance eqrel_subrel A B:
+  Related (@eqrel A B) (@subrel A B) subrel.
+Proof.
+  firstorder.
+Qed.
+
 (** ** Relation composition *)
 
 Definition rel_compose {A B C} (RAB: rel A B) (RBC: rel B C): rel A C :=
   fun x z => exists y, RAB x y /\ RBC y z.
+
+Hint Unfold rel_compose.
 
 Global Instance rel_compose_subrel {A B C}:
   Monotonic (@rel_compose A B C) (subrel ++> subrel ++> subrel).
@@ -260,6 +401,34 @@ Proof.
   unfold rel_compose.
   split; intros x y; firstorder; congruence.
 Qed.
+
+(** Transitivity and decomposition can be expressed in terms of
+  [rel_compose] in the following way. *)
+
+Global Instance rel_compose_rcompose {A B C} (RAB : rel A B) (RBC : rel B C) :
+  RCompose RAB RBC (rel_compose RAB RBC).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rel_compose_rdecompose {A B C} (RAB : rel A B) (RBC : rel B C) :
+  RDecompose RAB RBC (rel_compose RAB RBC).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rcompose_subrel `(RCompose) :
+  Related (rel_compose RAB RBC) RAC subrel.
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rdecompose_subrel `(RDecompose) :
+  Related RAC (rel_compose RAB RBC) subrel.
+Proof.
+  firstorder.
+Qed.
+
 
 (** ** Pulling a relation along functions *)
 
@@ -320,18 +489,25 @@ Qed.
 Hint Extern 1 (Transitive (rel_pull _ _ _)) =>
   eapply rel_pull_trans : typeclass_instances.
 
-(** We can also reuse instances of [RIntro] and [RElim] for the
-  underlying relation to provide corresponding instances for the
-  pulled relation. *)
+(** The introduction rule is straightforward, but changes the head
+  terms to the functions used with [rel_pull]. This means that an
+  [RIntro] rule would short-circuit any relational property formulated
+  for the original terms, even if the codomain is a matching
+  [rel_pull] relation and we have an appropriate [RElim] instance.
+  To avoid shadowing such properties, we define our introduction rule
+  as an [RStep] with a low priority. See test [rel_pull_2]. *)
 
 Lemma rel_pull_rintro {A B A' B'} (f: A -> A') (g: B -> B') R x y:
-  RIntro (R (f x) (g y)) (R @@ (f, g)) x y.
+  RStep (R (f x) (g y)) ((R @@ (f, g))%rel x y).
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RIntro _ (_ @@ (_, _)) _ _) =>
+Hint Extern 60 (RStep _ ((_ @@ (_, _))%rel _ _)) =>
   eapply rel_pull_rintro : typeclass_instances.
+
+(** We can reuse an instance of [RElim] for the underlying relation to
+  provide corresponding instances for the pulled relation. *)
 
 Lemma rel_pull_relim {A B A' B'} (f: A -> A') (g: B -> B') R x y P Q:
   RElim R (f x) (g y) P Q ->
@@ -370,6 +546,21 @@ Proof.
   destruct Hxy.
   rintro; eauto.
 Qed.
+
+Global Instance rel_push_subrel_params:
+  Params (@rel_push) 3.
+
+Lemma rel_push_corefl {A B} (f: A -> B) (R: rel A A):
+  Coreflexive R ->
+  Coreflexive (R !! f).
+Proof.
+  intros H _ _ [x y Hxy].
+  f_equal.
+  eauto using coreflexivity.
+Qed.
+
+Hint Extern 1 (Coreflexive (_ !! _)) =>
+  eapply rel_push_corefl : typeclass_instances.
 
 (** When using [R !! fst] or [R !! snd], if [rel_push_intro] does not
   apply, we can use the following instances instead. *)
@@ -498,7 +689,7 @@ Proof.
   assumption.
 Qed.
 
-Hint Extern 1 (RIntro _ (% _) _ _) =>
+Hint Extern 60 (RStep _ ((% _)%rel _ _)) =>
   eapply rel_pull_rintro : typeclass_instances.
 
 Hint Extern 1 (RElim (% _) _ _ _ _) =>
@@ -523,20 +714,63 @@ Qed.
 Hint Extern 0 (RIntro _ (req _) _ _) =>
   eapply req_rintro : typeclass_instances.
 
-Global Instance req_eq_subrel {A} (a: A):
-  Related (req a) eq subrel.
+Lemma req_corefl {A} (a: A):
+  Coreflexive (req a).
 Proof.
   destruct 1.
   reflexivity.
 Qed.
+
+Hint Extern 0 (Coreflexive (req _)) =>
+  eapply req_corefl : typeclass_instances.
 
 (** ** Checking predicates on the left and right elements *)
 
 Definition lsat {A B} (P: A -> Prop): rel A B :=
   fun x y => P x.
 
+Global Instance lsat_subrel A B:
+  Monotonic (@lsat A B) ((- ==> impl) ++> subrel).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance lsat_subrel_params:
+  Params (@lsat) 3.
+
 Definition rsat {A B} (P: B -> Prop): rel A B :=
   fun x y => P y.
+
+Global Instance rsat_subrel A B:
+  Monotonic (@rsat A B) ((- ==> impl) ++> subrel).
+Proof.
+  firstorder.
+Qed.
+
+Global Instance rsat_subrel_params:
+  Params (@rsat) 3.
+
+Inductive psat {A} (I: A -> Prop) (x: A): A -> Prop :=
+  psat_intro: I x -> psat I x x.
+
+Global Instance psat_subrel A:
+  Monotonic (@psat A) ((- ==> impl) ++> subrel).
+Proof.
+  intros P Q HPQ x _ [Hx].
+  constructor. apply HPQ. assumption.
+Qed.
+
+Global Instance psat_subrel_params:
+  Params (@psat) 3.
+
+Lemma psat_corefl {A} (I: A -> Prop):
+  Coreflexive (psat I).
+Proof.
+  intros x _ [_]. reflexivity.
+Qed.
+
+Hint Extern 0 (Coreflexive (psat _)) =>
+  eapply psat_corefl : typeclass_instances.
 
 (** ** Relation versions of [ex] and [all] *)
 
@@ -550,7 +784,7 @@ Definition rel_all {A B C} (R: C -> rel A B): rel A B :=
   fun x y => forall c, R c x y.
 
 Notation "'rforall' x .. y , p" :=
-  (rel_all (fun x => .. (rel_all (fun y => p)) .. ))
+  (rel_all (fun x => .. (rel_all (fun y => p%rel)) .. ))
   (at level 200, x binder, right associativity)
   : rel_scope.
 
@@ -577,12 +811,12 @@ Definition rel_ex {A B C} (R: C -> rel A B): rel A B :=
   fun x y => exists c, R c x y.
 
 Notation "'rexists' x .. y , p" :=
-  (rel_ex (fun x => .. (rel_ex (fun y => p)) ..))
+  (rel_ex (fun x => .. (rel_ex (fun y => p%rel)) ..))
   (at level 200, x binder, right associativity)
   : rel_scope.
 
-Lemma rel_ex_rintro {A B C} (R: C -> rel A B) m n:
-  RExists (exists c : C, R c m n) (rel_ex R) m n.
+Lemma rel_ex_rintro {A B C} (R: C -> rel A B) c m n:
+  RExists (R c m n) (rel_ex R) m n.
 Proof.
   firstorder.
 Qed.
@@ -601,6 +835,8 @@ Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
   eapply rel_ex_relim : typeclass_instances.
 
 (** ** The [rel_incr] construction *)
+
+(** XXX: this is on the way out, see KLR.v *)
 
 (** When dealing with Kripke logical relations, we have a family of
   relations indexed by a type of worlds, as well as an accessibility
