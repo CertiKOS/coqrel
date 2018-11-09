@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>coqrel.RDestruct</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library coqrel.RDestruct</h1>
+
+<div class="code">
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Export</span> <a class="idref" href="coqrel.RelDefinitions.html#"><span class="id" title="library">RelDefinitions</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab57"></a><h1 class="section">The <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> class</h1>
+
+<div class="paragraph"> </div>
+
+<a name="lab58"></a><h2 class="section">Tactics</h2>
+
+<div class="paragraph"> </div>
+
+ The <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#rdestruct"><span class="id" title="projection">rdestruct</span></a></span> tactic locates and uses an <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> instance
+  for a given hypothesis. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">rdestruct</span> <span class="id" title="var">H</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">lazymatch</span> <span class="id" title="var">type</span> <span class="id" title="var">of</span> <span class="id" title="var">H</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">R</span> ?<span class="id" title="var">m</span> ?<span class="id" title="var">n</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">not_evar</span> <span class="id" title="var">R</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">pattern</span> <span class="id" title="var">m</span>, <span class="id" title="var">n</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> (<a class="idref" href="coqrel.RelDefinitions.html#rdestruct"><span class="id" title="definition">rdestruct</span></a> (<span class="id" title="var">R</span>:=<span class="id" title="var">R</span>) <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">H</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">clear</span> <span class="id" title="var">H</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Delay.split_conjunction</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The <span class="inlinecode"><span class="id" title="var">rinversion</span></span> tactic is similar, but it remembers the terms
+  related by the destructed hypothesis. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">rinversion_tac</span> <span class="id" title="var">H</span> <span class="id" title="var">Hm</span> <span class="id" title="var">Hn</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">lazymatch</span> <span class="id" title="var">type</span> <span class="id" title="var">of</span> <span class="id" title="var">H</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">R</span> ?<span class="id" title="var">m</span> ?<span class="id" title="var">n</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">not_evar</span> <span class="id" title="var">R</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">pattern</span> <span class="id" title="var">m</span>, <span class="id" title="var">n</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">lazymatch</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- ?<span class="id" title="var">Q</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">generalize</span> (<a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#eq_refl"><span class="id" title="constructor">eq_refl</span></a> <span class="id" title="var">m</span>), (<a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#eq_refl"><span class="id" title="constructor">eq_refl</span></a> <span class="id" title="var">n</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">change</span> ((<span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> ⇒ <a class="idref" href="coqrel.Delay.html#Delay.delayed_goal"><span class="id" title="definition">Delay.delayed_goal</span></a> (<a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <span class="id" title="var">m</span> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <span class="id" title="var">n</span> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <span class="id" title="var">Q</span> <a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a>)) <span class="id" title="var">m</span> <span class="id" title="var">n</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> (<a class="idref" href="coqrel.RelDefinitions.html#rdestruct"><span class="id" title="definition">rdestruct</span></a> (<span class="id" title="var">R</span>:=<span class="id" title="var">R</span>) <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">H</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">Delay.split_conjunction</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">Hm</span> <span class="id" title="var">Hn</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Tactic Notation</span> "rinversion" <span class="id" title="keyword">constr</span>(<span class="id" title="var">H</span>) "as" <span class="id" title="var">ident</span>(<span class="id" title="var">Hl</span>) "," <span class="id" title="var">ident</span>(<span class="id" title="var">Hr</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="var">rinversion_tac</span> <span class="id" title="var">H</span> <span class="id" title="var">Hl</span> <span class="id" title="var">Hr</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Tactic Notation</span> "rinversion" <span class="id" title="var">hyp</span>(<span class="id" title="var">H</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hl</span> := <span class="id" title="tactic">fresh</span> <span class="id" title="var">H</span> "l" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hr</span> := <span class="id" title="tactic">fresh</span> <span class="id" title="var">H</span> "r" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">rinversion_tac</span> <span class="id" title="var">H</span> <span class="id" title="var">Hl</span> <span class="id" title="var">Hr</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Tactic Notation</span> "rinversion" <span class="id" title="keyword">constr</span>(<span class="id" title="var">H</span>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hl</span> := <span class="id" title="tactic">fresh</span> "Hl" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hr</span> := <span class="id" title="tactic">fresh</span> "Hr" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="var">rinversion_tac</span> <span class="id" title="var">H</span> <span class="id" title="var">Hl</span> <span class="id" title="var">Hr</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab59"></a><h2 class="section">Introducing the hypothesis to be destructed</h2>
+
+<div class="paragraph"> </div>
+
+ The goal of <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#rdestruct"><span class="id" title="projection">rdestruct</span></a></span> is usually to make progress on a goal
+  relating two <span class="inlinecode"><span class="id" title="keyword">match</span></span> constructions, by breaking down the terms being
+  matched. The instances below will attempt to prove automatically
+  that these terms are related, then destruct the resulting hypothesis
+  in order to break them down and reduce the <span class="inlinecode"><span class="id" title="keyword">match</span></span>es.
+
+<div class="paragraph"> </div>
+
+  If proving the destructed hypothesis automatically is not possible,
+  the user can use the following tactic to introduce it manually. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">rdestruct_assert</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">lazymatch</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| |- <span class="id" title="var">_</span> (<span class="id" title="keyword">match</span> ?<span class="id" title="var">m</span> <span class="id" title="keyword">with</span> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> <span class="id" title="keyword">end</span>) (<span class="id" title="keyword">match</span> ?<span class="id" title="var">n</span> <span class="id" title="keyword">with</span> <span class="id" title="var">_</span> ⇒ <span class="id" title="var">_</span> <span class="id" title="keyword">end</span>) ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Tm</span> := <span class="id" title="var">type</span> <span class="id" title="var">of</span> <span class="id" title="var">m</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Tn</span> := <span class="id" title="var">type</span> <span class="id" title="var">of</span> <span class="id" title="var">n</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">R</span> := <span class="id" title="tactic">fresh</span> "R" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">evar</span> (<span class="id" title="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" title="definition">rel</span></a> <span class="id" title="var">Tm</span> <span class="id" title="var">Tn</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">assert</span> (<span class="id" title="var">R</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span>); <span class="id" title="tactic">subst</span> <span class="id" title="var">R</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab60"></a><h2 class="section"><span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> steps</h2>
+
+<div class="paragraph"> </div>
+
+ Sometimes we want to remember what the destructed terms were.
+  To make this possible, we use the following relation to wrap the
+  subgoals generated by the <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> instance. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="rdestruct_result"><span class="id" title="definition">rdestruct_result</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} <span class="id" title="var">m</span> <span class="id" title="var">n</span> (<span class="id" title="var">Q</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" title="definition">rel</span></a> <a class="idref" href="coqrel.RDestruct.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.RDestruct.html#B"><span class="id" title="variable">B</span></a>): <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" title="definition">rel</span></a> <a class="idref" href="coqrel.RDestruct.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.RDestruct.html#B"><span class="id" title="variable">B</span></a> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">fun</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> ⇒ <a class="idref" href="coqrel.RDestruct.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d82a7d96d3659d805ffe732283716822"><span class="id" title="notation">∧</span></a> <a class="idref" href="coqrel.RDestruct.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="coqrel.RDestruct.html#Q"><span class="id" title="variable">Q</span></a> <a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+To use <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> instances to reduce a goal involving pattern
+  matching <span class="inlinecode"><span class="id" title="var">G</span></span> := <span class="inlinecode"><span class="id" title="var">_</span></span> <span class="inlinecode">(<span class="id" title="keyword">match</span></span> <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#m"><span class="id" title="variable">m</span></a></span> <span class="inlinecode"><span class="id" title="keyword">with</span></span> <span class="inlinecode"><span class="id" title="var">_</span></span> <span class="inlinecode"><span class="id" title="keyword">end</span>)</span> <span class="inlinecode">(<span class="id" title="keyword">match</span></span> <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#n"><span class="id" title="variable">n</span></a></span> <span class="inlinecode"><span class="id" title="keyword">with</span></span> <span class="inlinecode"><span class="id" title="var">_</span></span> <span class="inlinecode"><span class="id" title="keyword">end</span>)</span>, we
+  need to establish that <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#m"><span class="id" title="variable">m</span></a></span> and <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#n"><span class="id" title="variable">n</span></a></span> are related by some relation <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#R"><span class="id" title="variable">R</span></a></span>,
+  then locate an instance of <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> that corresponds to <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#R"><span class="id" title="variable">R</span></a></span>. It
+  is essential that this happens in one step. At some point, I tried
+  to split the process in two different <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" title="record">RStep</span></a></span>s, so that the user
+  could control the resolution of the <span class="inlinecode">?<a class="idref" href="coqrel.RelDefinitions.html#R"><span class="id" title="variable">R</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#m"><span class="id" title="variable">m</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#n"><span class="id" title="variable">n</span></a></span> subgoal. However, in
+  situation where <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> is not the right strategy, this may
+  push a <span class="inlinecode"><span class="id" title="var">delayed</span></span> <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#rauto"><span class="id" title="projection">rauto</span></a></span> into a dead end. Thankfully, now we can use
+  the <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RAuto"><span class="id" title="record">RAuto</span></a></span> typeclass to solve the <span class="inlinecode">?<a class="idref" href="coqrel.RelDefinitions.html#R"><span class="id" title="variable">R</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#m"><span class="id" title="variable">m</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#n"><span class="id" title="variable">n</span></a></span> subgoal in one swoop. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="rdestruct_rstep"><span class="id" title="lemma">rdestruct_rstep</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} <span class="id" title="var">m</span> <span class="id" title="var">n</span> (<span class="id" title="var">R</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" title="definition">rel</span></a> <a class="idref" href="coqrel.RDestruct.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.RDestruct.html#B"><span class="id" title="variable">B</span></a>) <span class="id" title="var">P</span> (<span class="id" title="var">Q</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" title="definition">rel</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span>):<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RAuto"><span class="id" title="class">RAuto</span></a> (<a class="idref" href="coqrel.RDestruct.html#R"><span class="id" title="variable">R</span></a> <a class="idref" href="coqrel.RDestruct.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="coqrel.RDestruct.html#n"><span class="id" title="variable">n</span></a>) <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="class">RDestruct</span></a> <a class="idref" href="coqrel.RDestruct.html#R"><span class="id" title="variable">R</span></a> <a class="idref" href="coqrel.RDestruct.html#P"><span class="id" title="variable">P</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RDestruct.html#P"><span class="id" title="variable">P</span></a> (<a class="idref" href="coqrel.RDestruct.html#rdestruct_result"><span class="id" title="definition">rdestruct_result</span></a> <a class="idref" href="coqrel.RDestruct.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="coqrel.RDestruct.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="coqrel.RDestruct.html#Q"><span class="id" title="variable">Q</span></a>) <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RDestruct.html#Q"><span class="id" title="variable">Q</span></a> <a class="idref" href="coqrel.RDestruct.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="coqrel.RDestruct.html#n"><span class="id" title="variable">n</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">Hmn</span> <span class="id" title="var">HR</span> <span class="id" title="var">H</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">firstorder</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">use_rdestruct_rstep</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">H</span> := <span class="id" title="tactic">fresh</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intro</span> <span class="id" title="var">H</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">pattern</span> <span class="id" title="var">m</span>, <span class="id" title="var">n</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> (<a class="idref" href="coqrel.RDestruct.html#rdestruct_rstep"><span class="id" title="lemma">rdestruct_rstep</span></a> <span class="id" title="var">m</span> <span class="id" title="var">n</span>);<br/>
+&nbsp;&nbsp;[ .. | <span class="id" title="tactic">eexact</span> <span class="id" title="var">H</span>].<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 40 (<a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" title="class">RStep</span></a> <span class="id" title="var">_</span> (<span class="id" title="var">_</span> (<span class="id" title="keyword">match</span> ?<span class="id" title="var">m</span> <span class="id" title="keyword">with</span> <span class="id" title="var">_</span>⇒<span class="id" title="var">_</span> <span class="id" title="keyword">end</span>) (<span class="id" title="keyword">match</span> ?<span class="id" title="var">n</span> <span class="id" title="keyword">with</span> <span class="id" title="var">_</span>⇒<span class="id" title="var">_</span> <span class="id" title="keyword">end</span>))) ⇒<br/>
+&nbsp;&nbsp;<span class="id" title="var">use_rdestruct_rstep</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> : <span class="id" title="var">typeclass_instances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab61"></a><h2 class="section">Choosing to discard or keep equations</h2>
+
+<div class="paragraph"> </div>
+
+ The <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" title="record">RStep</span></a></span> above will leave us with a bunch of <span class="inlinecode"><a class="idref" href="coqrel.RDestruct.html#rdestruct_result"><span class="id" title="definition">rdestruct_result</span></a></span>
+  subgoals. The next <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" title="record">RStep</span></a></span> will unpack them, and either discard or
+  keep equations.
+
+<div class="paragraph"> </div>
+
+  By default, we discard equations. This is to prevent them from
+  cluttering the context, possibly interfering with further steps, and
+  introducing unwanted dependencies. However, the user can use the
+  <span class="inlinecode"><a class="idref" href="coqrel.RDestruct.html#rdestruct_remember"><span class="id" title="inductive">rdestruct_remember</span></a></span> and <span class="inlinecode"><span class="id" title="var">rdestruct_forget</span></span> tactics below to control
+  this behavior. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">CoInductive</span> <a name="rdestruct_remember"><span class="id" title="inductive">rdestruct_remember</span></a> := <a name="rdestruct_remember_intro"><span class="id" title="constructor">rdestruct_remember_intro</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">rdestruct_remember</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">lazymatch</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> : <a class="idref" href="coqrel.RDestruct.html#rdestruct_remember"><span class="id" title="inductive">rdestruct_remember</span></a> |- <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">idtac</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">H</span> := <span class="id" title="tactic">fresh</span> "Hrdestruct" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">pose</span> <span class="id" title="var">proof</span> <a class="idref" href="coqrel.RDestruct.html#rdestruct_remember_intro"><span class="id" title="constructor">rdestruct_remember_intro</span></a> <span class="id" title="keyword">as</span> <span class="id" title="var">H</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">rdestruct_forget</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">lazymatch</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">H</span> : <a class="idref" href="coqrel.RDestruct.html#rdestruct_remember"><span class="id" title="inductive">rdestruct_remember</span></a> |- <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">clear</span> <span class="id" title="var">H</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">idtac</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+The following <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RStep"><span class="id" title="record">RStep</span></a></span> instance will keep or discard the equations
+  in <span class="inlinecode"><a class="idref" href="coqrel.RDestruct.html#rdestruct_result"><span class="id" title="definition">rdestruct_result</span></a></span> based on the user's choice. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="rdestruct_forget_rintro"><span class="id" title="lemma">rdestruct_forget_rintro</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} <span class="id" title="var">m</span> <span class="id" title="var">n</span> (<span class="id" title="var">Q</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" title="definition">rel</span></a> <a class="idref" href="coqrel.RDestruct.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.RDestruct.html#B"><span class="id" title="variable">B</span></a>) <span class="id" title="var">x</span> <span class="id" title="var">y</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" title="class">RIntro</span></a> (<a class="idref" href="coqrel.RDestruct.html#Q"><span class="id" title="variable">Q</span></a> <a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a>) (<a class="idref" href="coqrel.RDestruct.html#rdestruct_result"><span class="id" title="definition">rdestruct_result</span></a> <a class="idref" href="coqrel.RDestruct.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="coqrel.RDestruct.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="coqrel.RDestruct.html#Q"><span class="id" title="variable">Q</span></a>) <a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">firstorder</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a name="rdestruct_remember_rintro"><span class="id" title="lemma">rdestruct_remember_rintro</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} <span class="id" title="var">m</span> <span class="id" title="var">n</span> (<span class="id" title="var">Q</span>: <a class="idref" href="coqrel.RelDefinitions.html#rel"><span class="id" title="definition">rel</span></a> <a class="idref" href="coqrel.RDestruct.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.RDestruct.html#B"><span class="id" title="variable">B</span></a>) <span class="id" title="var">x</span> <span class="id" title="var">y</span>:<br/>
+&nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" title="class">RIntro</span></a> (<a class="idref" href="coqrel.RDestruct.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="coqrel.RDestruct.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="coqrel.RDestruct.html#Q"><span class="id" title="variable">Q</span></a> <a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a>) (<a class="idref" href="coqrel.RDestruct.html#rdestruct_result"><span class="id" title="definition">rdestruct_result</span></a> <a class="idref" href="coqrel.RDestruct.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="coqrel.RDestruct.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="coqrel.RDestruct.html#Q"><span class="id" title="variable">Q</span></a>) <a class="idref" href="coqrel.RDestruct.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="coqrel.RDestruct.html#y"><span class="id" title="variable">y</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">firstorder</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">rdestruct_result_rintro</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">lazymatch</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> : <a class="idref" href="coqrel.RDestruct.html#rdestruct_remember"><span class="id" title="inductive">rdestruct_remember</span></a> |- <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> <a class="idref" href="coqrel.RDestruct.html#rdestruct_remember_rintro"><span class="id" title="lemma">rdestruct_remember_rintro</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> <a class="idref" href="coqrel.RDestruct.html#rdestruct_forget_rintro"><span class="id" title="lemma">rdestruct_forget_rintro</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 100 (<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" title="class">RIntro</span></a> <span class="id" title="var">_</span> (<a class="idref" href="coqrel.RDestruct.html#rdestruct_result"><span class="id" title="definition">rdestruct_result</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span>) <span class="id" title="var">_</span> <span class="id" title="var">_</span>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" title="var">rdestruct_result_rintro</span> : <span class="id" title="var">typeclass_instances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab62"></a><h2 class="section">Default instance</h2>
+
+<div class="paragraph"> </div>
+
+ We provide a default instance of <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> by reifying the
+  behavior of the <span class="inlinecode"><span class="id" title="tactic">destruct</span></span> tactic on the relational hypothesis that
+  we're trying to destruct. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">default_rdestruct</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">m</span> := <span class="id" title="tactic">fresh</span> "m" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">n</span> := <span class="id" title="tactic">fresh</span> "n" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hmn</span> := <span class="id" title="tactic">fresh</span> "H" <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">P</span> := <span class="id" title="tactic">fresh</span> "P" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">H</span> := <span class="id" title="tactic">fresh</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">Hmn</span> <span class="id" title="var">P</span> <span class="id" title="var">H</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">revert</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">Hmn</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">delayed_conjunction</span> (<span class="id" title="tactic">intros</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">Hmn</span>; <span class="id" title="tactic">destruct</span> <span class="id" title="var">Hmn</span>; <span class="id" title="var">delay</span>);<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">pattern</span> <span class="id" title="var">P</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eexact</span> <span class="id" title="var">H</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 100 (<a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="class">RDestruct</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" title="var">default_rdestruct</span> : <span class="id" title="var">typeclass_instances</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+In the special case where the terms matched on the left- and
+  right-hand sides are identical, we want to destruct that term
+  instead. We accomplish this by introducing a special instance of
+  <span class="inlinecode"><a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="record">RDestruct</span></a></span> for the relation <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Ltac</span> <span class="id" title="var">eq_rdestruct</span> :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">m</span> := <span class="id" title="tactic">fresh</span> "m" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">n</span> := <span class="id" title="tactic">fresh</span> "n" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">Hmn</span> := <span class="id" title="tactic">fresh</span> "H" <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">P</span> := <span class="id" title="tactic">fresh</span> "P" <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">let</span> <span class="id" title="var">H</span> := <span class="id" title="tactic">fresh</span> <span class="id" title="keyword">in</span><br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">Hmn</span> <span class="id" title="var">P</span> <span class="id" title="var">H</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">revert</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">Hmn</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="var">delayed_conjunction</span> (<span class="id" title="tactic">intros</span> <span class="id" title="var">m</span> <span class="id" title="var">n</span> <span class="id" title="var">Hmn</span>; <span class="id" title="tactic">destruct</span> <span class="id" title="var">Hmn</span>; <span class="id" title="tactic">destruct</span> <span class="id" title="var">m</span>; <span class="id" title="var">delay</span>);<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">pattern</span> <span class="id" title="var">P</span>;<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eexact</span> <span class="id" title="var">H</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 99 (<a class="idref" href="coqrel.RelDefinitions.html#RDestruct"><span class="id" title="class">RDestruct</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <span class="id" title="var">_</span>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" title="var">eq_rdestruct</span> : <span class="id" title="var">typeclass_instances</span>.<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
