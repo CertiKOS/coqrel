@@ -22,13 +22,13 @@ Require Export Monotonicity.
 Definition klr W A B: Type :=
   W -> rel A B.
 
-Class KripkeFrame (W: Type) :=
+Class KripkeFrame (L: Type) (W: Type) :=
   {
     initw: W -> Prop;
-    acc: rel W W;
+    acc: L -> rel W W;
   }.
 
-Infix "~>" := acc (at level 70).
+Infix "~>" := (acc tt) (at level 70).
 Notation "# ~> w" := (initw w) (at level 70).
 
 Delimit Scope klr_scope with klr.
@@ -234,24 +234,24 @@ Section MODALITIES.
   (** The box modality asserts that the relation holds at all
     possible future worlds. *)
 
-  Definition klr_box {A B} (R: klr W A B): klr W A B :=
-    fun w x y => forall w', w ~> w' -> R w' x y.
+  Definition klr_box {A B} (l: L) (R: klr W A B): klr W A B :=
+    fun w x y => forall w', acc l w w' -> R w' x y.
 
   Global Instance klr_box_subrel {A B}:
-    Monotonic (@klr_box A B) ((- ==> subrel) ++> (- ==> subrel)).
+    Monotonic (@klr_box A B) (- ==> (- ==> subrel) ++> (- ==> subrel)).
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_box_rintro {A B} (R: klr W A B) w x y:
-    RIntro (forall w' (Hw': w ~> w'), R w' x y) (klr_box R w) x y.
+  Lemma klr_box_rintro {A B} l (R: klr W A B) w x y:
+    RIntro (forall w' (Hw': acc l w w'), R w' x y) (klr_box l R w) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_box_relim {A B} (R: klr W A B) w w' x y P Q:
+  Lemma klr_box_relim {A B} l (R: klr W A B) w w' x y P Q:
     RElim (R w') x y P Q ->
-    RElim (klr_box R w) x y (w ~> w' /\ P) Q.
+    RElim (klr_box l R w) x y (acc l w w' /\ P) Q.
   Proof.
     intros H Hxy [Hw' HP].
     apply H; auto.
@@ -262,24 +262,24 @@ Section MODALITIES.
     intro rule: we want to first determine what [w'] should be, then
     attempt to prove [w ~> w']. *)
 
-  Definition klr_diam {A B} (R: klr W A B): klr W A B :=
-    fun w x y => exists w', w ~> w' /\ R w' x y.
+  Definition klr_diam {A B} (l: L) (R: klr W A B): klr W A B :=
+    fun w x y => exists w', acc l w w' /\ R w' x y.
 
   Global Instance klr_diam_subrel {A B}:
-    Monotonic (@klr_diam A B) ((- ==> subrel) ++> (- ==> subrel)).
+    Monotonic (@klr_diam A B) (- ==> (- ==> subrel) ++> (- ==> subrel)).
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_diam_rintro {A B} (R: klr W A B) w w' x y:
-    RExists (R w' x y /\ w ~> w') (klr_diam R w) x y.
+  Lemma klr_diam_rintro {A B} l (R: klr W A B) w w' x y:
+    RExists (R w' x y /\ acc l w w') (klr_diam l R w) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_diam_relim {A B} (R: klr W A B) w x y P Q:
-    (forall w', w ~> w' -> RElim (R w') x y P Q) ->
-    RElim (klr_diam R w) x y P Q.
+  Lemma klr_diam_relim {A B} l (R: klr W A B) w x y P Q:
+    (forall w', acc l w w' -> RElim (R w') x y P Q) ->
+    RElim (klr_diam l R w) x y P Q.
   Proof.
     intros H (w' & Hw' & Hxy) HP.
     eapply H; eauto.
@@ -299,8 +299,10 @@ Hint Extern 0 (RExists _ (klr_diam _ _) _ _) =>
 Hint Extern 1 (RElim (klr_diam _ _) _ _ _ _) =>
   eapply klr_diam_relim : typeclass_instances.
 
-Notation "[] R" := (klr_box R) (at level 65) : klr_scope.
-Notation "<> R" := (klr_diam R) (at level 65) : klr_scope.
+Notation "[ l ] R" := (klr_box l R) (at level 65) : klr_scope.
+Notation "< l > R" := (klr_diam l R) (at level 65) : klr_scope.
+Notation "[] R" := (klr_box tt R) (at level 65) : klr_scope.
+Notation "<> R" := (klr_diam tt R) (at level 65) : klr_scope.
 
 (** ** Flattening KLRs *)
 
@@ -400,8 +402,10 @@ Hint Extern 1 (RElim (rel_diam _) _ _ _ _) =>
   eapply rel_diam_relim : typeclass_instances.
 
 Notation "|= R" := (rel_kvd R) (at level 65) : rel_scope.
-Notation "[] R" := (rel_box R) (at level 65) : rel_scope.
-Notation "<> R" := (rel_diam R) (at level 65) : rel_scope.
+Notation "[ l ] R" := (rel_box l R) (at level 65) : rel_scope.
+Notation "< l > R" := (rel_diam l R) (at level 65) : rel_scope.
+Notation "[] R" := (rel_box tt R) (at level 65) : rel_scope.
+Notation "<> R" := (rel_diam tt R) (at level 65) : rel_scope.
 
 (** ** Pulling along a Kripke frame morphism *)
 
