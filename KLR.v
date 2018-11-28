@@ -302,6 +302,24 @@ Notation "< l > R" := (klr_diam l R) (at level 65) : klr_scope.
 Notation "[] R" := (klr_box tt R) (at level 65) : klr_scope.
 Notation "<> R" := (klr_diam tt R) (at level 65) : klr_scope.
 
+(** For Kripke frames indexed by pairs, the following variants allow
+  the components being related to access the labels used for transitions. *)
+
+Section ARROW_MOD.
+  Context {W L1 L2} `{kf: KripkeFrame (L1 * L2) W}.
+
+  Definition klr_boxto {A B} (R : klr W A B) : klr W (L1 -> A) (L2 -> B) :=
+    fun w f g =>
+      forall l1 l2 w', acc (l1, l2) w w' -> R w' (f l1) (g l2).
+
+  Definition klr_diamat {A B} (R : klr W A B) : klr W (L1 * A) (L2 * B) :=
+    fun w '(l1, a) '(l2, b) =>
+      exists w', acc (l1, l2) w w' /\ R w' a b.
+End ARROW_MOD.
+
+Notation "[] -> R" := (klr_boxto R) (at level 65) : klr_scope.
+Notation "<> * R" := (klr_diamat R) (at level 65) : klr_scope.
+
 (** ** Flattening KLRs *)
 
 (** When converting back to a standard [rel], we can quantify over
