@@ -33,6 +33,17 @@ Delimit Scope klr_scope with klr.
 Bind Scope klr_scope with klr.
 
 
+(** * Operations on KLRs *)
+
+Inductive klr_sum {WA A1 A2 WB B1 B2} RA RB: klr (WA + WB) (A1 + B1) (A2 + B2) :=
+  | klr_inl w a1 a2 :
+      RA w a1 a2 ->
+      klr_sum RA RB (inl w) (inl a1) (inl a2)
+  | klr_inr w b1 b2 :
+      RB w b1 b2 ->
+      klr_sum RA RB (inr w) (inr b1) (inr b2).
+
+
 (** * Kripke relators *)
 
 (** Just like relators allow us to construct complex relations from
