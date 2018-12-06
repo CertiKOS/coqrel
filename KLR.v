@@ -298,14 +298,14 @@ End MODALITIES.
 Global Instance klr_box_subrel_params: Params (@klr_box) 4.
 Global Instance klr_diam_subrel_params: Params (@klr_diam) 4.
 
-Hint Extern 0 (RIntro _ (klr_box _ _) _ _) =>
+Hint Extern 0 (RIntro _ (klr_box _ _ _) _ _) =>
   eapply klr_box_rintro : typeclass_instances.
-Hint Extern 1 (RElim (klr_box _ _) _ _ _ _) =>
+Hint Extern 1 (RElim (klr_box _ _ _) _ _ _ _) =>
   eapply klr_box_relim : typeclass_instances.
 
-Hint Extern 0 (RExists _ (klr_diam _ _) _ _) =>
+Hint Extern 0 (RExists _ (klr_diam _ _ _) _ _) =>
   eapply klr_diam_rintro : typeclass_instances.
-Hint Extern 1 (RElim (klr_diam _ _) _ _ _ _) =>
+Hint Extern 1 (RElim (klr_diam _ _ _) _ _ _ _) =>
   eapply klr_diam_relim : typeclass_instances.
 
 Notation "[ l ] R" := (klr_box l R) (at level 65) : klr_scope.

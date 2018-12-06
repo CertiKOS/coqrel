@@ -179,7 +179,7 @@ Ltac split_hyp H :=
       let Hw' := fresh "H" w' in
       destruct H as (w' & Hw' & H);
       split_hyp H
-    | klr_diam ?R ?w ?x ?y =>
+    | klr_diam ?l ?R ?w ?x ?y =>
       let w' := fresh w "'" in
       let Hw' := fresh "H" w' in
       destruct H as (w' & Hw' & H);
