@@ -191,14 +191,30 @@ Section USUAL.
   Definition set_kge {A B} (R: klr W A B): klr W (A -> Prop) (B -> Prop) :=
     fun w sA sB => forall b, sB b -> exists a, sA a /\ R w a b.
 
+  Definition klr_union {W A B} :=
+    k2 (W:=W) (@rel_union A B).
+
+  Definition klr_inter {W A B} :=
+    k2 (W:=W) (@rel_inter A B).
+
   Definition klr_curry {W A1 B1 C1 A2 B2 C2} :=
     k1 (W:=W) (@rel_curry A1 B1 C1 A2 B2 C2).
 End USUAL.
 
-Infix "++>" := arrow_klr : klr_scope.
+Notation "RA ==> RB" := (arrow_klr RA RB)
+  (at level 55, right associativity) : klr_scope.
+
+Notation "RA ++> RB" := (arrow_klr RA RB)
+  (at level 55, right associativity) : klr_scope.
+
+Notation "RA --> RB" := (arrow_klr (k1 flip RA) RB)
+  (at level 55, right associativity) : klr_scope.
+
 Notation "- ==> R" := (arrow_pointwise_klr _ R) : klr_scope.
 Infix "*" := prod_klr : klr_scope.
 Infix "+" := sum_klr : klr_scope.
+Infix "\/" := klr_union : klr_scope.
+Infix "/\" := klr_inter : klr_scope.
 Notation "% R" := (klr_curry R) : klr_scope.
 
 Hint Extern 0 (RIntro _ (arrow_klr _ _ _) _ _) =>
