@@ -43,12 +43,16 @@
 <span class="id" title="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" title="keyword">Global Instance</span> <a name="None_le"><span class="id" title="instance">None_le</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} <span class="id" title="var">R</span> <span class="id" title="var">y</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <a name="None_le"><span class="id" title="lemma">None_le</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} <span class="id" title="var">R</span> <span class="id" title="var">y</span>:<br/>
 &nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" title="class">RIntro</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a> (@<a class="idref" href="coqrel.OptionRel.html#option_le"><span class="id" title="inductive">option_le</span></a> <a class="idref" href="coqrel.OptionRel.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.OptionRel.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="coqrel.OptionRel.html#R"><span class="id" title="variable">R</span></a>) <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Datatypes.html#None"><span class="id" title="constructor">None</span></a> <a class="idref" href="coqrel.OptionRel.html#y"><span class="id" title="variable">y</span></a>.<br/>
 <span class="id" title="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">_</span>.<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">apply</span> @<a class="idref" href="coqrel.OptionRel.html#None_le_def"><span class="id" title="constructor">None_le_def</span></a>.<br/>
 <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" title="class">RIntro</span></a> <span class="id" title="var">_</span> (<a class="idref" href="coqrel.OptionRel.html#option_le"><span class="id" title="inductive">option_le</span></a> <span class="id" title="var">_</span>) <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Datatypes.html#None"><span class="id" title="constructor">None</span></a> <span class="id" title="var">_</span>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> <a class="idref" href="coqrel.OptionRel.html#None_le"><span class="id" title="lemma">None_le</span></a> : <span class="id" title="var">typeclass_instances</span>.<br/>
 
 <br/>
 <span class="id" title="keyword">Global Instance</span> <a name="option_le_subrel"><span class="id" title="instance">option_le_subrel</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span>:<br/>
@@ -129,12 +133,16 @@
 <span class="id" title="keyword">Qed</span>.<br/>
 
 <br/>
-<span class="id" title="keyword">Global Instance</span> <a name="None_ge"><span class="id" title="instance">None_ge</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} <span class="id" title="var">R</span> <span class="id" title="var">x</span>:<br/>
+<span class="id" title="keyword">Lemma</span> <a name="None_ge"><span class="id" title="lemma">None_ge</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">B</span>} <span class="id" title="var">R</span> <span class="id" title="var">x</span>:<br/>
 &nbsp;&nbsp;<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" title="class">RIntro</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a> (@<a class="idref" href="coqrel.OptionRel.html#option_ge"><span class="id" title="inductive">option_ge</span></a> <a class="idref" href="coqrel.OptionRel.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="coqrel.OptionRel.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="coqrel.OptionRel.html#R"><span class="id" title="variable">R</span></a>) <a class="idref" href="coqrel.OptionRel.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Datatypes.html#None"><span class="id" title="constructor">None</span></a>.<br/>
 <span class="id" title="keyword">Proof</span>.<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">_</span>.<br/>
 &nbsp;&nbsp;<span class="id" title="tactic">apply</span> @<a class="idref" href="coqrel.OptionRel.html#None_ge_def"><span class="id" title="constructor">None_ge_def</span></a>.<br/>
 <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Extern</span> 0 (<a class="idref" href="coqrel.RelDefinitions.html#RIntro"><span class="id" title="class">RIntro</span></a> <span class="id" title="var">_</span> (<a class="idref" href="coqrel.OptionRel.html#option_ge"><span class="id" title="inductive">option_ge</span></a> <span class="id" title="var">_</span>) <span class="id" title="var">_</span> <a class="idref" href="http://coq.inria.fr/distrib/8.6.1/stdlib/Coq.Init.Datatypes.html#None"><span class="id" title="constructor">None</span></a>) ⇒<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> <a class="idref" href="coqrel.OptionRel.html#None_ge"><span class="id" title="lemma">None_ge</span></a> : <span class="id" title="var">typeclass_instances</span>.<br/>
 
 <br/>
 <span class="id" title="keyword">Global Instance</span> <a name="option_ge_subrel"><span class="id" title="instance">option_ge_subrel</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span>:<br/>
