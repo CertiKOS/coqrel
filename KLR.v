@@ -22,17 +22,26 @@ Require Export Monotonicity.
 Definition klr W A B: Type :=
   W -> rel A B.
 
-Class KripkeFrame (W: Type) :=
+Class KripkeFrame (L: Type) (W: Type) :=
   {
-    initw: W -> Prop;
-    acc: rel W W;
+    acc: L -> rel W W;
   }.
 
-Infix "~>" := acc (at level 70).
-Notation "# ~> w" := (initw w) (at level 70).
+Infix "~>" := (acc tt) (at level 70).
 
 Delimit Scope klr_scope with klr.
 Bind Scope klr_scope with klr.
+
+
+(** * Operations on KLRs *)
+
+Inductive klr_sum {WA A1 A2 WB B1 B2} RA RB: klr (WA + WB) (A1 + B1) (A2 + B2) :=
+  | klr_inl w a1 a2 :
+      RA w a1 a2 ->
+      klr_sum RA RB (inl w) (inl a1) (inl a2)
+  | klr_inr w b1 b2 :
+      RB w b1 b2 ->
+      klr_sum RA RB (inr w) (inr b1) (inr b2).
 
 
 (** * Kripke relators *)
@@ -182,14 +191,30 @@ Section USUAL.
   Definition set_kge {A B} (R: klr W A B): klr W (A -> Prop) (B -> Prop) :=
     fun w sA sB => forall b, sB b -> exists a, sA a /\ R w a b.
 
+  Definition klr_union {W A B} :=
+    k2 (W:=W) (@rel_union A B).
+
+  Definition klr_inter {W A B} :=
+    k2 (W:=W) (@rel_inter A B).
+
   Definition klr_curry {W A1 B1 C1 A2 B2 C2} :=
     k1 (W:=W) (@rel_curry A1 B1 C1 A2 B2 C2).
 End USUAL.
 
-Infix "++>" := arrow_klr : klr_scope.
+Notation "RA ==> RB" := (arrow_klr RA RB)
+  (at level 55, right associativity) : klr_scope.
+
+Notation "RA ++> RB" := (arrow_klr RA RB)
+  (at level 55, right associativity) : klr_scope.
+
+Notation "RA --> RB" := (arrow_klr (k1 flip RA) RB)
+  (at level 55, right associativity) : klr_scope.
+
 Notation "- ==> R" := (arrow_pointwise_klr _ R) : klr_scope.
 Infix "*" := prod_klr : klr_scope.
 Infix "+" := sum_klr : klr_scope.
+Infix "\/" := klr_union : klr_scope.
+Infix "/\" := klr_inter : klr_scope.
 Notation "% R" := (klr_curry R) : klr_scope.
 
 Hint Extern 0 (RIntro _ (arrow_klr _ _ _) _ _) =>
@@ -234,24 +259,24 @@ Section MODALITIES.
   (** The box modality asserts that the relation holds at all
     possible future worlds. *)
 
-  Definition klr_box {A B} (R: klr W A B): klr W A B :=
-    fun w x y => forall w', w ~> w' -> R w' x y.
+  Definition klr_box {A B} (l: L) (R: klr W A B): klr W A B :=
+    fun w x y => forall w', acc l w w' -> R w' x y.
 
   Global Instance klr_box_subrel {A B}:
-    Monotonic (@klr_box A B) ((- ==> subrel) ++> (- ==> subrel)).
+    Monotonic (@klr_box A B) (- ==> (- ==> subrel) ++> (- ==> subrel)).
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_box_rintro {A B} (R: klr W A B) w x y:
-    RIntro (forall w' (Hw': w ~> w'), R w' x y) (klr_box R w) x y.
+  Lemma klr_box_rintro {A B} l (R: klr W A B) w x y:
+    RIntro (forall w' (Hw': acc l w w'), R w' x y) (klr_box l R w) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_box_relim {A B} (R: klr W A B) w w' x y P Q:
+  Lemma klr_box_relim {A B} l (R: klr W A B) w w' x y P Q:
     RElim (R w') x y P Q ->
-    RElim (klr_box R w) x y (w ~> w' /\ P) Q.
+    RElim (klr_box l R w) x y (acc l w w' /\ P) Q.
   Proof.
     intros H Hxy [Hw' HP].
     apply H; auto.
@@ -262,24 +287,24 @@ Section MODALITIES.
     intro rule: we want to first determine what [w'] should be, then
     attempt to prove [w ~> w']. *)
 
-  Definition klr_diam {A B} (R: klr W A B): klr W A B :=
-    fun w x y => exists w', w ~> w' /\ R w' x y.
+  Definition klr_diam {A B} (l: L) (R: klr W A B): klr W A B :=
+    fun w x y => exists w', acc l w w' /\ R w' x y.
 
   Global Instance klr_diam_subrel {A B}:
-    Monotonic (@klr_diam A B) ((- ==> subrel) ++> (- ==> subrel)).
+    Monotonic (@klr_diam A B) (- ==> (- ==> subrel) ++> (- ==> subrel)).
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_diam_rintro {A B} (R: klr W A B) w w' x y:
-    RExists (R w' x y /\ w ~> w') (klr_diam R w) x y.
+  Lemma klr_diam_rintro {A B} l (R: klr W A B) w w' x y:
+    RExists (R w' x y /\ acc l w w') (klr_diam l R w) x y.
   Proof.
     firstorder.
   Qed.
 
-  Lemma klr_diam_relim {A B} (R: klr W A B) w x y P Q:
-    (forall w', w ~> w' -> RElim (R w') x y P Q) ->
-    RElim (klr_diam R w) x y P Q.
+  Lemma klr_diam_relim {A B} l (R: klr W A B) w x y P Q:
+    (forall w', acc l w w' -> RElim (R w') x y P Q) ->
+    RElim (klr_diam l R w) x y P Q.
   Proof.
     intros H (w' & Hw' & Hxy) HP.
     eapply H; eauto.
@@ -289,23 +314,43 @@ End MODALITIES.
 Global Instance klr_box_subrel_params: Params (@klr_box) 4.
 Global Instance klr_diam_subrel_params: Params (@klr_diam) 4.
 
-Hint Extern 0 (RIntro _ (klr_box _ _) _ _) =>
+Hint Extern 0 (RIntro _ (klr_box _ _ _) _ _) =>
   eapply klr_box_rintro : typeclass_instances.
-Hint Extern 1 (RElim (klr_box _ _) _ _ _ _) =>
+Hint Extern 1 (RElim (klr_box _ _ _) _ _ _ _) =>
   eapply klr_box_relim : typeclass_instances.
 
-Hint Extern 0 (RExists _ (klr_diam _ _) _ _) =>
+Hint Extern 0 (RExists _ (klr_diam _ _ _) _ _) =>
   eapply klr_diam_rintro : typeclass_instances.
-Hint Extern 1 (RElim (klr_diam _ _) _ _ _ _) =>
+Hint Extern 1 (RElim (klr_diam _ _ _) _ _ _ _) =>
   eapply klr_diam_relim : typeclass_instances.
 
-Notation "[] R" := (klr_box R) (at level 65) : klr_scope.
-Notation "<> R" := (klr_diam R) (at level 65) : klr_scope.
+Notation "[ l ] R" := (klr_box l R) (at level 65) : klr_scope.
+Notation "< l > R" := (klr_diam l R) (at level 65) : klr_scope.
+Notation "[] R" := (klr_box tt R) (at level 65) : klr_scope.
+Notation "<> R" := (klr_diam tt R) (at level 65) : klr_scope.
+
+(** For Kripke frames indexed by pairs, the following variants allow
+  the components being related to access the labels used for transitions. *)
+
+Section ARROW_MOD.
+  Context {W L1 L2} `{kf: KripkeFrame (L1 * L2) W}.
+
+  Definition klr_boxto {A B} (R : klr W A B) : klr W (L1 -> A) (L2 -> B) :=
+    fun w f g =>
+      forall l1 l2 w', acc (l1, l2) w w' -> R w' (f l1) (g l2).
+
+  Definition klr_diamat {A B} (R : klr W A B) : klr W (L1 * A) (L2 * B) :=
+    fun w '(l1, a) '(l2, b) =>
+      exists w', acc (l1, l2) w w' /\ R w' a b.
+End ARROW_MOD.
+
+Notation "[] -> R" := (klr_boxto R) (at level 65) : klr_scope.
+Notation "<> * R" := (klr_diamat R) (at level 65) : klr_scope.
 
 (** ** Flattening KLRs *)
 
 (** When converting back to a standard [rel], we can quantify over
-  initial worlds in the same two ways. *)
+  all worlds. *)
 
 Section UNKRIPKIFY.
   Context `{kf: KripkeFrame}.
@@ -331,55 +376,9 @@ Section UNKRIPKIFY.
   Proof.
     firstorder.
   Qed.
-
-  Definition rel_box {A B} (R: klr W A B): rel A B :=
-    fun x y => forall w, # ~> w -> R w x y.
-
-  Global Instance rel_box_subrel A B:
-    Monotonic (@rel_box A B) ((- ==> subrel) ++> subrel).
-  Proof.
-    firstorder.
-  Qed.
-
-  Lemma rel_box_rintro {A B} (R: klr W A B) x y:
-    RIntro (forall w, # ~> w -> R w x y) (rel_box R) x y.
-  Proof.
-    firstorder.
-  Qed.
-
-  Lemma rel_box_relim {A B} (R: klr W A B) w x y P Q:
-    RElim (R w) x y P Q ->
-    RElim (rel_box R) x y (P /\ # ~> w) Q.
-  Proof.
-    firstorder.
-  Qed.
-
-  Definition rel_diam {A B} (R: klr W A B): rel A B :=
-    fun x y => exists w, # ~> w /\ R w x y.
-
-  Global Instance rel_diam_subrel A B:
-    Monotonic (@rel_diam A B) ((- ==> subrel) ++> subrel).
-  Proof.
-    firstorder.
-  Qed.
-
-  Lemma rel_diam_rintro {A B} (R: klr W A B) w x y:
-    RExists (R w x y /\ # ~> w) (rel_diam R) x y.
-  Proof.
-    firstorder.
-  Qed.
-
-  Lemma rel_diam_relim {A B} (R: klr W A B) x y (P Q: Prop):
-    (forall w, RElim (R w) x y ((# ~> w) -> P) Q) ->
-    RElim (rel_diam R) x y P Q.
-  Proof.
-    firstorder.
-  Qed.
 End UNKRIPKIFY.
 
 Global Instance rel_kvd_subrel_params: Params (@rel_kvd) 3.
-Global Instance rel_box_subrel_params: Params (@rel_box) 3.
-Global Instance rel_diam_subrel_params: Params (@rel_diam) 3.
 
 Hint Extern 0 (RIntro _ (rel_kvd _) _ _) =>
   eapply rel_kvd_rintro : typeclass_instances.
@@ -387,21 +386,7 @@ Hint Extern 0 (RIntro _ (rel_kvd _) _ _) =>
 Hint Extern 1 (RElim (rel_kvd _) _ _ _ _) =>
   eapply rel_kvd_relim : typeclass_instances.
 
-Hint Extern 0 (RIntro _ (rel_box _) _ _) =>
-  eapply rel_box_rintro : typeclass_instances.
-
-Hint Extern 1 (RElim (rel_box _) _ _ _ _) =>
-  eapply rel_box_relim : typeclass_instances.
-
-Hint Extern 0 (RExists _ (rel_diam _) _ _) =>
-  eapply rel_diam_rintro : typeclass_instances.
-
-Hint Extern 1 (RElim (rel_diam _) _ _ _ _) =>
-  eapply rel_diam_relim : typeclass_instances.
-
 Notation "|= R" := (rel_kvd R) (at level 65) : rel_scope.
-Notation "[] R" := (rel_box R) (at level 65) : rel_scope.
-Notation "<> R" := (rel_diam R) (at level 65) : rel_scope.
 
 (** ** Pulling along a Kripke frame morphism *)
 

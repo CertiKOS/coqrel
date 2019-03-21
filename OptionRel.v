@@ -13,12 +13,15 @@ Proof.
   exact @Some_le_def.
 Qed.
 
-Global Instance None_le {A B} R y:
+Lemma None_le {A B} R y:
   RIntro True (@option_le A B R) None y.
 Proof.
   intros _.
   apply @None_le_def.
 Qed.
+
+Hint Extern 0 (RIntro _ (option_le _) None _) =>
+  eapply None_le : typeclass_instances.
 
 Global Instance option_le_subrel A B:
   Monotonic (@option_le A B) (subrel ++> subrel).
@@ -82,12 +85,15 @@ Proof.
   exact @Some_ge_def.
 Qed.
 
-Global Instance None_ge {A B} R x:
+Lemma None_ge {A B} R x:
   RIntro True (@option_ge A B R) x None.
 Proof.
   intros _.
   apply @None_ge_def.
 Qed.
+
+Hint Extern 0 (RIntro _ (option_ge _) _ None) =>
+  eapply None_ge : typeclass_instances.
 
 Global Instance option_ge_subrel A B:
   Monotonic (@option_ge A B) (subrel ++> subrel).
