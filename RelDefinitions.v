@@ -549,3 +549,50 @@ Qed.
 
 Hint Extern 1 (RDestruct (flip _) _) =>
   eapply flip_rdestruct : typeclass_instances.
+
+(** When the goal is of the form [?R x y] with [?R] an uninstantiated
+  existential variable, we must then decide whether to attempt
+  resolving [?R x y] directly, or try resolving [?R' y x] instead,
+  with [?R] instantiated to [flip ?R']. However, it is impossible to
+  know in advance which of these will eventually work, so this is one
+  situation where backtracking is unavoidable.
+
+  The [RExists] instances below are used to make that decision.
+  The class [PolarityResolved] can be used as a guard in [RIntro]
+  instances which are general enough to instantiate such [?R]s —
+  for example, see the [Monotonicity] library. It ensures that the
+  specified relation either is not an existential variable, or that
+  its polarity has been chosen through [direct_rexists] or
+  [flip_rexists] below. *)
+
+Class PolarityResolved {A B} (R: rel A B).
+
+Hint Extern 1 (PolarityResolved ?R) =>
+  not_evar R; constructor : typeclass_instances.
+
+Ltac polarity_unresolved R :=
+  is_evar R;
+  lazymatch goal with
+    | H : PolarityResolved R |- _ => fail
+    | _ => idtac
+  end.
+
+Lemma direct_rexists {A B} (R: rel A B) (m: A) (n: B):
+  RExists (PolarityResolved R -> R m n) R m n.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RExists _ ?R _ _) =>
+  polarity_unresolved R; eapply direct_rexists : typeclass_instances.
+
+Lemma flip_rexists {A B} (R: rel A B) (Rc: rel B A) (m: A) (n: B):
+  Convertible R (flip Rc) ->
+  RExists (PolarityResolved Rc -> flip Rc m n) R m n.
+Proof.
+  unfold Convertible. intros; subst.
+  firstorder.
+Qed.
+
+Hint Extern 2 (RExists _ ?R _ _) =>
+  polarity_unresolved R; eapply flip_rexists : typeclass_instances.

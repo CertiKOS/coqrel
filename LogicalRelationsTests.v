@@ -44,8 +44,9 @@ Goal
     p (f a).
 Proof.
   intros A a b R f p Hf Hp Hab H.
-  Fail rewrite <- Hab in H.
-Abort.
+  rewrite <- Hab in H.
+  assumption.
+Qed.
 
 (** ** Monotonicity tactics *)
 
