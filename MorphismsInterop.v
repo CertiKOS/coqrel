@@ -155,6 +155,7 @@ Qed.
   [subrel] instances. Again, we use an immediate hint. *)
 
 Lemma subrelation_subrel {A} (R1 R2: relation A):
+  Unconvertible R1 R2 ->
   subrelation R1 R2 ->
   Related R1 R2 subrel.
 Proof.
