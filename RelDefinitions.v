@@ -78,7 +78,8 @@ Bind Scope rel_scope with Relation_Definitions.relation.
   evars incorrectly or spawn them too early should have lower priority
   (higher numbers):
 
-    - 10 [RIntro]
+    - 10 [Reflexivity]
+    - 20 [RIntro]
     - 30 [preorder]
     - 40 [RDestruct]
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
@@ -151,6 +152,30 @@ Hint Extern 1 (RAutoSubgoals _) =>
 Hint Extern 1000 (RAuto _) =>
   red; solve [ delay ] : typeclass_instances.
 
+(** ** Reflexivity *)
+
+(** This is an early check to solve easy goals where a reflexive
+  relation is applied to two identical arguments, however we are
+  careful not to cause any instantiation of existential variables.
+  The [Monotonicity] strategy provides a more general way to use
+  reflexivity. *)
+
+Ltac no_evars t :=
+  lazymatch t with
+    | ?f ?x => no_evars f; no_evars x
+    | ?m => not_evar m
+  end.
+
+Lemma reflexivity_rstep {A} (R: rel A A) (x: A) :
+  Reflexive R ->
+  RStep True (R x x).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 10 (RStep _ (?R ?x ?x)) =>
+  no_evars R; eapply reflexivity_rstep : typeclass_instances.
+
 (** ** Introduction rules *)
 
 (** In effect, [RIntro] is pretty much identical to [RStep], but we
@@ -169,7 +194,7 @@ Ltac rintro :=
   end.
 
 Global Instance rintro_rstep:
-  forall `(RIntro), RStep P (R m n) | 10.
+  forall `(RIntro), RStep P (R m n) | 20.
 Proof.
   firstorder.
 Qed.
