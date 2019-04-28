@@ -386,7 +386,7 @@ Proof.
 Qed.
 
 Global Instance sum_subrel_params:
-  Params (@sum) 4.
+  Params (@sum_rel) 4.
 
 Lemma sum_rel_refl {A B} (R1: rel A A) (R2: rel B B):
   Reflexive R1 -> Reflexive R2 -> Reflexive (R1 + R2).

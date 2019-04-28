@@ -412,6 +412,7 @@ Ltac monotonicity :=
   instance. *)
 
 Global Instance monotonicity_rstep {A B} (P: Prop) (R: rel A B) m n:
+  PolarityResolved R ->
   Monotonicity P (R m n) ->
   RStep P (R m n) | 50.
 Proof.

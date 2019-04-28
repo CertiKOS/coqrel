@@ -104,7 +104,8 @@ Module Delay.
       end in
     match goal with
       | |- _ /\ _ => split; [handle_subgoal | split_conjunction]
-      | |- _ => exact I
+      | |- True => exact I
+      | |- ?P => is_evar P; exact I
       | |- _ => handle_subgoal
     end.
 

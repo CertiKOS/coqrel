@@ -44,8 +44,9 @@ Goal
     p (f a).
 Proof.
   intros A a b R f p Hf Hp Hab H.
-  Fail rewrite <- Hab in H.
-Abort.
+  rewrite <- Hab in H.
+  assumption.
+Qed.
 
 (** ** Monotonicity tactics *)
 
@@ -101,11 +102,11 @@ Qed.
   you don't know yet. *)
 
 Goal
-  forall {A B} (RA: rel A A) (RB: rel B B) (m n: (A -> B) * B) (x y: A),
+  forall {A B} (RA: rel A A) (RB: rel B B) (m n: (A -> B) * B) (x: A),
     ((- ==> RB) * RB)%rel m n ->
     RB (fst m x) (fst n x).
 Proof.
-  intros A B RA RB m n x y Hmn.
+  intros A B RA RB m n x Hmn.
   try monotonicity.
   try rauto.
 Abort.

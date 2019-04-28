@@ -78,7 +78,8 @@ Bind Scope rel_scope with Relation_Definitions.relation.
   evars incorrectly or spawn them too early should have lower priority
   (higher numbers):
 
-    - 10 [RIntro]
+    - 10 [Reflexivity]
+    - 20 [RIntro]
     - 30 [preorder]
     - 40 [RDestruct]
     - 50 [Monotonicity] (includes [Reflexivity] -- we may want to split)
@@ -96,9 +97,7 @@ Ltac rstep :=
 
 (** ** Proof automation *)
 
-(** The following class solves the goal [Q] automatically. The
-  typeclass resolution process allows for backtracking, trying every
-  possible [RStep] at a given time. *)
+(** The following class solves the goal [Q] automatically. *)
 
 Class RAuto (Q: Prop) :=
   rauto : Q.
@@ -118,10 +117,11 @@ Ltac rauto :=
   can involve some backtracking, once a step has been chosen [RAuto]
   never backtracks. This avoids exponential blow up in the search
   space, so that [RAuto] remains efficient even in case of failure.
-  From a usability perspective, it also encourages proper hygiene when
-  declaring instances, since extraneous or too broadly applicable
-  instance will cause failures (rather than silently add weight to the
-  system). *)
+  This encourages proper hygiene when declaring instances, since
+  extraneous or too broadly applicable instance will cause failures
+  (rather than silently add weight to the system).
+  This also enables the user to investigate failures by stepping
+  through the process using the [rstep] tactic. *)
 
 Class RAutoSubgoals (P: Prop) :=
   rauto_subgoals : P.
@@ -145,11 +145,34 @@ Hint Extern 1 (RAutoSubgoals _) =>
   rauto_split : typeclass_instances.
 
 (** If [rauto] is run under the [delayed] tactical and we don't know
-  how to make progress, bail out. Note that this will inhibit
-  backtracking. *)
+  how to make progress, bail out. *)
 
 Hint Extern 1000 (RAuto _) =>
   red; solve [ delay ] : typeclass_instances.
+
+(** ** Reflexivity *)
+
+(** This is an early check to solve easy goals where a reflexive
+  relation is applied to two identical arguments, however we are
+  careful not to cause any instantiation of existential variables.
+  The [Monotonicity] strategy provides a more general way to use
+  reflexivity. *)
+
+Ltac no_evars t :=
+  lazymatch t with
+    | ?f ?x => no_evars f; no_evars x
+    | ?m => not_evar m
+  end.
+
+Lemma reflexivity_rstep {A} (R: rel A A) (x: A) :
+  Reflexive R ->
+  RStep True (R x x).
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 10 (RStep _ (?R ?x ?x)) =>
+  no_evars R; eapply reflexivity_rstep : typeclass_instances.
 
 (** ** Introduction rules *)
 
@@ -169,7 +192,7 @@ Ltac rintro :=
   end.
 
 Global Instance rintro_rstep:
-  forall `(RIntro), RStep P (R m n) | 10.
+  forall `(RIntro), RStep P (R m n) | 20.
 Proof.
   firstorder.
 Qed.
@@ -230,6 +253,7 @@ Ltac relim H :=
   lazymatch goal with
     | |- ?Q =>
       apply (relim (Q:=Q) H)
+      (* ^ XXX split_conjunction? *)
   end.
 
 (** The resolution process is directed by the syntax of [R]. We define
@@ -549,3 +573,50 @@ Qed.
 
 Hint Extern 1 (RDestruct (flip _) _) =>
   eapply flip_rdestruct : typeclass_instances.
+
+(** When the goal is of the form [?R x y] with [?R] an uninstantiated
+  existential variable, we must then decide whether to attempt
+  resolving [?R x y] directly, or try resolving [?R' y x] instead,
+  with [?R] instantiated to [flip ?R']. However, it is impossible to
+  know in advance which of these will eventually work, so this is one
+  situation where backtracking is unavoidable.
+
+  The [RExists] instances below are used to make that decision.
+  The class [PolarityResolved] can be used as a guard in [RIntro]
+  instances which are general enough to instantiate such [?R]s —
+  for example, see the [Monotonicity] library. It ensures that the
+  specified relation either is not an existential variable, or that
+  its polarity has been chosen through [direct_rexists] or
+  [flip_rexists] below. *)
+
+Class PolarityResolved {A B} (R: rel A B).
+
+Hint Extern 1 (PolarityResolved ?R) =>
+  not_evar R; constructor : typeclass_instances.
+
+Ltac polarity_unresolved R :=
+  is_evar R;
+  lazymatch goal with
+    | H : PolarityResolved R |- _ => fail
+    | _ => idtac
+  end.
+
+Lemma direct_rexists {A B} (R: rel A B) (m: A) (n: B):
+  RExists (PolarityResolved R -> R m n) R m n.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RExists _ ?R _ _) =>
+  polarity_unresolved R; eapply direct_rexists : typeclass_instances.
+
+Lemma flip_rexists {A B} (R: rel A B) (Rc: rel B A) (m: A) (n: B):
+  Convertible R (flip Rc) ->
+  RExists (PolarityResolved Rc -> flip Rc m n) R m n.
+Proof.
+  unfold Convertible. intros; subst.
+  firstorder.
+Qed.
+
+Hint Extern 2 (RExists _ ?R _ _) =>
+  polarity_unresolved R; eapply flip_rexists : typeclass_instances.

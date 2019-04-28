@@ -479,15 +479,15 @@ Qed.
 Hint Extern 1 (Symmetric (rel_pull _ _ _)) =>
   eapply rel_pull_sym : typeclass_instances.
 
-Lemma rel_pull_trans {A B} (f: A -> B) R:
-  Transitive R ->
-  Transitive (R @@ f).
+Lemma rel_pull_rcompose {A1 A2 A3 B1 B2 B3} f g h R12 R23 R13 :
+  @RCompose B1 B2 B3 R12 R23 R13 ->
+  @RCompose A1 A2 A3 (R12 @@ (f, g)) (R23 @@ (g, h)) (R13 @@ (f, h)).
 Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Transitive (rel_pull _ _ _)) =>
-  eapply rel_pull_trans : typeclass_instances.
+Hint Extern 1 (RCompose _ _ (rel_pull _ _ _)) =>
+  eapply rel_pull_rcompose : typeclass_instances.
 
 (** The introduction rule is straightforward, but changes the head
   terms to the functions used with [rel_pull]. This means that an
