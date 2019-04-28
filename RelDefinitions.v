@@ -97,9 +97,7 @@ Ltac rstep :=
 
 (** ** Proof automation *)
 
-(** The following class solves the goal [Q] automatically. The
-  typeclass resolution process allows for backtracking, trying every
-  possible [RStep] at a given time. *)
+(** The following class solves the goal [Q] automatically. *)
 
 Class RAuto (Q: Prop) :=
   rauto : Q.
@@ -119,10 +117,11 @@ Ltac rauto :=
   can involve some backtracking, once a step has been chosen [RAuto]
   never backtracks. This avoids exponential blow up in the search
   space, so that [RAuto] remains efficient even in case of failure.
-  From a usability perspective, it also encourages proper hygiene when
-  declaring instances, since extraneous or too broadly applicable
-  instance will cause failures (rather than silently add weight to the
-  system). *)
+  This encourages proper hygiene when declaring instances, since
+  extraneous or too broadly applicable instance will cause failures
+  (rather than silently add weight to the system).
+  This also enables the user to investigate failures by stepping
+  through the process using the [rstep] tactic. *)
 
 Class RAutoSubgoals (P: Prop) :=
   rauto_subgoals : P.
@@ -146,8 +145,7 @@ Hint Extern 1 (RAutoSubgoals _) =>
   rauto_split : typeclass_instances.
 
 (** If [rauto] is run under the [delayed] tactical and we don't know
-  how to make progress, bail out. Note that this will inhibit
-  backtracking. *)
+  how to make progress, bail out. *)
 
 Hint Extern 1000 (RAuto _) =>
   red; solve [ delay ] : typeclass_instances.
@@ -255,6 +253,7 @@ Ltac relim H :=
   lazymatch goal with
     | |- ?Q =>
       apply (relim (Q:=Q) H)
+      (* ^ XXX split_conjunction? *)
   end.
 
 (** The resolution process is directed by the syntax of [R]. We define
