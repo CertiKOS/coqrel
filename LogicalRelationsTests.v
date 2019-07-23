@@ -369,10 +369,51 @@ Proof.
   rstep.
 Qed.
 
+(** ** General issues *)
+
+(** Assumptions can be used by [Monotonicity] to solve the goal.
+  However, consider the goal [?R f g |- (- ==> S) f g].
+  [Monotonicity] can solve this by instantiating [R] and using the
+  hypothesis, however [RIntro] will take precedence in this case.
+  This means we will end up with a goal [?R f g, x |- S (f x) (g x)]
+  that cannot be solved anymore.
+
+  When [?R] is already [- ==> S] or some equivalent relation, this is
+  not a problem, because the work done by [RIntro] can essentially be
+  undone later by [Monotonicity]. However when [?R] is an existential
+  variable this is not true and we would prefer an earlier
+  instantiation.
+
+  This is a possible workaround:
+<<<
+Lemma assumption_rstep {P : Prop} :
+  P -> RStep True P.
+Proof.
+  firstorder.
+Qed.
+
+Hint Extern 1 (RStep _ (_ ?x ?y)) =>
+  lazymatch goal with
+    H : ?R x y |- _ => is_evar R; eexact (assumption_rstep H)
+  end : typeclass_instances.
+>>>
+  *)
+
+Goal
+  forall A B (R : relation B) (f g : A -> B), exists X : relation (A -> B),
+    X f g ->
+    (- ==> R) f g.
+Proof.
+  intros. eexists. intros.
+  Fail rauto.
+  monotonicity.
+Abort.
+
 (** ** The [transport] tactic *)
 
 Goal
-  forall W acc A B C (R1: W -> rel A A) (R2: W -> rel B B) (R3: W -> rel C C) f g a b x w,
+  forall W acc A B C (R1: W -> rel A A) (R2: W -> rel B B) (R3: W -> rel C C),
+  forall f g a b x w,
     Monotonic f (rforall w, R1 w ++> R2 w) ->
     Monotonic g (rforall w, R2 w ++> option_rel (rel_incr acc R3 w)) ->
     R1 w a b ->
