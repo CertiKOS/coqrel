@@ -166,7 +166,7 @@ Tactic Notation "delay" := Delay.delay.
 
 Definition delay (P: Prop) := P.
 
-Hint Extern 0 (delay _) => delay.
+Hint Extern 0 (delay _) => delay : core.
 
 Hint Extern 100 => delay : delay.
 
