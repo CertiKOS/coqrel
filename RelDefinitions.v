@@ -55,6 +55,7 @@ Hint Extern 1 (Once ?P) =>
 
 Definition rel (A1 A2: Type) := A1 -> A2 -> Prop.
 
+Declare Scope rel_scope.
 Delimit Scope rel_scope with rel.
 Bind Scope rel_scope with rel.
 
@@ -430,7 +431,7 @@ Proof.
 Qed.
 
 Global Instance arrow_subrel_params:
-  Params (@arrow_rel) 4.
+  Params (@arrow_rel) 4 := { }.
 
 Lemma arrow_rintro {A1 A2 B1 B2} (RA: rel A1 A2) (RB: rel B1 B2) f g:
   RIntro (forall x y, RA x y -> RB (f x) (g y)) (RA ++> RB) f g.
@@ -543,7 +544,7 @@ Proof.
 Qed.
 
 Global Instance flip_subrel_params:
-  Params (@flip) 3.
+  Params (@flip) 3 := { }.
 
 Lemma flip_rintro {A B} (R: rel A B) m n:
   RIntro (R n m) (flip R) m n.

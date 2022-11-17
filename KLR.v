@@ -29,6 +29,7 @@ Class KripkeFrame (L: Type) (W: Type) :=
 
 Infix "~>" := (acc tt) (at level 70).
 
+Declare Scope klr_scope.
 Delimit Scope klr_scope with klr.
 Bind Scope klr_scope with klr.
 
@@ -143,9 +144,9 @@ Section LIFT.
   Qed.
 End LIFT.
 
-Global Instance k_rel_params: Params (@k) 4.
-Global Instance k1_rel_params: Params (@k1) 5.
-Global Instance k2_rel_params: Params (@k2) 6.
+Global Instance k_rel_params: Params (@k) 4 := { }.
+Global Instance k1_rel_params: Params (@k1) 5 := { }.
+Global Instance k2_rel_params: Params (@k2) 6 := { }.
 
 Hint Extern 0 (RIntro _ (k _ _) _ _) =>
   eapply k_rintro : typeclass_instances.
@@ -311,8 +312,8 @@ Section MODALITIES.
   Qed.
 End MODALITIES.
 
-Global Instance klr_box_subrel_params: Params (@klr_box) 4.
-Global Instance klr_diam_subrel_params: Params (@klr_diam) 4.
+Global Instance klr_box_subrel_params: Params (@klr_box) 4 := { }.
+Global Instance klr_diam_subrel_params: Params (@klr_diam) 4 := { }.
 
 Hint Extern 0 (RIntro _ (klr_box _ _ _) _ _) =>
   eapply klr_box_rintro : typeclass_instances.
@@ -378,7 +379,7 @@ Section UNKRIPKIFY.
   Qed.
 End UNKRIPKIFY.
 
-Global Instance rel_kvd_subrel_params: Params (@rel_kvd) 3.
+Global Instance rel_kvd_subrel_params: Params (@rel_kvd) 3 := { }.
 
 Hint Extern 0 (RIntro _ (rel_kvd _) _ _) =>
   eapply rel_kvd_rintro : typeclass_instances.
@@ -405,7 +406,7 @@ Proof.
 Qed.
 
 Global Instance klr_pullw_subrel_params:
-  Params (@klr_pullw) 5.
+  Params (@klr_pullw) 5 := { }.
 
 Lemma klr_pullw_rintro {W1 W2 A B} (f: W1 -> W2) R w (x:A) (y:B):
   RIntro (R (f w) x y) (klr_pullw f R w) x y.

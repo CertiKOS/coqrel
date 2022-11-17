@@ -3,6 +3,16 @@ Require Import Coq.Lists.List.
 Require Import OptionRel.
 Local Open Scope rel_scope.
 
+(** * Testing Delay.v *)
+
+Goal
+  forall P Q : Prop, P -> P /\ Q.
+Proof.
+  Fail delay.
+  delayed (intros; split; auto; delay); [idtac].
+  (* this should leave us with the subgoal Q, which hit [delay] above. *)
+Abort.
+
 (** * Tests *)
 
 (** ** Reflexivity *)

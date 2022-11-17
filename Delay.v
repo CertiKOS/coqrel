@@ -1,9 +1,9 @@
-(** This file implements a tactical [delaying tac] and a tactic
+(** This file implements a tactical [delayed tac] and a tactic
   [delay], which function in the following way: [tac] is able to
   invoke [delay] to solve any subgoal. Assuming the subgoal can be
-  typed in the context in which [delaying tac] was invoked, the
+  typed in the context in which [delayed tac] was invoked, the
   [delay] tactic will succeed, and the subgoal will instead become a
-  subgoal of the encolosing invocation of [delaying tac].
+  subgoal of the encolosing invocation of [delayed tac].
 
   To see why this is useful, consider the way [eauto] works. Applying
   an [eauto] hint is only considered successful when the generated
@@ -16,9 +16,9 @@
   possible, then let the user (or another tactic in a sequence) solve
   the remaining subgoals. With the tactics defined below, this can be
   accomplished by registering an external hint making use of [delay]
-  for strategic subgoals, and invoking [delaying eauto].
+  for strategic subgoals, and invoking [delayed eauto].
 
-  Additionally, the variant [delaying_conjunction] bundles all of the
+  Additionally, the variant [delayed_conjunction] bundles all of the
   subgoals solved by [delay] in a single conjunction of the form
   [P1 /\ ... /\ Pn /\ True]. This is useful as it provides a uniform
   interface when reifying the effect of a tactic. *)
@@ -27,8 +27,8 @@
 (** * The [delayed]/[delay] tactics *)
 
 Module Delay.
-  (** The [delaying] tactical and the [delay] tactic communicate
-    through the use of existential variables. Specifically, [delaying]
+  (** The [delayed] tactical and the [delay] tactic communicate
+    through the use of existential variables. Specifically, [delayed]
     introduces a so-called "open conjunction" to the context. The open
     conjunction starts as a hypothesis of type [?P], and remains of
     the form [P1 /\ ... /\ Pn /\ ?Q] throughout. Each invocation of
@@ -114,11 +114,11 @@ Module Delay.
   Ltac delay :=
     idtac;
     lazymatch goal with
-      | _ : open_conjunction _ |- ?G =>
+      | _ : open_conjunction ?P |- ?G =>
         change (delayed_goal G);
         let Hdelayed := fresh "Hdelayed" in
         revert_until_conjunction Hdelayed;
-        use_conjunction (open_conjunction_proj _ Hdelayed)
+        use_conjunction (open_conjunction_proj P Hdelayed)
       | _ =>
         fail "delay can only be used under the 'delayed' tactical"
     end.

@@ -97,7 +97,7 @@ Proof.
 Qed.
 
 Global Instance arrow_pointwise_subrel_params:
-  Params (@arrow_pointwise_rel) 3.
+  Params (@arrow_pointwise_rel) 3 := { }.
 
 Lemma arrow_pointwise_rintro {A B1 B2} (R: rel B1 B2) f g:
   RIntro (forall x: A, R (f x) (g x)) (- ==> R) f g.
@@ -267,7 +267,7 @@ Proof.
 Qed.
 
 Global Instance set_le_subrel_params:
-  Params (@set_le) 3.
+  Params (@set_le) 3 := { }.
 
 Lemma set_le_refl {A} (R : relation A) :
   Reflexive R ->
@@ -299,7 +299,7 @@ Proof.
 Qed.
 
 Global Instance set_ge_subrel_params:
-  Params (@set_ge) 3.
+  Params (@set_ge) 3 := { }.
 
 Lemma set_ge_refl {A} (R : relation A) :
   Reflexive R ->
@@ -386,7 +386,7 @@ Proof.
 Qed.
 
 Global Instance sum_subrel_params:
-  Params (@sum_rel) 4.
+  Params (@sum_rel) 4 := { }.
 
 Lemma sum_rel_refl {A B} (R1: rel A A) (R2: rel B B):
   Reflexive R1 -> Reflexive R2 -> Reflexive (R1 + R2).
@@ -476,7 +476,7 @@ Proof.
 Qed.
 
 Global Instance prod_subrel_params:
-  Params (@prod_rel) 4.
+  Params (@prod_rel) 4 := { }.
 
 Global Instance prod_rdestruct {A1 B1 A2 B2} (RA: rel A1 A2) (RB: rel B1 B2):
   RDestruct
@@ -563,7 +563,7 @@ Proof.
 Qed.
 
 Global Instance option_subrel_params:
-  Params (@option_rel) 3.
+  Params (@option_rel) 3 := { }.
 
 Lemma option_rel_refl `(HR: Reflexive):
   Reflexive (option_rel R).
@@ -624,7 +624,7 @@ Proof.
 Qed.
 
 Global Instance list_subrel_params:
-  Params (@list_rel) 3.
+  Params (@list_rel) 3 := { }.
 
 Lemma list_rel_refl `(HR: Reflexive):
   Reflexive (list_rel R).
@@ -739,7 +739,7 @@ Proof.
 Qed.
 
 Global Instance all_monotonic_params:
-  Params (@all) 1.
+  Params (@all) 1 := { }.
 
 Global Instance ex_monotonic A:
   Monotonic (@ex A) ((- ==> impl) ++> impl).
@@ -751,7 +751,7 @@ Proof.
 Qed.
 
 Global Instance ex_monotonic_params:
-  Params (@ex) 1.
+  Params (@ex) 1 := { }.
 
 Global Instance and_monotonic:
   Monotonic (@and) (impl ++> impl ++> impl).

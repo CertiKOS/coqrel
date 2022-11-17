@@ -34,12 +34,12 @@ Global Existing Instance left_le.
 Global Existing Instance right_le.
 
 
-(** * Definitions for [leb] *)
+(** * Definitions for [Bool.le] *)
 
 (** ** Properties *)
 
 Global Instance leb_preo:
-  PreOrder leb.
+  PreOrder Bool.le.
 Proof.
   split.
   - intros [|]; simpl; eauto.
@@ -49,17 +49,17 @@ Proof.
 Qed.
 
 Lemma leb_rdestruct:
-  RDestruct leb (fun P => P false false /\ P true true /\ P false true).
+  RDestruct Bool.le (fun P => P false false /\ P true true /\ P false true).
 Proof.
   intros b1 b2 Hb P (HPff & HPtt & HPft).
   destruct b1, b2; eauto; discriminate.
 Qed.
 
-Hint Extern 0 (RDestruct leb _) =>
+Hint Extern 0 (RDestruct Bool.le _) =>
   eapply leb_rdestruct : typeclass_instances.
 
 Global Instance leb_transport_eq_true x y:
-  Transport Bool.leb x y (x = true) (y = true).
+  Transport Bool.le x y (x = true) (y = true).
 Proof.
   clear.
   destruct x, y; firstorder.
@@ -68,7 +68,7 @@ Qed.
 (** ** Monotonicity of various definitions *)
 
 Lemma true_leb b:
-  Related b true leb.
+  Related b true Bool.le.
 Proof.
   destruct b; reflexivity.
 Qed.
@@ -77,7 +77,7 @@ Hint Extern 0 (Related _ true _) =>
   eapply true_leb : typeclass_instances.
 
 Lemma false_leb b:
-  Related false b leb.
+  Related false b Bool.le.
 Proof.
   destruct b; reflexivity.
 Qed.
@@ -86,28 +86,28 @@ Hint Extern 0 (Related false _ _) =>
   eapply false_leb : typeclass_instances.
 
 Global Instance negb_leb:
-  Monotonic negb (leb --> leb).
+  Monotonic negb (Bool.le --> Bool.le).
 Proof.
   unfold negb.
   rauto.
 Qed.
 
 Global Instance andb_leb:
-  Monotonic andb (leb ++> leb ++> leb).
+  Monotonic andb (Bool.le ++> Bool.le ++> Bool.le).
 Proof.
   unfold andb.
   rauto.
 Qed.
 
 Global Instance orb_leb:
-  Monotonic orb (leb ++> leb ++> leb).
+  Monotonic orb (Bool.le ++> Bool.le ++> Bool.le).
 Proof.
   unfold orb.
   rauto.
 Qed.
 
 Global Instance implb_leb:
-  Monotonic implb (leb --> leb ++> leb).
+  Monotonic implb (Bool.le --> Bool.le ++> Bool.le).
 Proof.
   unfold implb.
   rauto.

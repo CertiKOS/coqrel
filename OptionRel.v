@@ -31,7 +31,7 @@ Proof.
 Qed.
 
 Global Instance option_le_subrel_params:
-  Params (@option_le) 3.
+  Params (@option_le) 3 := { }.
 
 Global Instance option_le_rel {A B}:
   Related (@option_rel A B) (@option_le A B) (subrel ++> subrel) | 10.
@@ -103,7 +103,7 @@ Proof.
 Qed.
 
 Global Instance option_ge_subrel_params:
-  Params (@option_ge) 3.
+  Params (@option_ge) 3 := { }.
 
 Global Instance option_ge_rel {A B}:
   Related (@option_rel A B) (@option_ge A B) (subrel ++> subrel) | 10.
