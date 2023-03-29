@@ -20,7 +20,7 @@ Proof.
   apply @None_le_def.
 Qed.
 
-Hint Extern 0 (RIntro _ (option_le _) None _) =>
+Global Hint Extern 0 (RIntro _ (option_le _) None _) =>
   eapply None_le : typeclass_instances.
 
 Global Instance option_le_subrel A B:
@@ -46,7 +46,7 @@ Proof.
   intros [x|]; constructor; reflexivity.
 Qed.
 
-Hint Extern 1 (Reflexive (option_le ?R)) =>
+Global Hint Extern 1 (Reflexive (option_le ?R)) =>
   eapply option_le_refl : typeclass_instances.
 
 Lemma option_le_trans {A} (R: relation A):
@@ -60,7 +60,7 @@ Proof.
   - constructor.
 Qed.
 
-Hint Extern 1 (Transitive (option_le ?R)) =>
+Global Hint Extern 1 (Transitive (option_le ?R)) =>
   eapply option_le_trans : typeclass_instances.
 
 Global Instance option_map_le:
@@ -92,7 +92,7 @@ Proof.
   apply @None_ge_def.
 Qed.
 
-Hint Extern 0 (RIntro _ (option_ge _) _ None) =>
+Global Hint Extern 0 (RIntro _ (option_ge _) _ None) =>
   eapply None_ge : typeclass_instances.
 
 Global Instance option_ge_subrel A B:
@@ -118,7 +118,7 @@ Proof.
   intros [x|]; constructor; reflexivity.
 Qed.
 
-Hint Extern 1 (Reflexive (option_ge ?R)) =>
+Global Hint Extern 1 (Reflexive (option_ge ?R)) =>
   eapply option_ge_refl : typeclass_instances.
 
 Lemma option_ge_trans {A} (R: relation A):
@@ -132,7 +132,7 @@ Proof.
   - constructor.
 Qed.
 
-Hint Extern 1 (Transitive (option_ge ?R)) =>
+Global Hint Extern 1 (Transitive (option_ge ?R)) =>
   eapply option_ge_trans : typeclass_instances.
 
 Global Instance option_map_ge:

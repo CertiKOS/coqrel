@@ -30,7 +30,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
+Global Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
   eapply rel_union_rexists_l : typeclass_instances.
 
 Lemma rel_union_rexists_r {A B} (R1 R2: rel A B) x y:
@@ -39,7 +39,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
+Global Hint Extern 0 (RExists _ (_ \/ _) _ _) =>
   eapply rel_union_rexists_r : typeclass_instances.
 
 (** More often, we can solve a [rel_union] goal using a monotonicity
@@ -51,7 +51,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ subrel _ (_ \/ _)%rel) =>
+Global Hint Extern 0 (RExists _ subrel _ (_ \/ _)%rel) =>
   eapply rel_union_subrel_rexists_l : typeclass_instances.
 
 Lemma rel_union_subrel_rexists_r {A B} (R R1 R2: rel A B):
@@ -60,7 +60,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ subrel _ (_ \/ _)%rel) =>
+Global Hint Extern 0 (RExists _ subrel _ (_ \/ _)%rel) =>
   eapply rel_union_subrel_rexists_r : typeclass_instances.
 
 Lemma rel_union_lub {A B} (R1 R2 R: rel A B):
@@ -69,7 +69,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 2 (RIntro _ subrel (_ \/ _)%rel _) =>
+Global Hint Extern 2 (RIntro _ subrel (_ \/ _)%rel _) =>
   eapply rel_union_lub : typeclass_instances.
 
 Lemma rel_union_refl_l {A} (R1 R2: rel A A):
@@ -79,7 +79,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Reflexive (_ \/ _)) =>
+Global Hint Extern 1 (Reflexive (_ \/ _)) =>
   eapply rel_union_refl_l : typeclass_instances.
 
 Lemma rel_union_refl_r {A} (R1 R2: rel A A):
@@ -89,7 +89,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Reflexive (_ \/ _)) =>
+Global Hint Extern 1 (Reflexive (_ \/ _)) =>
   eapply rel_union_refl_r : typeclass_instances.
 
 Lemma rel_union_corefl {A} (R1 R2: rel A A):
@@ -100,7 +100,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Coreflexive (_ \/ _)) =>
+Global Hint Extern 1 (Coreflexive (_ \/ _)) =>
   eapply rel_union_corefl : typeclass_instances.
 
 Lemma rel_union_sym {A} (R1 R2: rel A A):
@@ -111,7 +111,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Symmetric (_ \/ _)) =>
+Global Hint Extern 1 (Symmetric (_ \/ _)) =>
   eapply rel_union_sym : typeclass_instances.
 
 (** ** Intersection of relations *)
@@ -146,7 +146,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ (_ /\ _) _ _) =>
+Global Hint Extern 0 (RExists _ (_ /\ _) _ _) =>
   eapply rel_inter_rexists : typeclass_instances.
 
 Lemma rel_inter_subrel_rexists_l {A B} (R1 R2 R: rel A B):
@@ -155,7 +155,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ subrel (_ /\ _)%rel _) =>
+Global Hint Extern 0 (RExists _ subrel (_ /\ _)%rel _) =>
   eapply rel_inter_subrel_rexists_l : typeclass_instances.
 
 Lemma rel_inter_subrel_rexists_r {A B} (R1 R2 R: rel A B):
@@ -164,7 +164,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ subrel (_ /\ _)%rel _) =>
+Global Hint Extern 0 (RExists _ subrel (_ /\ _)%rel _) =>
   eapply rel_inter_subrel_rexists_r : typeclass_instances.
 
 Lemma rel_inter_glb {A B} (R R1 R2: rel A B):
@@ -173,7 +173,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 2 (RIntro _ subrel _ (_ /\ _)%rel) =>
+Global Hint Extern 2 (RIntro _ subrel _ (_ /\ _)%rel) =>
   eapply rel_inter_glb : typeclass_instances.
 
 Lemma rel_inter_refl {A} (R1 R2: rel A A):
@@ -185,7 +185,7 @@ Proof.
   split; reflexivity.
 Qed.
 
-Hint Extern 2 (Reflexive (_ /\ _)) =>
+Global Hint Extern 2 (Reflexive (_ /\ _)) =>
   eapply rel_inter_refl : typeclass_instances.
 
 Lemma rel_inter_corefl_l {A} (R1 R2: rel A A):
@@ -195,7 +195,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Coreflexive (_ /\ _)) =>
+Global Hint Extern 1 (Coreflexive (_ /\ _)) =>
   eapply rel_inter_corefl_l : typeclass_instances.
 
 Lemma rel_inter_corefl_r {A} (R1 R2: rel A A):
@@ -205,7 +205,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Coreflexive (_ /\ _)) =>
+Global Hint Extern 1 (Coreflexive (_ /\ _)) =>
   eapply rel_inter_corefl_r : typeclass_instances.
 
 Lemma rel_inter_trans {A} (R1 R2: rel A A):
@@ -217,7 +217,7 @@ Proof.
   split; etransitivity; eassumption.
 Qed.
 
-Hint Extern 2 (Transitive (_ /\ _)) =>
+Global Hint Extern 2 (Transitive (_ /\ _)) =>
   eapply rel_inter_trans : typeclass_instances.
 
 Lemma rel_inter_sym {A} (R1 R2: rel A A):
@@ -229,7 +229,7 @@ Proof.
   split; symmetry; assumption.
 Qed.
 
-Hint Extern 2 (Symmetric (_ /\ _)) =>
+Global Hint Extern 2 (Symmetric (_ /\ _)) =>
   eapply rel_inter_sym : typeclass_instances.
 
 Global Instance rel_inter_flip_sym {A} (R: rel A A):
@@ -251,7 +251,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 60 (RStep _ (subrel _ (flip _))) =>
+Global Hint Extern 60 (RStep _ (subrel _ (flip _))) =>
   eapply subrel_sym_flip : typeclass_instances.
 
 (** ** Implication *)
@@ -274,7 +274,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (rel_impl _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (rel_impl _ _) _ _) =>
   eapply rel_impl_rintro : typeclass_instances.
 
 Lemma rel_impl_relim {A B} (R1 R2: rel A B) x y:
@@ -283,7 +283,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RElim (rel_impl _ _) _ _ _ _) =>
+Global Hint Extern 0 (RElim (rel_impl _ _) _ _ _ _) =>
   eapply rel_impl_relim : typeclass_instances.
 
 Lemma rel_impl_subrel_codomain {A B} (R1 R2: rel A B):
@@ -305,7 +305,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (Related ⊥%rel _ _) =>
+Global Hint Extern 0 (Related ⊥%rel _ _) =>
   eapply rel_bot_subrel : typeclass_instances.
 
 Lemma rel_bot_relim {A B} (x: A) (y: B) P:
@@ -314,7 +314,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RElim ⊥ _ _ _ _) =>
+Global Hint Extern 0 (RElim ⊥ _ _ _ _) =>
   eapply rel_bot_relim : typeclass_instances.
 
 Definition rel_top {A B}: rel A B :=
@@ -328,7 +328,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ ⊤ _ _) =>
+Global Hint Extern 0 (RIntro _ ⊤ _ _) =>
   eapply rel_top_rintro : typeclass_instances.
 
 Global Instance rel_top_equiv {A}:
@@ -362,7 +362,7 @@ Qed.
 Definition rel_compose {A B C} (RAB: rel A B) (RBC: rel B C): rel A C :=
   fun x z => exists y, RAB x y /\ RBC y z.
 
-Hint Unfold rel_compose : core.
+Global Hint Unfold rel_compose : core.
 
 Global Instance rel_compose_subrel {A B C}:
   Monotonic (@rel_compose A B C) (subrel ++> subrel ++> subrel).
@@ -466,7 +466,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Reflexive (rel_pull _ _ _)) =>
+Global Hint Extern 1 (Reflexive (rel_pull _ _ _)) =>
   eapply rel_pull_refl : typeclass_instances.
 
 Lemma rel_pull_sym {A B} (f: A -> B) R:
@@ -476,7 +476,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Symmetric (rel_pull _ _ _)) =>
+Global Hint Extern 1 (Symmetric (rel_pull _ _ _)) =>
   eapply rel_pull_sym : typeclass_instances.
 
 Lemma rel_pull_rcompose {A1 A2 A3 B1 B2 B3} f g h R12 R23 R13 :
@@ -486,7 +486,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RCompose _ _ (rel_pull _ _ _)) =>
+Global Hint Extern 1 (RCompose _ _ (rel_pull _ _ _)) =>
   eapply rel_pull_rcompose : typeclass_instances.
 
 (** The introduction rule is straightforward, but changes the head
@@ -503,7 +503,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 60 (RStep _ ((_ @@ (_, _))%rel _ _)) =>
+Global Hint Extern 60 (RStep _ ((_ @@ (_, _))%rel _ _)) =>
   eapply rel_pull_rintro : typeclass_instances.
 
 (** We can reuse an instance of [RElim] for the underlying relation to
@@ -516,7 +516,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (_ @@ (_, _)) _ _ _ _) =>
+Global Hint Extern 1 (RElim (_ @@ (_, _)) _ _ _ _) =>
   eapply rel_pull_relim : typeclass_instances.
 
 (** ** Pushing a relation along functions *)
@@ -524,7 +524,7 @@ Hint Extern 1 (RElim (_ @@ (_, _)) _ _ _ _) =>
 Inductive rel_push {A1 A2 B1 B2} f g (R: rel A1 A2): rel B1 B2 :=
   rel_push_rintro x y: RIntro (R x y) (rel_push f g R) (f x) (g y).
 
-Hint Extern 1 (RIntro _ (rel_push _ _ _) _ _) =>
+Global Hint Extern 1 (RIntro _ (rel_push _ _ _) _ _) =>
   eapply rel_push_rintro : typeclass_instances.
 
 (** The level we choose here is to match the notation used for
@@ -559,7 +559,7 @@ Proof.
   eauto using coreflexivity.
 Qed.
 
-Hint Extern 1 (Coreflexive (_ !! _)) =>
+Global Hint Extern 1 (Coreflexive (_ !! _)) =>
   eapply rel_push_corefl : typeclass_instances.
 
 (** When using [R !! fst] or [R !! snd], if [rel_push_intro] does not
@@ -575,7 +575,7 @@ Proof.
   assumption.
 Qed.
 
-Hint Extern 1 (RExists _ (_ !! fst) _ _) =>
+Global Hint Extern 1 (RExists _ (_ !! fst) _ _) =>
   eapply rel_push_fst_rexists : typeclass_instances.
 
 Lemma rel_push_snd_rexists {A1 A2 B1 B2} (x1:A1) (x2:A2) (y1:B1) (y2:B2) R:
@@ -588,7 +588,7 @@ Proof.
   assumption.
 Qed.
 
-Hint Extern 1 (RExists _ (_ !! snd) _ _) =>
+Global Hint Extern 1 (RExists _ (_ !! snd) _ _) =>
   eapply rel_push_snd_rexists : typeclass_instances.
 
 (** ** Relation currying *)
@@ -673,7 +673,7 @@ Ltac unfold_uncurry :=
       change G
   end.
 
-Hint Extern 1 (UnfoldUncurry ?P ?Q) =>
+Global Hint Extern 1 (UnfoldUncurry ?P ?Q) =>
   repeat unfold_uncurry; constructor : typeclass_instances.
 
 (** Now we can provide a somewhat general [RElim] instance for
@@ -689,10 +689,10 @@ Proof.
   assumption.
 Qed.
 
-Hint Extern 60 (RStep _ ((% _)%rel _ _)) =>
+Global Hint Extern 60 (RStep _ ((% _)%rel _ _)) =>
   eapply rel_pull_rintro : typeclass_instances.
 
-Hint Extern 1 (RElim (% _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (% _) _ _ _ _) =>
   eapply rel_curry_relim : typeclass_instances.
 
 (** ** The [req] relation *)
@@ -711,7 +711,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (req _) _ _) =>
+Global Hint Extern 0 (RIntro _ (req _) _ _) =>
   eapply req_rintro : typeclass_instances.
 
 Lemma req_corefl {A} (a: A):
@@ -721,7 +721,7 @@ Proof.
   reflexivity.
 Qed.
 
-Hint Extern 0 (Coreflexive (req _)) =>
+Global Hint Extern 0 (Coreflexive (req _)) =>
   eapply req_corefl : typeclass_instances.
 
 (** ** Checking predicates on the left and right elements *)
@@ -769,7 +769,7 @@ Proof.
   intros x _ [_]. reflexivity.
 Qed.
 
-Hint Extern 0 (Coreflexive (psat _)) =>
+Global Hint Extern 0 (Coreflexive (psat _)) =>
   eapply psat_corefl : typeclass_instances.
 
 (** ** Relation versions of [ex] and [all] *)
@@ -794,7 +794,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (rel_all _) _ _) =>
+Global Hint Extern 0 (RIntro _ (rel_all _) _ _) =>
   eapply rel_all_rintro : typeclass_instances.
 
 Lemma rel_all_relim {A B C} (R: C -> rel A B) x y P Q:
@@ -804,7 +804,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (rel_all _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (rel_all _) _ _ _ _) =>
   eapply rel_all_relim; eexists : typeclass_instances.
 
 Definition rel_ex {A B C} (R: C -> rel A B): rel A B :=
@@ -821,7 +821,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ (rel_ex _) _ _) =>
+Global Hint Extern 0 (RExists _ (rel_ex _) _ _) =>
   eapply rel_ex_rintro : typeclass_instances.
 
 Lemma rel_ex_relim {A B C} (R: C -> rel A B) x y P Q:
@@ -831,7 +831,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (rel_ex _) _ _ _ _) =>
   eapply rel_ex_relim : typeclass_instances.
 
 (** ** The [rel_incr] construction *)
@@ -875,7 +875,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RExists _ (rel_incr _ _ _) _ _) =>
+Global Hint Extern 0 (RExists _ (rel_incr _ _ _) _ _) =>
   eapply rel_incr_rintro : typeclass_instances.
 
 Lemma rel_incr_rdestruct {W A B} acc R w T:
@@ -892,5 +892,5 @@ Proof.
   eapply H; eauto.
 Qed.
 
-Hint Extern 2 (RDestruct (rel_incr _ _ _) _) =>
+Global Hint Extern 2 (RDestruct (rel_incr _ _ _) _) =>
   eapply rel_incr_rdestruct; intro; eexists; split : typeclass_instances.

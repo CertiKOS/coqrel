@@ -47,7 +47,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (respectful _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (respectful _ _) _ _) =>
   eapply respectful_rintro : typeclass_instances.
 
 Lemma respectful_relim {A B} (RA: relation A) (RB: relation B) f g m n P Q:
@@ -57,7 +57,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (respectful _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (respectful _ _) _ _ _ _) =>
   eapply respectful_relim : typeclass_instances.
 
 Global Instance forall_relation_subrel A P:
@@ -75,7 +75,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (forall_relation _) _ _) =>
+Global Hint Extern 0 (RIntro _ (forall_relation _) _ _) =>
   eapply forall_relation_rintro : typeclass_instances.
 
 Lemma forall_relation_relim {A B} (R: forall a:A, relation (B a)) f g a P Q:
@@ -85,7 +85,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (forall_relation _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (forall_relation _) _ _ _ _) =>
   eapply forall_relation_relim : typeclass_instances.
 
 Global Instance pointwise_relation_subrel A B:
@@ -103,7 +103,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (pointwise_relation _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (pointwise_relation _ _) _ _) =>
  eapply pointwise_relation_rintro : typeclass_instances.
 
 Lemma pointwise_relation_relim {A B} (R: relation B) f g a P Q:
@@ -113,7 +113,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (pointwise_relation _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (pointwise_relation _ _) _ _ _ _) =>
   eapply pointwise_relation_relim : typeclass_instances.
 
 (** The rewriting system sometimes generates arguments constraints of
@@ -162,7 +162,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Immediate subrelation_subrel : typeclass_instances.
+Global Hint Immediate subrelation_subrel : typeclass_instances.
 
 
 (** ** Satisfying [Morphisms.Proper] queries *)
@@ -177,5 +177,5 @@ Ltac solve_morphisms_proper :=
       rauto
   end.
 
-Hint Extern 10 (Morphisms.Proper _ _) =>
+Global Hint Extern 10 (Morphisms.Proper _ _) =>
   solve_morphisms_proper : typeclass_instances.

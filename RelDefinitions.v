@@ -13,7 +13,7 @@ Require Export Delay.
 
 Class NotEvar {A} (x: A).
 
-Hint Extern 1 (NotEvar ?x) =>
+Global Hint Extern 1 (NotEvar ?x) =>
   not_evar x; constructor : typeclass_instances.
 
 (** This version of [Unconvertible] does not assume that [a] and [b]
@@ -26,7 +26,7 @@ Ltac unconvertible a b :=
     [ unify a b with typeclass_instances; fail 1
     | exact tt ].
 
-Hint Extern 1 (Unconvertible ?a ?b) =>
+Global Hint Extern 1 (Unconvertible ?a ?b) =>
   unconvertible a b : typeclass_instances.
 
 (** Sometimes we may want to introduce an auxiliary variable to help
@@ -35,14 +35,14 @@ Hint Extern 1 (Unconvertible ?a ?b) =>
 Class Convertible {A} (x y: A) :=
   convertible: x = y.
 
-Hint Extern 1 (Convertible ?x ?y) =>
+Global Hint Extern 1 (Convertible ?x ?y) =>
   eapply eq_refl : typeclass_instances.
 
 (** The following class can be used to inhibit backtracking. *)
 
 Class Once P := once : P.
 
-Hint Extern 1 (Once ?P) =>
+Global Hint Extern 1 (Once ?P) =>
   red; once typeclasses eauto : typeclass_instances.
 
 
@@ -142,13 +142,13 @@ Ltac rauto_split :=
     | |- ?Q => change (RAuto Q)
   end.
 
-Hint Extern 1 (RAutoSubgoals _) =>
+Global Hint Extern 1 (RAutoSubgoals _) =>
   rauto_split : typeclass_instances.
 
 (** If [rauto] is run under the [delayed] tactical and we don't know
   how to make progress, bail out. *)
 
-Hint Extern 1000 (RAuto _) =>
+Global Hint Extern 1000 (RAuto _) =>
   red; solve [ delay ] : typeclass_instances.
 
 (** ** Reflexivity *)
@@ -172,7 +172,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 10 (RStep _ (?R ?x ?x)) =>
+Global Hint Extern 10 (RStep _ (?R ?x ?x)) =>
   no_evars R; eapply reflexivity_rstep : typeclass_instances.
 
 (** ** Introduction rules *)
@@ -357,7 +357,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RStep _ (Related _ _ _)) =>
+Global Hint Extern 1 (RStep _ (Related _ _ _)) =>
   eapply unfold_monotonic_rstep : typeclass_instances.
 
 (** ** Order on relations *)
@@ -439,7 +439,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (_ ++> _) _ _) =>
+Global Hint Extern 0 (RIntro _ (_ ++> _) _ _) =>
   eapply arrow_rintro : typeclass_instances.
 
 Lemma arrow_relim {A1 A2 B1 B2} RA RB f g m n P Q:
@@ -449,7 +449,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (_ ++> _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (_ ++> _) _ _ _ _) =>
   eapply arrow_relim : typeclass_instances.
 
 (** *** Dependent products *)
@@ -519,7 +519,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (forall_rel _) _ _) =>
+Global Hint Extern 0 (RIntro _ (forall_rel _) _ _) =>
   eapply forall_rintro : typeclass_instances.
 
 Lemma forall_relim {V1 V2 E FV1 FV2} R f g v1 v2 e P Q:
@@ -529,7 +529,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (forall_rel _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (forall_rel _) _ _ _ _) =>
   eapply forall_relim : typeclass_instances.
 
 (** ** Inverse relation *)
@@ -552,7 +552,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RIntro _ (flip _) _ _) =>
+Global Hint Extern 1 (RIntro _ (flip _) _ _) =>
   eapply flip_rintro : typeclass_instances.
 
 Lemma flip_relim {A B} (R: rel A B) m n P Q:
@@ -562,7 +562,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (flip _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (flip _) _ _ _ _) =>
   eapply flip_relim : typeclass_instances.
 
 Lemma flip_rdestruct {A B} (R: rel A B) T:
@@ -572,7 +572,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RDestruct (flip _) _) =>
+Global Hint Extern 1 (RDestruct (flip _) _) =>
   eapply flip_rdestruct : typeclass_instances.
 
 (** When the goal is of the form [?R x y] with [?R] an uninstantiated
@@ -592,7 +592,7 @@ Hint Extern 1 (RDestruct (flip _) _) =>
 
 Class PolarityResolved {A B} (R: rel A B).
 
-Hint Extern 1 (PolarityResolved ?R) =>
+Global Hint Extern 1 (PolarityResolved ?R) =>
   not_evar R; constructor : typeclass_instances.
 
 Ltac polarity_unresolved R :=
@@ -608,7 +608,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RExists _ ?R _ _) =>
+Global Hint Extern 1 (RExists _ ?R _ _) =>
   polarity_unresolved R; eapply direct_rexists : typeclass_instances.
 
 Lemma flip_rexists {A B} (R: rel A B) (Rc: rel B A) (m: A) (n: B):
@@ -619,5 +619,5 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 2 (RExists _ ?R _ _) =>
+Global Hint Extern 2 (RExists _ ?R _ _) =>
   polarity_unresolved R; eapply flip_rexists : typeclass_instances.

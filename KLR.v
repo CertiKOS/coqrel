@@ -148,19 +148,19 @@ Global Instance k_rel_params: Params (@k) 4 := { }.
 Global Instance k1_rel_params: Params (@k1) 5 := { }.
 Global Instance k2_rel_params: Params (@k2) 6 := { }.
 
-Hint Extern 0 (RIntro _ (k _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (k _ _) _ _) =>
   eapply k_rintro : typeclass_instances.
-Hint Extern 1 (RElim (k _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (k _ _) _ _ _ _) =>
   eapply k_relim : typeclass_instances.
 
-Hint Extern 0 (RIntro _ (k1 _ _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (k1 _ _ _) _ _) =>
   eapply k1_rintro : typeclass_instances.
-Hint Extern 1 (RElim (k1 _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (k1 _ _ _) _ _ _ _) =>
   eapply k1_relim : typeclass_instances.
 
-Hint Extern 0 (RIntro _ (k2 _ _ _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (k2 _ _ _ _) _ _) =>
   eapply k2_rintro : typeclass_instances.
-Hint Extern 1 (RElim (k2 _ _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (k2 _ _ _ _) _ _ _ _) =>
   eapply k2_relim : typeclass_instances.
 
 (** *** Usual relators *)
@@ -218,34 +218,34 @@ Infix "\/" := klr_union : klr_scope.
 Infix "/\" := klr_inter : klr_scope.
 Notation "% R" := (klr_curry R) : klr_scope.
 
-Hint Extern 0 (RIntro _ (arrow_klr _ _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (arrow_klr _ _ _) _ _) =>
   eapply k2_rintro : typeclass_instances.
-Hint Extern 1 (RElim (arrow_klr _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (arrow_klr _ _ _) _ _ _ _) =>
   eapply k2_relim : typeclass_instances.
 
-Hint Extern 0 (RIntro _ (arrow_pointwise_klr _ _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (arrow_pointwise_klr _ _ _) _ _) =>
   eapply k1_rintro : typeclass_instances.
-Hint Extern 1 (RElim (arrow_pointwise_klr _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (arrow_pointwise_klr _ _ _) _ _ _ _) =>
   eapply k1_relim : typeclass_instances.
 
-Hint Extern 0 (RIntro _ (prod_klr _ _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (prod_klr _ _ _) _ _) =>
   eapply k2_rintro : typeclass_instances.
-Hint Extern 1 (RElim (prod_klr _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (prod_klr _ _ _) _ _ _ _) =>
   eapply k2_relim : typeclass_instances.
 
-Hint Extern 0 (RIntro _ (sum_klr _ _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (sum_klr _ _ _) _ _) =>
   eapply k2_rintro : typeclass_instances.
-Hint Extern 1 (RElim (sum_klr _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (sum_klr _ _ _) _ _ _ _) =>
   eapply k2_relim : typeclass_instances.
 
-Hint Extern 0 (RIntro _ (list_klr _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (list_klr _ _) _ _) =>
   eapply k1_rintro : typeclass_instances.
-Hint Extern 1 (RElim (list_klr _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (list_klr _ _) _ _ _ _) =>
   eapply k1_relim : typeclass_instances.
 
-Hint Extern 0 (RIntro _ (klr_curry _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (klr_curry _ _) _ _) =>
   eapply k1_rintro : typeclass_instances.
-Hint Extern 1 (RElim (klr_curry _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (klr_curry _ _) _ _ _ _) =>
   eapply k1_relim : typeclass_instances.
 
 (** ** Modal relators *)
@@ -315,14 +315,14 @@ End MODALITIES.
 Global Instance klr_box_subrel_params: Params (@klr_box) 4 := { }.
 Global Instance klr_diam_subrel_params: Params (@klr_diam) 4 := { }.
 
-Hint Extern 0 (RIntro _ (klr_box _ _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (klr_box _ _ _) _ _) =>
   eapply klr_box_rintro : typeclass_instances.
-Hint Extern 1 (RElim (klr_box _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (klr_box _ _ _) _ _ _ _) =>
   eapply klr_box_relim : typeclass_instances.
 
-Hint Extern 0 (RExists _ (klr_diam _ _ _) _ _) =>
+Global Hint Extern 0 (RExists _ (klr_diam _ _ _) _ _) =>
   eapply klr_diam_rintro : typeclass_instances.
-Hint Extern 1 (RElim (klr_diam _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (klr_diam _ _ _) _ _ _ _) =>
   eapply klr_diam_relim : typeclass_instances.
 
 Notation "[ l ] R" := (klr_box l R) (at level 65) : klr_scope.
@@ -381,10 +381,10 @@ End UNKRIPKIFY.
 
 Global Instance rel_kvd_subrel_params: Params (@rel_kvd) 3 := { }.
 
-Hint Extern 0 (RIntro _ (rel_kvd _) _ _) =>
+Global Hint Extern 0 (RIntro _ (rel_kvd _) _ _) =>
   eapply rel_kvd_rintro : typeclass_instances.
 
-Hint Extern 1 (RElim (rel_kvd _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (rel_kvd _) _ _ _ _) =>
   eapply rel_kvd_relim : typeclass_instances.
 
 Notation "|= R" := (rel_kvd R) (at level 65) : rel_scope.
@@ -414,7 +414,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (klr_pullw _ _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (klr_pullw _ _ _) _ _) =>
   eapply klr_pullw_rintro : typeclass_instances.
 
 Lemma klr_pullw_relim {W1 W2 A B} (f: W1 -> W2) R w (x:A) (y:B) P Q:
@@ -424,5 +424,5 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (klr_pullw _ _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (klr_pullw _ _ _) _ _ _ _) =>
   eapply klr_pullw_relim : typeclass_instances.

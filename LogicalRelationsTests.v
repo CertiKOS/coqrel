@@ -402,7 +402,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RStep _ (_ ?x ?y)) =>
+Global Hint Extern 1 (RStep _ (_ ?x ?y)) =>
   lazymatch goal with
     H : ?R x y |- _ => is_evar R; eexact (assumption_rstep H)
   end : typeclass_instances.

@@ -132,7 +132,7 @@ Ltac query_params m1 m2 :=
     | not_evar h1; is_evar  h2; eapply (query_params_one h1 p1)
     | is_evar  h1; not_evar h2; eapply (query_params_one h2 p2) ].
 
-Hint Extern 10 (QueryParams ?m1 ?m2 _) =>
+Global Hint Extern 10 (QueryParams ?m1 ?m2 _) =>
   query_params m1 m2 : typeclass_instances.
 
 (** Now that we can figure out how many parameters to drop, we use
@@ -174,7 +174,7 @@ Ltac remove_params n m1 m2 f g :=
   remove_params_from n m1 ltac:(fun m1' => unify f m1';
     remove_params_from n m2 ltac:(fun m2' => unify g m2')).
 
-Hint Extern 1 (RemoveParams ?n ?m1 ?m2 ?f ?g) =>
+Global Hint Extern 1 (RemoveParams ?n ?m1 ?m2 ?f ?g) =>
   remove_params n m1 m2 f g; constructor : typeclass_instances.
 
 (** The class [RemoveAllParams] implements the concurrent removal of
@@ -204,7 +204,7 @@ Ltac remove_all_params m1 m2 f g :=
     | not_evar m1; unify f m1;
       not_evar m2; unify g m2 ].
 
-Hint Extern 1 (RemoveAllParams ?m1 ?m2 ?f ?g) =>
+Global Hint Extern 1 (RemoveAllParams ?m1 ?m2 ?f ?g) =>
   remove_all_params m1 m2 f g; constructor : typeclass_instances.
 
 (** *** Selecting a relational property *)
@@ -312,7 +312,7 @@ Ltac context_candidate :=
       eexact H
   end.
 
-Hint Extern 1 (CandidateProperty _ _ _ _) =>
+Global Hint Extern 1 (CandidateProperty _ _ _ _) =>
   context_candidate : typeclass_instances.
 
 (** *** Using [subrel] *)
@@ -464,7 +464,7 @@ Ltac common_prefix m1 m2 f :=
       end
     | unify m1 m2; unify f m1 ].
 
-Hint Extern 1 (CommonPrefix ?m1 ?m2 ?f) =>
+Global Hint Extern 1 (CommonPrefix ?m1 ?m2 ?f) =>
   common_prefix m1 m2 f; constructor : typeclass_instances.
 
 Global Instance eq_candidate {A B C} R (m1: A) (m2: B) (f: C):

@@ -166,9 +166,9 @@ Tactic Notation "delay" := Delay.delay.
 
 Definition delay (P: Prop) := P.
 
-Hint Extern 0 (delay _) => delay : core.
+Global Hint Extern 0 (delay _) => delay : core.
 
-Hint Extern 100 => delay : delay.
+Global Hint Extern 100 => delay : delay.
 
 (** This typeclass wrapper is convenient for performing a nested
   search outside of a potential "delayed" context. *)
@@ -176,7 +176,7 @@ Hint Extern 100 => delay : delay.
 Class NonDelayed (P: Prop) :=
   nondelayed : P.
 
-Hint Extern 1 (NonDelayed _) =>
+Global Hint Extern 1 (NonDelayed _) =>
   red; try Delay.undelay : typeclass_instances.
 
 
@@ -191,7 +191,7 @@ Hint Extern 1 (NonDelayed _) =>
 Class EApply (HT P Q: Prop) :=
   eapply : HT -> P -> Q.
 
-Hint Extern 1 (EApply ?HT _ _) =>
+Global Hint Extern 1 (EApply ?HT _ _) =>
   let H := fresh in
   let HP := fresh "HP" in
     intros H HP;

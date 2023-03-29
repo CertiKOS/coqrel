@@ -106,7 +106,7 @@ Ltac use_rdestruct_rstep m n :=
   eapply (rdestruct_rstep m n);
   [ .. | eexact H].
 
-Hint Extern 40 (RStep _ (_ (match ?m with _=>_ end) (match ?n with _=>_ end))) =>
+Global Hint Extern 40 (RStep _ (_ (match ?m with _=>_ end) (match ?n with _=>_ end))) =>
   use_rdestruct_rstep m n : typeclass_instances.
 
 (** ** Choosing to discard or keep equations *)
@@ -163,7 +163,7 @@ Ltac rdestruct_result_rintro :=
       eapply rdestruct_forget_rintro
   end.
 
-Hint Extern 100 (RIntro _ (rdestruct_result _ _ _) _ _) =>
+Global Hint Extern 100 (RIntro _ (rdestruct_result _ _ _) _ _) =>
   rdestruct_result_rintro : typeclass_instances.
 
 (** ** Default instance *)
@@ -184,7 +184,7 @@ Ltac default_rdestruct :=
   pattern P;
   eexact H.
 
-Hint Extern 100 (RDestruct _ _) =>
+Global Hint Extern 100 (RDestruct _ _) =>
   default_rdestruct : typeclass_instances.
 
 (** In the special case where the terms matched on the left- and
@@ -204,5 +204,5 @@ Ltac eq_rdestruct :=
   pattern P;
   eexact H.
 
-Hint Extern 99 (RDestruct eq _) =>
+Global Hint Extern 99 (RDestruct eq _) =>
   eq_rdestruct : typeclass_instances.

@@ -105,7 +105,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (- ==> _) _ _) =>
+Global Hint Extern 0 (RIntro _ (- ==> _) _ _) =>
   eapply arrow_pointwise_rintro : typeclass_instances.
 
 (** Note that although the elimination rule could use a single
@@ -128,7 +128,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (- ==> _) _ _ _ _) =>
   eapply arrow_pointwise_relim : typeclass_instances.
 
 Lemma arrow_pointwise_refl {T} `(Reflexive) :
@@ -137,7 +137,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Reflexive (- ==> _)) =>
+Global Hint Extern 1 (Reflexive (- ==> _)) =>
   eapply arrow_pointwise_refl : typeclass_instances.
 
 Global Instance arrow_pointwise_rel_compose {T} `(RCompose) :
@@ -183,7 +183,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (forall_pointwise_rel _) _ _) =>
+Global Hint Extern 0 (RIntro _ (forall_pointwise_rel _) _ _) =>
   eapply forall_pointwise_rintro : typeclass_instances.
 
 Lemma forall_pointwise_relim {V FV1 FV2} R f g v P Q:
@@ -193,7 +193,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (forall_pointwise_rel _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (forall_pointwise_rel _) _ _ _ _) =>
   eapply forall_pointwise_relim : typeclass_instances.
 
 (** *** Dependent products (restricted version) *)
@@ -222,7 +222,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 0 (RIntro _ (forallp_rel _ _) _ _) =>
+Global Hint Extern 0 (RIntro _ (forallp_rel _ _) _ _) =>
   eapply forallp_rintro : typeclass_instances.
 
 (** Since [e : E v1 v2] cannot be unified in [Q], the elimination rule
@@ -235,7 +235,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RElim (forallp_rel _ _) _ _ _ _) =>
+Global Hint Extern 1 (RElim (forallp_rel _ _) _ _ _ _) =>
   eapply forallp_relim : typeclass_instances.
 
 (** TODO: A further specialization could be [foralln_rel], which does
@@ -276,7 +276,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Reflexive (set_le _)) =>
+Global Hint Extern 1 (Reflexive (set_le _)) =>
   eapply set_le_refl : typeclass_instances.
 
 Global Instance set_le_compose `(RCompose) :
@@ -308,7 +308,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (Reflexive (set_ge _)) =>
+Global Hint Extern 1 (Reflexive (set_ge _)) =>
   eapply set_ge_refl : typeclass_instances.
 
 Global Instance set_ge_compose `(RCompose) :
@@ -395,7 +395,7 @@ Proof.
   destruct x; constructor; reflexivity.
 Qed.
 
-Hint Extern 2 (Reflexive (_ + _)) =>
+Global Hint Extern 2 (Reflexive (_ + _)) =>
   eapply sum_rel_refl : typeclass_instances.
 
 Lemma sum_rel_corefl {A B} (R1: rel A A) (R2: rel B B):
@@ -406,7 +406,7 @@ Proof.
   eauto using coreflexivity.
 Qed.
 
-Hint Extern 2 (Coreflexive (_ + _)) =>
+Global Hint Extern 2 (Coreflexive (_ + _)) =>
   eapply sum_rel_corefl : typeclass_instances.
 
 Lemma sum_rel_trans {A B} (R1: rel A A) (R2: rel B B):
@@ -416,7 +416,7 @@ Proof.
   destruct Hxy; inversion Hyz; constructor; etransitivity; eassumption.
 Qed.
 
-Hint Extern 2 (Transitive (_ + _)) =>
+Global Hint Extern 2 (Transitive (_ + _)) =>
   eapply sum_rel_trans : typeclass_instances.
 
 Lemma sum_rel_sym {A B} (R1: rel A A) (R2: rel B B):
@@ -426,7 +426,7 @@ Proof.
   destruct Hxy; constructor; symmetry; eassumption.
 Qed.
 
-Hint Extern 2 (Symmetric (_ + _)) =>
+Global Hint Extern 2 (Symmetric (_ + _)) =>
   eapply sum_rel_sym : typeclass_instances.
 
 Lemma sum_rel_preorder {A B} (R1: rel A A) (R2: rel B B):
@@ -435,7 +435,7 @@ Proof.
   split; typeclasses eauto.
 Qed.
 
-Hint Extern 2 (PreOrder (_ + _)) =>
+Global Hint Extern 2 (PreOrder (_ + _)) =>
   eapply sum_rel_preorder : typeclass_instances.
 
 (** *** Pairs *)
@@ -494,7 +494,7 @@ Proof.
   destruct x; constructor; reflexivity.
 Qed.
 
-Hint Extern 2 (Reflexive (_ * _)) =>
+Global Hint Extern 2 (Reflexive (_ * _)) =>
   eapply prod_rel_refl : typeclass_instances.
 
 Lemma prod_rel_corefl {A B} (R1: rel A A) (R2: rel B B):
@@ -504,7 +504,7 @@ Proof.
   f_equal; eauto using coreflexivity.
 Qed.
 
-Hint Extern 2 (Coreflexive (_ * _)) =>
+Global Hint Extern 2 (Coreflexive (_ * _)) =>
   eapply prod_rel_corefl : typeclass_instances.
 
 Lemma prod_rel_trans {A B} (R1: rel A A) (R2: rel B B):
@@ -514,7 +514,7 @@ Proof.
   destruct Hxy; inversion Hyz; constructor; etransitivity; eassumption.
 Qed.
 
-Hint Extern 2 (Transitive (_ * _)) =>
+Global Hint Extern 2 (Transitive (_ * _)) =>
   eapply prod_rel_trans : typeclass_instances.
 
 Lemma prod_rel_sym {A B} (R1: rel A A) (R2: rel B B):
@@ -524,7 +524,7 @@ Proof.
   destruct Hxy; constructor; symmetry; eassumption.
 Qed.
 
-Hint Extern 2 (Symmetric (_ * _)) =>
+Global Hint Extern 2 (Symmetric (_ * _)) =>
   eapply prod_rel_sym : typeclass_instances.
 
 Lemma prod_rel_preorder {A B} (R1: rel A A) (R2: rel B B):
@@ -533,7 +533,7 @@ Proof.
   split; typeclasses eauto.
 Qed.
 
-Hint Extern 2 (PreOrder (_ * _)) =>
+Global Hint Extern 2 (PreOrder (_ * _)) =>
   eapply prod_rel_preorder : typeclass_instances.
 
 (** *** Option types *)
@@ -571,7 +571,7 @@ Proof.
   intros [x | ]; constructor; reflexivity.
 Qed.
 
-Hint Extern 1 (Reflexive (option_rel _)) =>
+Global Hint Extern 1 (Reflexive (option_rel _)) =>
   eapply option_rel_refl : typeclass_instances.
 
 Global Instance option_map_rel:
@@ -633,7 +633,7 @@ Proof.
   induction l; constructor; eauto.
 Qed.
 
-Hint Extern 1 (Reflexive (list_rel _)) =>
+Global Hint Extern 1 (Reflexive (list_rel _)) =>
   eapply list_rel_refl : typeclass_instances.
 
 Lemma list_rel_corefl `(HR: Coreflexive):
@@ -644,7 +644,7 @@ Proof.
   f_equal; eauto using coreflexivity.
 Qed.
 
-Hint Extern 1 (Coreflexive (list_rel _)) =>
+Global Hint Extern 1 (Coreflexive (list_rel _)) =>
   eapply list_rel_corefl : typeclass_instances.
 
 Lemma list_rel_sym `(HR: Symmetric):
@@ -654,7 +654,7 @@ Proof.
   induction Hl; constructor; eauto.
 Qed.
 
-Hint Extern 1 (Symmetric (list_rel _)) =>
+Global Hint Extern 1 (Symmetric (list_rel _)) =>
   eapply list_rel_sym : typeclass_instances.
 
 Lemma list_rel_trans `(HR: Transitive):
@@ -665,7 +665,7 @@ Proof.
   induction Hl12; inversion 1; constructor; eauto.
 Qed.
 
-Hint Extern 1 (Transitive (list_rel _)) =>
+Global Hint Extern 1 (Transitive (list_rel _)) =>
   eapply list_rel_trans : typeclass_instances.
 
 Global Instance length_rel:
@@ -727,7 +727,7 @@ Proof.
   firstorder.
 Qed.
 
-Hint Extern 1 (RStep _ (_ -> _)) =>
+Global Hint Extern 1 (RStep _ (_ -> _)) =>
   eapply fold_impl_rstep : typeclass_instances.
 
 Global Instance all_monotonic {A}:

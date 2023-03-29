@@ -55,7 +55,7 @@ Proof.
   destruct b1, b2; eauto; discriminate.
 Qed.
 
-Hint Extern 0 (RDestruct Bool.le _) =>
+Global Hint Extern 0 (RDestruct Bool.le _) =>
   eapply leb_rdestruct : typeclass_instances.
 
 Global Instance leb_transport_eq_true x y:
@@ -73,7 +73,7 @@ Proof.
   destruct b; reflexivity.
 Qed.
 
-Hint Extern 0 (Related _ true _) =>
+Global Hint Extern 0 (Related _ true _) =>
   eapply true_leb : typeclass_instances.
 
 Lemma false_leb b:
@@ -82,7 +82,7 @@ Proof.
   destruct b; reflexivity.
 Qed.
 
-Hint Extern 0 (Related false _ _) =>
+Global Hint Extern 0 (Related false _ _) =>
   eapply false_leb : typeclass_instances.
 
 Global Instance negb_leb:
