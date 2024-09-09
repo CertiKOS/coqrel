@@ -2,7 +2,10 @@ Makefile
 Makefile.bak
 Makefile.conf
 .coqdeps.d
+.Makefile.d
 *.v.d
 *.vo
+*.vok
+*.vos
 *.glob
 .*.aux
