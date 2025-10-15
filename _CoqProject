@@ -15,5 +15,6 @@ LogicalRelations.v
 BoolRel.v
 OptionRel.v
 KLR.v
+RelQuotient.v
 
 LogicalRelationsTests.v
