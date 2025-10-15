@@ -87,5 +87,5 @@ Ltac rgraph :=
 
 (** Hook [rgraph] for providing [RStep]s *)
 
-Hint Extern 30 (RStep ?P (_ _ _)) =>
+Global Hint Extern 30 (RStep ?P (_ _ _)) =>
   solve [ try unify P True; intro; rgraph ] : typeclass_instances.

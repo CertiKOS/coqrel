@@ -62,7 +62,7 @@ Proof.
   assumption.
 Qed.
 
-Hint Immediate transitive_rcompose : typeclass_instances.
+Global Hint Immediate transitive_rcompose : typeclass_instances.
 
 (** ** Decomposition *)
 
