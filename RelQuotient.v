@@ -43,6 +43,15 @@ Arguments quotient {A B} R.
 
 Local Obligation Tactic := solve [rauto | firstorder].
 
+Lemma quotient_ext_eq {A B R} (x y : @quotient A B R) :
+  (forall a, in_eqcl x a <-> in_eqcl y a) -> x = y.
+Proof.
+  destruct x as [x [xb Hx]], y as [y [yb Hy]]. cbn. intros H.
+  cut (x = y). { intro. subst. f_equal. apply proof_irrelevance. }
+  apply functional_extensionality. intros a.
+  apply propositional_extensionality. firstorder.
+Qed.
+
 (** Obtaining the equivalence class associated with
   an element of the base type is straightforward. *)
 
@@ -76,10 +85,7 @@ Proof.
   split.
   - intros [ ]. firstorder.
   - unfold flip, qle. intros [Hxy Hyx].
-    destruct x as [x [xa Hx]], y as [y [ya Hy]]; cbn in *.
-    cut (x = y). { intro. subst. f_equal. apply proof_irrelevance. }
-    apply functional_extensionality. intros a.
-    apply propositional_extensionality. firstorder.
+    apply quotient_ext_eq. firstorder.
 Qed.
 
 (** ** Properties *)
@@ -147,3 +153,52 @@ Section EQCL_PROPERTIES.
   Qed.
 End EQCL_PROPERTIES.
 
+(** ** Homomorphisms *)
+
+(** Under certain conditions, functions on base types can be lifted to
+  functions between quotient types. It is not completely clear to me
+  at this point how to best express the most general version of this,
+  but the treatment below is good enough for preorders. *)
+
+Section HOM.
+  Context {A} (R : relation A) `{HR : !Reflexive R}.
+  Context {B} (S : relation B) `{HS : !Transitive S}.
+  Context (f : A -> B) `{Hf : Monotonic f (R ++> S)}.
+
+  Obligation Tactic := idtac.
+
+  Program Definition qmap (x : quotient R) : quotient S :=
+    {| in_eqcl b :=
+        exists xa, (forall a, in_eqcl x a <-> R a xa) /\ S b (f xa) |}.
+  Next Obligation.
+    intros [x [xa Hxa]]. cbn.
+    exists (f xa). intros b. split.
+    - intros (xa' & Hxa' & Hb).
+      transitivity (f xa'); auto. clear b Hb.
+      rstep. apply Hxa. apply Hxa'. reflexivity.
+    - intros Hb. exists xa. auto.
+  Qed.
+
+  Lemma qmap_eqcl a :
+    qmap (eqcl R a) = eqcl S (f a).
+  Proof.
+    apply quotient_ext_eq.
+    cbn. firstorder.
+  Qed.
+End HOM.
+
+(** The quotient maps induced by the construction above are monotonic. *)
+
+Global Instance qmap_qle :
+  Monotonic (@qmap) (forallr -, forallr -, rel_top ==>
+                     forallr -, forallr -, rel_top ==>
+                     forallr -, rel_top ==>
+                     qle ++> qle).
+Proof.
+  intros A R HR HR' _ B S HS HS' _ f Hf Hf' _.
+  intros [x [xa Hxa]] [y [ya Hya]]. unfold qle; cbn. intros Hxy.
+  intros b (xa' & Hxa' & Hb).
+  exists ya. split; auto.
+  transitivity (f xa'); auto. clear b Hb. rstep.
+  apply Hya. apply Hxy. apply Hxa'. reflexivity.
+Qed.
