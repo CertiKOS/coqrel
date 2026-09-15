@@ -19,7 +19,7 @@ Require Import Delay.
   instance of [RElim] which will allow us to use [R' f g] to make
   progress on the current goal. Most of the time, [f] and [g] will be
   identical so that the corresponding relational property can be
-  writted [Monotonic f R'].
+  written [Monotonic f R'].
 
   For instance, we can register the monotonicity of [plus] as an
   instance of [Monotonic plus (lt ++> lt ++> lt)]. Given an goal of
@@ -144,7 +144,7 @@ Global Hint Extern 10 (QueryParams ?m1 ?m2 _) =>
       both applications simulataneously.
 
   Again, we need to take into account that either application could
-  contain an eixstential variable. When we encounter an existential
+  contain an existential variable. When we encounter an existential
   variable while chopping off arguments, we short-circuit the process
   and simply generate a new evar to serve as the shortened version. *)
 
