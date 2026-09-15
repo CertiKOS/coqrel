@@ -41,7 +41,7 @@ Record quotient {A B} {R : rel A B} :=
 
 Arguments quotient {A B} R.
 
-Local Obligation Tactic := solve [rauto | firstorder].
+Local Obligation Tactic := try solve [rauto | firstorder].
 
 Lemma quotient_ext_eq {A B R} (x y : @quotient A B R) :
   (forall a, in_eqcl x a <-> in_eqcl y a) -> x = y.
@@ -165,8 +165,6 @@ Section HOM.
   Context {B} (S : relation B) `{HS : !Transitive S}.
   Context (f : A -> B) `{Hf : Monotonic f (R ++> S)}.
 
-  Obligation Tactic := idtac.
-
   Program Definition qmap (x : quotient R) : quotient S :=
     {| in_eqcl b :=
         exists xa, (forall a, in_eqcl x a <-> R a xa) /\ S b (f xa) |}.
@@ -202,3 +200,47 @@ Proof.
   transitivity (f xa'); auto. clear b Hb. rstep.
   apply Hya. apply Hxy. apply Hxa'. reflexivity.
 Qed.
+
+(** ** Pairs *)
+
+Section PROD.
+  Context {A1 B1} {R1 : rel A1 B1}.
+  Context {A2 B2} {R2 : rel A2 B2}.
+
+  Program Definition qpair (x : quotient R1) (y : quotient R2) : quotient (R1 * R2) :=
+    {| in_eqcl '(a1, a2) := in_eqcl x a1 /\ in_eqcl y a2 |}.
+  Next Obligation.
+    intros [x [xb Hxb]] [y [yb Hyb]].
+    exists (xb, yb). intros [xa ya].
+    cbn. firstorder.
+  Qed.
+
+  Lemma qpair_eqcl b1 b2 :
+    qpair (eqcl R1 b1) (eqcl R2 b2) = eqcl (R1 * R2) (b1, b2).
+  Proof.
+    apply quotient_ext_eq.
+    intros [a1 a2]. cbn. firstorder.
+  Qed.
+End PROD.
+
+Section MAP2.
+  Context {A} (R : relation A) `{HR : !Reflexive R}.
+  Context {B} (S : relation B) `{HS : !Reflexive S}.
+  Context {C} (T : relation C) `{HT : !Transitive T}.
+  Context (f : A -> B -> C) `{Hf : !Monotonic f (R ++> S ++> T)}.
+
+  Program Definition qmap2 (x : quotient R) (y : quotient S) :=
+    qmap (R * S) T (fun '(a, b) => f a b) (Hf := _) (qpair x y).
+  Next Obligation.
+    intros x y [a1 b1] [a2 b2] [Ha Hb].
+    cbn in *. rauto.
+  Qed.
+
+  Lemma qmap2_eqcl a b :
+    qmap2 (eqcl R a) (eqcl S b) = eqcl T (f a b).
+  Proof.
+    unfold qmap2.
+    rewrite qpair_eqcl, qmap_eqcl.
+    reflexivity.
+  Qed.
+End MAP2.
