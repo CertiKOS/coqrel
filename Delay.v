@@ -168,6 +168,7 @@ Definition delay (P: Prop) := P.
 
 Global Hint Extern 0 (delay _) => delay : core.
 
+Create HintDb delay.
 Global Hint Extern 100 => delay : delay.
 
 (** This typeclass wrapper is convenient for performing a nested

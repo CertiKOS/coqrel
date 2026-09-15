@@ -395,7 +395,7 @@ Definition klr_pullw {W1 W2 A B} (f: W1 -> W2) (R: klr W2 A B): klr W1 A B :=
   fun w => R (f w).
 
 Notation "R @@ [ f ]" := (klr_pullw f R)
-  (at level 30, right associativity) : klr_scope.
+  (at level 1, right associativity) : klr_scope.
 
 Global Instance klr_pullw_subrel {W1 W2 A B} RW1 RW2:
   Monotonic

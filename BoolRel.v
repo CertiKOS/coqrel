@@ -1,5 +1,5 @@
 Require Import LogicalRelations.
-Require Export Coq.Bool.Bool.
+Require Export Stdlib.Bool.Bool.
 
 
 (** * Relations for [sumbool] *)

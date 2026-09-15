@@ -16,9 +16,9 @@ Require Import LogicalRelations.
   as predicates on the base type ("subsets")
   satisfying certain properties. This is what we do here. *)
 
-Require Import FunctionalExtensionality.
-Require Import PropExtensionality.
-Require Import ProofIrrelevance.
+Require Import Stdlib.Logic.FunctionalExtensionality.
+Require Import Stdlib.Logic.PropExtensionality.
+Require Import Stdlib.Logic.ProofIrrelevance.
 
 (** It should be noted that the elements of the quotient are
   "non constructive". [explain] *)
