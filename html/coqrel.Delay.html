@@ -50,7 +50,7 @@ This file implements a tactical <span class="inlinecode"><span class="id" title=
 
   Additionally, the variant <span class="inlinecode"><span class="id" title="var">delayed_conjunction</span></span> bundles all of the
   subgoals solved by <span class="inlinecode"><a class="idref" href="coqrel.Delay.html#delay"><span class="id" title="definition">delay</span></a></span> in a single conjunction of the form
-  <span class="inlinecode"><span class="id" title="var">P1</span></span> <span class="inlinecode">∧</span> <span class="inlinecode">...</span> <span class="inlinecode">∧</span> <span class="inlinecode"><span class="id" title="var">Pn</span></span> <span class="inlinecode">∧</span> <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a></span>. This is useful as it provides a uniform
+  <span class="inlinecode"><span class="id" title="var">P1</span></span> <span class="inlinecode">∧</span> <span class="inlinecode">...</span> <span class="inlinecode">∧</span> <span class="inlinecode"><span class="id" title="var">Pn</span></span> <span class="inlinecode">∧</span> <span class="inlinecode"><a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#True"><span class="id" title="inductive">True</span></a></span>. This is useful as it provides a uniform
   interface when reifying the effect of a tactic. 
 <div class="paragraph"> </div>
 
@@ -79,10 +79,10 @@ The <span class="inlinecode"><span class="id" title="var">delayed</span></span> 
 <br/>
 &nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">use_conjunction</span> <span class="id" title="var">H</span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">lazymatch</span> <span class="id" title="keyword">type</span> <span class="id" title="keyword">of</span> <span class="id" title="var">H</span> <span class="id" title="keyword">with</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">A</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#ba2b0e492d2b4675a0acf3ea92aabadd"><span class="id" title="notation">∧</span></a> ?<span class="id" title="var">B</span> ⇒<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">use_conjunction</span> (@<a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#proj2"><span class="id" title="lemma">proj2</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span> <span class="id" title="var">H</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ?<span class="id" title="var">A</span> <a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#ba2b0e492d2b4675a0acf3ea92aabadd"><span class="id" title="notation">∧</span></a> ?<span class="id" title="var">B</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">use_conjunction</span> (@<a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#proj2"><span class="id" title="lemma">proj2</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span> <span class="id" title="var">H</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">_</span> ⇒<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> (<a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#proj1"><span class="id" title="lemma">proj1</span></a> <span class="id" title="var">H</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">eapply</span> (<a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#proj1"><span class="id" title="lemma">proj1</span></a> <span class="id" title="var">H</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
 
 <br/>
@@ -118,7 +118,7 @@ The evar can only be instantiated to refer to variables that
 <br/>
 &nbsp;&nbsp;<span class="id" title="keyword">Ltac</span> <span class="id" title="var">revert_until_conjunction</span> <span class="id" title="var">Hdelayed</span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- <a class="idref" href="coqrel.Delay.html#Delay.open_conjunction"><span class="id" title="record">open_conjunction</span></a> <span class="id" title="var">_</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="var">_</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- <a class="idref" href="coqrel.Delay.html#Delay.open_conjunction"><span class="id" title="record">open_conjunction</span></a> <span class="id" title="var">_</span> <a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Notations.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="var">_</span> ⇒<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intro</span> <span class="id" title="var">Hdelayed</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">H</span> : <span class="id" title="var">_</span> |- <span class="id" title="var">_</span> ⇒<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">revert</span> <span class="id" title="var">H</span>;<br/>
@@ -161,8 +161,8 @@ Once we're done, we've packaged all of the goals we solved using
 <div class="paragraph"> </div>
 
     Although we expect the conjunctions produced by <span class="inlinecode"><span class="id" title="var">use_conjunction</span></span>
-    to be terminated by <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a></span> and this should be regarded as the
-    canonical format, when the last conjunct is a non-<span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a></span>
+    to be terminated by <span class="inlinecode"><a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#True"><span class="id" title="inductive">True</span></a></span> and this should be regarded as the
+    canonical format, when the last conjunct is a non-<span class="inlinecode"><a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#True"><span class="id" title="inductive">True</span></a></span>
     proposition we consider it as an additional subgoal. Likewise we
     don't require the conclusions to be wrapped in <span class="inlinecode"><a class="idref" href="coqrel.Delay.html#Delay.delayed_goal"><span class="id" title="definition">delayed_goal</span></a></span>.
     This allows for some flexibility when dealing with manually
@@ -180,9 +180,9 @@ Once we're done, we've packaged all of the goals we solved using
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- <span class="id" title="var">_</span> ⇒ <span class="id" title="tactic">idtac</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span> <span class="id" title="tactic">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="keyword">goal</span> <span class="id" title="keyword">with</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- <span class="id" title="var">_</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#ba2b0e492d2b4675a0acf3ea92aabadd"><span class="id" title="notation">∧</span></a> <span class="id" title="var">_</span> ⇒ <span class="id" title="tactic">split</span>; [<span class="id" title="var">handle_subgoal</span> | <span class="id" title="var">split_conjunction</span>]<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- <a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a> ⇒ <span class="id" title="tactic">exact</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#I"><span class="id" title="constructor">I</span></a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- ?<span class="id" title="var">P</span> ⇒ <span class="id" title="var">is_evar</span> <span class="id" title="var">P</span>; <span class="id" title="tactic">exact</span> <a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#I"><span class="id" title="constructor">I</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- <span class="id" title="var">_</span> <a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#ba2b0e492d2b4675a0acf3ea92aabadd"><span class="id" title="notation">∧</span></a> <span class="id" title="var">_</span> ⇒ <span class="id" title="tactic">split</span>; [<span class="id" title="var">handle_subgoal</span> | <span class="id" title="var">split_conjunction</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- <a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#True"><span class="id" title="inductive">True</span></a> ⇒ <span class="id" title="tactic">exact</span> <a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#I"><span class="id" title="constructor">I</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- ?<span class="id" title="var">P</span> ⇒ <span class="id" title="var">is_evar</span> <span class="id" title="var">P</span>; <span class="id" title="tactic">exact</span> <a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Logic.html#I"><span class="id" title="constructor">I</span></a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| |- <span class="id" title="var">_</span> ⇒ <span class="id" title="var">handle_subgoal</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
 
@@ -270,6 +270,7 @@ Now we can defined <span class="inlinecode"><span class="id" title="var">delayed
 <span class="id" title="keyword">Global Hint Extern</span> 0 (<a class="idref" href="coqrel.Delay.html#delay"><span class="id" title="definition">delay</span></a> <span class="id" title="var">_</span>) ⇒ <span class="id" title="var">delay</span> : <span class="id" title="var">core</span>.<br/>
 
 <br/>
+<span class="id" title="keyword">Create HintDb</span> <span class="id" title="var">delay</span>.<br/>
 <span class="id" title="keyword">Global Hint Extern</span> 100 ⇒ <span class="id" title="var">delay</span> : <span class="id" title="var">delay</span>.<br/>
 
 <br/>
@@ -282,8 +283,8 @@ This typeclass wrapper is convenient for performing a nested
 <div class="code">
 
 <br/>
-<span class="id" title="keyword">Class</span> <a id="NonDelayed" class="idref" href="#NonDelayed"><span class="id" title="record">NonDelayed</span></a> (<a id="P:7" class="idref" href="#P:7"><span class="id" title="binder">P</span></a>: <span class="id" title="keyword">Prop</span>) :=<br/>
-&nbsp;&nbsp;<a id="nondelayed" class="idref" href="#nondelayed"><span class="id" title="projection">nondelayed</span></a> : <a class="idref" href="coqrel.Delay.html#P:7"><span class="id" title="variable">P</span></a>.<br/>
+<span class="id" title="keyword">Class</span> <a id="NonDelayed" class="idref" href="#NonDelayed"><span class="id" title="inductive, record"><span id="NonDelayed" class="id">NonDelayed</span></span></a> (<a id="P:7" class="idref" href="#P:7"><span class="id" title="binder">P</span></a>: <span class="id" title="keyword">Prop</span>) :=<br/>
+&nbsp;&nbsp;<a id="nondelayed" class="idref" href="#nondelayed"><span class="id" title="constructor, projection"><span id="nondelayed" class="id">nondelayed</span></span></a> : <a class="idref" href="coqrel.Delay.html#P:7"><span class="id" title="variable">P</span></a>.<br/>
 
 <br/>
 <span class="id" title="keyword">Global Hint Extern</span> 1 (<a class="idref" href="coqrel.Delay.html#NonDelayed"><span class="id" title="class">NonDelayed</span></a> <span class="id" title="var">_</span>) ⇒<br/>
@@ -299,15 +300,15 @@ This typeclass wrapper is convenient for performing a nested
 
  To demonstrate how <span class="inlinecode"><span class="id" title="var">delayed_conjunction</span></span> can be used to reify a
   tactic into a typeclass, we define the <span class="inlinecode"><a class="idref" href="coqrel.Delay.html#EApply"><span class="id" title="record">EApply</span></a></span> typeclass. An
-  instance of <span class="inlinecode"><a class="idref" href="coqrel.Delay.html#EApply"><span class="id" title="record">EApply</span></a></span> <span class="inlinecode"><span class="id" title="var">HT</span></span> <span class="inlinecode"><span class="id" title="var">P</span></span> <span class="inlinecode"><span class="id" title="var">Q</span></span> expresses that if <span class="inlinecode"><span class="id" title="var">H</span></span> is a hypothesis of
-  type <span class="inlinecode"><span class="id" title="var">HT</span></span>, then invoking <span class="inlinecode"><span class="id" title="tactic">eapply</span></span> <span class="inlinecode"><span class="id" title="var">H</span></span> on a goal of type <span class="inlinecode"><span class="id" title="var">Q</span></span> will
+  instance of <span class="inlinecode"><a class="idref" href="coqrel.Delay.html#EApply"><span class="id" title="record">EApply</span></a></span> <span class="inlinecode"><a class="idref" href="coqrel.RelQuotient.html#MAP2.HT"><span class="id" title="variable">HT</span></a></span> <span class="inlinecode"><span class="id" title="var">P</span></span> <span class="inlinecode"><span class="id" title="var">Q</span></span> expresses that if <span class="inlinecode"><span class="id" title="var">H</span></span> is a hypothesis of
+  type <span class="inlinecode"><a class="idref" href="coqrel.RelQuotient.html#MAP2.HT"><span class="id" title="variable">HT</span></a></span>, then invoking <span class="inlinecode"><span class="id" title="tactic">eapply</span></span> <span class="inlinecode"><span class="id" title="var">H</span></span> on a goal of type <span class="inlinecode"><span class="id" title="var">Q</span></span> will
   generate the subgoal conjunction <span class="inlinecode"><span class="id" title="var">P</span></span>. 
 </div>
 <div class="code">
 
 <br/>
-<span class="id" title="keyword">Class</span> <a id="EApply" class="idref" href="#EApply"><span class="id" title="record">EApply</span></a> (<a id="HT:10" class="idref" href="#HT:10"><span class="id" title="binder">HT</span></a> <a id="P:11" class="idref" href="#P:11"><span class="id" title="binder">P</span></a> <a id="Q:12" class="idref" href="#Q:12"><span class="id" title="binder">Q</span></a>: <span class="id" title="keyword">Prop</span>) :=<br/>
-&nbsp;&nbsp;<a id="eapply" class="idref" href="#eapply"><span class="id" title="projection">eapply</span></a> : <a class="idref" href="coqrel.Delay.html#HT:10"><span class="id" title="variable">HT</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="coqrel.Delay.html#P:11"><span class="id" title="variable">P</span></a> <a class="idref" href="http://coq.inria.fr/distrib/V8.15.2/stdlib//Coq.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="coqrel.Delay.html#Q:12"><span class="id" title="variable">Q</span></a>.<br/>
+<span class="id" title="keyword">Class</span> <a id="EApply" class="idref" href="#EApply"><span class="id" title="inductive, record"><span id="EApply" class="id">EApply</span></span></a> (<a id="HT:10" class="idref" href="#HT:10"><span class="id" title="binder">HT</span></a> <a id="P:11" class="idref" href="#P:11"><span class="id" title="binder">P</span></a> <a id="Q:12" class="idref" href="#Q:12"><span class="id" title="binder">Q</span></a>: <span class="id" title="keyword">Prop</span>) :=<br/>
+&nbsp;&nbsp;<a id="eapply" class="idref" href="#eapply"><span class="id" title="constructor, projection"><span id="eapply" class="id">eapply</span></span></a> : <a class="idref" href="coqrel.Delay.html#HT:10"><span class="id" title="variable">HT</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Notations.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="coqrel.Delay.html#P:11"><span class="id" title="variable">P</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.2/corelib//Corelib.Init.Notations.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="coqrel.Delay.html#Q:12"><span class="id" title="variable">Q</span></a>.<br/>
 
 <br/>
 <span class="id" title="keyword">Global Hint Extern</span> 1 (<a class="idref" href="coqrel.Delay.html#EApply"><span class="id" title="class">EApply</span></a> ?<span class="id" title="var">HT</span> <span class="id" title="var">_</span> <span class="id" title="var">_</span>) ⇒<br/>
@@ -321,7 +322,7 @@ This typeclass wrapper is convenient for performing a nested
 </div>
 
 <div id="footer">
-<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://rocq-prover.org/">coqdoc</a>
 </div>
 
 </div>
