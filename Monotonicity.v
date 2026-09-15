@@ -491,7 +491,8 @@ Qed.
 <<
     Hint Extern 1 (RElim (@eq (_ -> _)) _ _ _ _) =>
       eapply f_equal_relim : typeclass_instances.
->> *)
+>>
+  *)
 
 Lemma f_equal_relim {A B} f g m n P Q:
   RElim eq (f m) (g n) P Q ->

@@ -395,7 +395,7 @@ Qed.
   instantiation.
 
   This is a possible workaround:
-<<<
+<<
 Lemma assumption_rstep {P : Prop} :
   P -> RStep True P.
 Proof.
@@ -406,7 +406,7 @@ Global Hint Extern 1 (RStep _ (_ ?x ?y)) =>
   lazymatch goal with
     H : ?R x y |- _ => is_evar R; eexact (assumption_rstep H)
   end : typeclass_instances.
->>>
+>>
   *)
 
 Goal

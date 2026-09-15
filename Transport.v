@@ -137,7 +137,8 @@ Ltac rel_curry2_set_le_transport keyword :=
 <<
     Hint Extern 10 (Transport _ _ _ (writable_block _ _) _) =>
       eapply impl_transport : typeclass_instances.
->> *)
+>>
+  *)
 
 Lemma impl_transport P Q:
   Transport impl P Q P Q.
