@@ -1,6 +1,6 @@
-Require Export Coq.Program.Basics.
-Require Export Coq.Relations.Relation_Definitions.
-Require Export Coq.Classes.Morphisms.
+Require Export Stdlib.Program.Basics.
+Require Export Stdlib.Relations.Relation_Definitions.
+Require Export Stdlib.Classes.Morphisms.
 Require Setoid.
 Require Export Delay.
 
@@ -183,7 +183,7 @@ Global Hint Extern 10 (RStep _ (?R ?x ?x)) =>
 Class RIntro {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rintro: P -> R m n.
 
-Arguments RIntro {A%type B%type} P%type R%rel m n.
+Arguments RIntro {A%_type B%_type} P%_type R%_rel m n.
 
 Ltac rintro :=
   lazymatch goal with
@@ -220,7 +220,7 @@ Qed.
 Class RExists {A B} (P: Prop) (R: rel A B) (m: A) (n: B): Prop :=
   rexists: P -> R m n.
 
-Arguments RExists {A%type B%type} P%type R%rel m n.
+Arguments RExists {A%_type B%_type} P%_type R%_rel m n.
 
 Ltac reexists :=
   lazymatch goal with
@@ -248,7 +248,7 @@ Qed.
 Class RElim {A B} (R: rel A B) (m: A) (n: B) (P Q: Prop): Prop :=
   relim: R m n -> P -> Q.
 
-Arguments RElim {A%type B%type} R%rel m n P%type Q%type.
+Arguments RElim {A%_type B%_type} R%_rel m n P%_type Q%_type.
 
 Ltac relim H :=
   lazymatch goal with
@@ -342,12 +342,12 @@ Class RDestruct {A B: Type} (R: rel A B) (T: rel A B -> Prop) :=
 Class Related {A B} (f: A) (g: B) (R: rel A B) :=
   related: R f g.
 
-Arguments Related {A%type B%type} _ _ R%rel.
+Arguments Related {A%_type B%_type} _ _ R%_rel.
 
 Notation "'@' 'Monotonic' T m R" := (@Related T T m m R%rel)
   (at level 10, T at next level, R at next level, m at next level).
 
-Notation Monotonic m R := (Related m m R%rel).
+Abbreviation Monotonic m R := (Related m m R%rel).
 
 (** We provide a [RStep] instance for unfolding [Related]. *)
 
@@ -369,7 +369,7 @@ Global Hint Extern 1 (RStep _ (Related _ _ _)) =>
 Definition subrel {A B}: rel (rel A B) (rel A B) :=
   fun R1 R2 => forall x y, R1 x y -> R2 x y.
 
-Arguments subrel {A%type B%type} R1%rel R2%rel.
+Arguments subrel {A%_type B%_type} R1%_rel R2%_rel.
 
 Global Instance subrel_preorder A B:
   @PreOrder (rel A B) subrel.
@@ -413,7 +413,7 @@ Definition arrow_rel {A1 A2 B1 B2}:
   rel A1 A2 -> rel B1 B2 -> rel (A1 -> B1) (A2 -> B2) :=
     fun RA RB f g => forall x y, RA x y -> RB (f x) (g y).
 
-Arguments arrow_rel {A1%type A2%type B1%type B2%type} RA%rel RB%rel _ _.
+Arguments arrow_rel {A1%_type A2%_type B1%_type B2%_type} RA%_rel RB%_rel _ _.
 
 Notation "RA ==> RB" := (arrow_rel RA RB)
   (at level 55, right associativity) : rel_scope.
@@ -493,23 +493,23 @@ Definition forall_rel {V1 V2} {E: V1->V2->Type} {FV1: V1->Type} {FV2: V2->Type}:
   fun FE f g =>
     forall v1 v2 (e: E v1 v2), FE v1 v2 e (f v1) (g v2).
 
-Arguments forall_rel {V1%type V2%type E%type FV1%type FV2%type} FE%rel _ _.
+Arguments forall_rel {V1%_type V2%_type E%_type FV1%_type FV2%_type} FE%_rel _ _.
 
 Notation "'forallr' e @ v1 v2 : E , R" :=
   (forall_rel (E := E) (fun v1 v2 e => R))
-  (at level 200, e ident, v1 ident, v2 ident, right associativity) : rel_scope.
+  (at level 200, e pattern, v1 pattern, v2 pattern, right associativity) : rel_scope.
 
 Notation "'forallr' e @ v1 v2 , R" :=
   (forall_rel (fun v1 v2 e => R))
-  (at level 200, e ident, v1 ident, v2 ident, right associativity) : rel_scope.
+  (at level 200, e pattern, v1 pattern, v2 pattern, right associativity) : rel_scope.
 
 Notation "'forallr' e : E , R" :=
   (forall_rel (E := E) (fun _ _ e => R))
-  (at level 200, e ident, right associativity) : rel_scope.
+  (at level 200, e pattern, right associativity) : rel_scope.
 
 Notation "'forallr' e , R" :=
   (forall_rel (fun _ _ e => R))
-  (at level 200, e ident, right associativity) : rel_scope.
+  (at level 200, e pattern, right associativity) : rel_scope.
 
 Lemma forall_rintro {V1 V2 E F1 F2} (FE: forall x y, _ -> rel _ _) f g:
   RIntro

@@ -1,5 +1,5 @@
-Require Import Coq.Classes.Morphisms.
-Require Import Coq.Relations.Relation_Definitions.
+Require Import Stdlib.Classes.Morphisms.
+Require Import Stdlib.Relations.Relation_Definitions.
 Require Import RelDefinitions.
 Require Import RelOperators.
 Require Import Relators.

@@ -1,4 +1,4 @@
-Require Export Coq.Classes.RelationClasses.
+Require Export Stdlib.Classes.RelationClasses.
 Require Export RelDefinitions.
 
 

@@ -16,9 +16,9 @@ Require Import LogicalRelations.
   as predicates on the base type ("subsets")
   satisfying certain properties. This is what we do here. *)
 
-Require Import FunctionalExtensionality.
-Require Import PropExtensionality.
-Require Import ProofIrrelevance.
+Require Import Stdlib.Logic.FunctionalExtensionality.
+Require Import Stdlib.Logic.PropExtensionality.
+Require Import Stdlib.Logic.ProofIrrelevance.
 
 (** It should be noted that the elements of the quotient are
   "non constructive". [explain] *)
@@ -29,25 +29,34 @@ Require Import ProofIrrelevance.
   Elements of [quotient R] as defined below are essentially the
   preimage sets induced by [R]. When [R] is an equivalence relation,
   this will correspond to the usual definition.
-  However, the construction will be meaningful in other cases.
+  However, the construction is meaningful in other cases.
   For example, when [R] is a preorder the construction gives the
   associated partial order. *)
 
-Record quotient {A} {R : relation A} :=
+Record quotient {A B} {R : rel A B} :=
   {
     in_eqcl : A -> Prop;
-    in_eqcl_wf : exists a, forall x, in_eqcl x <-> R x a;
+    in_eqcl_wf : exists b, forall a, in_eqcl a <-> R a b;
   }.
 
-Arguments quotient {A} R.
+Arguments quotient {A B} R.
 
-Local Obligation Tactic := solve [rauto | firstorder].
+Local Obligation Tactic := try solve [rauto | firstorder].
+
+Lemma quotient_ext_eq {A B R} (x y : @quotient A B R) :
+  (forall a, in_eqcl x a <-> in_eqcl y a) -> x = y.
+Proof.
+  destruct x as [x [xb Hx]], y as [y [yb Hy]]. cbn. intros H.
+  cut (x = y). { intro. subst. f_equal. apply proof_irrelevance. }
+  apply functional_extensionality. intros a.
+  apply propositional_extensionality. firstorder.
+Qed.
 
 (** Obtaining the equivalence class associated with
   an element of the base type is straightforward. *)
 
-Program Definition eqcl {A} (R : relation A) (a : A) : quotient R :=
-  {| in_eqcl u := R u a |}.
+Program Definition eqcl {A B} (R : rel A B) (b : B) : quotient R :=
+  {| in_eqcl a := R a b |}.
 
 Global Instance eqcl_params :
   Params (@eqcl) 1 := {}.
@@ -57,29 +66,26 @@ Global Instance eqcl_params :
 (** The preimage sets used to define the [quotient] type can be
   ordered by inclusion. *)
 
-Definition qle {A} {R : relation A} : relation (quotient R) :=
-  fun x y => forall u, in_eqcl x u -> in_eqcl y u.
+Definition qle {A B} {R : rel A B} : relation (quotient R) :=
+  fun x y => forall a, in_eqcl x a -> in_eqcl y a.
 
 (** The induced ordering is always a partial order, no matter what
   properties [R] may or may not have. *)
 
-Global Instance eqcl_le_preo {A} (R : relation A) :
-  PreOrder (@qle A R).
+Global Instance eqcl_le_preo {A B} (R : rel A B) :
+  PreOrder (@qle A B R).
 Proof.
   firstorder.
 Qed.
 
-Global Instance eqcl_le_po {A} (R : relation A) :
-  PartialOrder eq (@qle A R).
+Global Instance eqcl_le_po {A B} (R : rel A B) :
+  PartialOrder eq (@qle A B R).
 Proof.
   intros x y. cbn.
   split.
   - intros [ ]. firstorder.
   - unfold flip, qle. intros [Hxy Hyx].
-    destruct x as [x [xa Hx]], y as [y [ya Hy]]; cbn in *.
-    cut (x = y). { intro. subst. f_equal. apply proof_irrelevance. }
-    apply functional_extensionality. intros a.
-    apply propositional_extensionality. firstorder.
+    apply quotient_ext_eq. firstorder.
 Qed.
 
 (** ** Properties *)
@@ -107,23 +113,23 @@ Qed.
   Below I attempt to formalize the corresponding properties
   in a fine-grained manner. *)
 
-Section PROPERTIES.
+(** Every element in the quotient set is obtained as the equivalence
+  class of an element of [A]. *)
+
+Lemma eqcl_surjective {A B} (R : rel A B) (x : quotient R) :
+  exists a, x = eqcl R a.
+Proof.
+  destruct (in_eqcl_wf x) as [a Ha]. exists a.
+  apply antisymmetry; firstorder.
+Qed.
+
+Section EQCL_PROPERTIES.
   Context {A} (R : relation A).
-
-  (** Every element in the quotient set is obtained as the equivalence
-    class of an element of [A]. *)
-
-  Lemma eqcl_surjective (x : quotient R) :
-    exists a, x = eqcl R a.
-  Proof.
-    destruct (in_eqcl_wf x) as [a Ha]. exists a.
-    apply antisymmetry; firstorder.
-  Qed.
 
   (** If [R] is transitive, then the principal downsets associated
     with related elements are ordered accordingly. *)
 
-  Global Instance eqcl_of_le `{HR : !Transitive R} :
+  Global Instance eqcl_le `{HR : !Transitive R} :
     Monotonic (eqcl R) (R ++> qle).
   Proof.
     intros u v Huv a. cbn. intro. rauto.
@@ -131,18 +137,110 @@ Section PROPERTIES.
 
   (** If [R] is a PER, then related elements become equal. *)
 
-  Global Instance eqcl_of_eq `{HR : !PER R} :
+  Global Instance eqcl_eq `{HR : !PER R} :
     Monotonic (eqcl R) (R ++> eq).
   Proof.
     intros u v Huv.
     apply antisymmetry; rauto.
   Qed.
 
-  (** If [R] is a reflexive, only related elements can become ordered. *)
+  (** If [R] is reflexive, only related elements can become ordered. *)
 
   Theorem eqcl_reflection `{HR : !Reflexive R} :
     forall x y, qle (eqcl R x) (eqcl R y) -> R x y.
   Proof.
     firstorder.
   Qed.
-End PROPERTIES.
+End EQCL_PROPERTIES.
+
+(** ** Homomorphisms *)
+
+(** Under certain conditions, functions on base types can be lifted to
+  functions between quotient types. It is not completely clear to me
+  at this point how to best express the most general version of this,
+  but the treatment below is good enough for preorders. *)
+
+Section HOM.
+  Context {A} (R : relation A) `{HR : !Reflexive R}.
+  Context {B} (S : relation B) `{HS : !Transitive S}.
+  Context (f : A -> B) `{Hf : Monotonic f (R ++> S)}.
+
+  Program Definition qmap (x : quotient R) : quotient S :=
+    {| in_eqcl b :=
+        exists xa, (forall a, in_eqcl x a <-> R a xa) /\ S b (f xa) |}.
+  Next Obligation.
+    intros [x [xa Hxa]]. cbn.
+    exists (f xa). intros b. split.
+    - intros (xa' & Hxa' & Hb).
+      transitivity (f xa'); auto. clear b Hb.
+      rstep. apply Hxa. apply Hxa'. reflexivity.
+    - intros Hb. exists xa. auto.
+  Qed.
+
+  Lemma qmap_eqcl a :
+    qmap (eqcl R a) = eqcl S (f a).
+  Proof.
+    apply quotient_ext_eq.
+    cbn. firstorder.
+  Qed.
+End HOM.
+
+(** The quotient maps induced by the construction above are monotonic. *)
+
+Global Instance qmap_qle :
+  Monotonic (@qmap) (forallr -, forallr -, rel_top ==>
+                     forallr -, forallr -, rel_top ==>
+                     forallr -, rel_top ==>
+                     qle ++> qle).
+Proof.
+  intros A R HR HR' _ B S HS HS' _ f Hf Hf' _.
+  intros [x [xa Hxa]] [y [ya Hya]]. unfold qle; cbn. intros Hxy.
+  intros b (xa' & Hxa' & Hb).
+  exists ya. split; auto.
+  transitivity (f xa'); auto. clear b Hb. rstep.
+  apply Hya. apply Hxy. apply Hxa'. reflexivity.
+Qed.
+
+(** ** Pairs *)
+
+Section PROD.
+  Context {A1 B1} {R1 : rel A1 B1}.
+  Context {A2 B2} {R2 : rel A2 B2}.
+
+  Program Definition qpair (x : quotient R1) (y : quotient R2) : quotient (R1 * R2) :=
+    {| in_eqcl '(a1, a2) := in_eqcl x a1 /\ in_eqcl y a2 |}.
+  Next Obligation.
+    intros [x [xb Hxb]] [y [yb Hyb]].
+    exists (xb, yb). intros [xa ya].
+    cbn. firstorder.
+  Qed.
+
+  Lemma qpair_eqcl b1 b2 :
+    qpair (eqcl R1 b1) (eqcl R2 b2) = eqcl (R1 * R2) (b1, b2).
+  Proof.
+    apply quotient_ext_eq.
+    intros [a1 a2]. cbn. firstorder.
+  Qed.
+End PROD.
+
+Section MAP2.
+  Context {A} (R : relation A) `{HR : !Reflexive R}.
+  Context {B} (S : relation B) `{HS : !Reflexive S}.
+  Context {C} (T : relation C) `{HT : !Transitive T}.
+  Context (f : A -> B -> C) `{Hf : !Monotonic f (R ++> S ++> T)}.
+
+  Program Definition qmap2 (x : quotient R) (y : quotient S) :=
+    qmap (R * S) T (fun '(a, b) => f a b) (Hf := _) (qpair x y).
+  Next Obligation.
+    intros x y [a1 b1] [a2 b2] [Ha Hb].
+    cbn in *. rauto.
+  Qed.
+
+  Lemma qmap2_eqcl a b :
+    qmap2 (eqcl R a) (eqcl S b) = eqcl T (f a b).
+  Proof.
+    unfold qmap2.
+    rewrite qpair_eqcl, qmap_eqcl.
+    reflexivity.
+  Qed.
+End MAP2.

@@ -40,7 +40,7 @@ Qed.
 
 (** For [set_le] the situation is slightly more involved, for two
   reasons. First, a regular [eapply set_le_transport] fails to unify
-  the parameter [B] of [Transport] against the [_ -> Prop] provied by
+  the parameter [B] of [Transport] against the [_ -> Prop] provided by
   the instance below. This can be worked around by pre-unifying that
   specific parameter. Second, because [set_le_transport] is
   potentially applicable to virtually any hypothesis (since there is
@@ -79,7 +79,7 @@ Ltac set_le_transport keyword :=
       end
   end.
       
-(** We defined a few more relation patterns based on [set_le] and
+(** We define a few more relation patterns based on [set_le] and
   [rel_curry], with a similar strategy. *)
 
 Lemma rel_curry_set_le_transport {A1 A2 B1 B2} R sA sB (a1: A1) (a2: A2):
@@ -137,7 +137,8 @@ Ltac rel_curry2_set_le_transport keyword :=
 <<
     Hint Extern 10 (Transport _ _ _ (writable_block _ _) _) =>
       eapply impl_transport : typeclass_instances.
->> *)
+>>
+  *)
 
 Lemma impl_transport P Q:
   Transport impl P Q P Q.

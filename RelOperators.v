@@ -7,7 +7,7 @@ Require Import Relators.
 Definition rel_union {A B} (R1 R2: rel A B): rel A B :=
   fun x y => R1 x y \/ R2 x y.
 
-Arguments rel_union {_ _} R1%rel R2%rel _ _.
+Arguments rel_union {_ _} R1%_rel R2%_rel _ _.
 
 Infix "\/" := rel_union : rel_scope.
 
@@ -119,7 +119,7 @@ Global Hint Extern 1 (Symmetric (_ \/ _)) =>
 Definition rel_inter {A B} (R1 R2: rel A B): rel A B :=
   fun x y => R1 x y /\ R2 x y.
 
-Arguments rel_inter {_ _} R1%rel R2%rel _ _.
+Arguments rel_inter {_ _} R1%_rel R2%_rel _ _.
 
 Infix "/\" := rel_inter : rel_scope.
 
@@ -342,7 +342,7 @@ Qed.
 Definition eqrel {A B}: rel (rel A B) (rel A B) :=
   (subrel /\ flip subrel)%rel.
 
-Arguments eqrel {_ _} RA%rel RB%rel.
+Arguments eqrel {_ _} RA%_rel RB%_rel.
 
 Global Instance eqrel_equivalence A B:
   Equivalence (@eqrel A B).
@@ -438,14 +438,9 @@ Definition rel_pull {A B A' B'} f g (R: rel A' B'): rel A B :=
 (** We use the following notation. Left associativity would make more
   sense but we have to match [Coq.Classes.RelationPairs]. *)
 
-Notation "R @@ ( f , g )" := (rel_pull f g R)
-  (at level 30, right associativity) : rel_scope.
-
-Notation "R @@ f" := (rel_pull f f R)
-  (at level 30, right associativity) : rel_scope.
-
-Notation "R @@ ( f )" := (rel_pull f f R)
-  (at level 30, right associativity) : rel_scope.
+Notation "R @@ ( f , g )" := (rel_pull f g R) (at level 1) : rel_scope.
+Notation "R @@ f" := (rel_pull f f R) (at level 1) : rel_scope.
+Notation "R @@ ( f )" := (rel_pull f f R) (at level 1) : rel_scope.
 
 Global Instance rel_pull_subrel {A B A' B'} (f: A -> A') (g: B -> B'):
   Monotonic (rel_pull f g) (subrel ++> subrel).
